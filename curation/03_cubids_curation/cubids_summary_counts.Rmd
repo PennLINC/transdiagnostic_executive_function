@@ -1,0 +1,102 @@
+---
+title: "cubids_summary_counts"
+output: html_document
+date: "2025-02-28"
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(ggplot2)
+library(ggrepel)
+library(dplyr)
+```
+
+
+
+```{r load cubids summary, include=TRUE}
+# Read cubids summary tsv file
+cubids_summary <- read.delim('/Users/bsevchik/projects/EF_cubids_validation/final_cubids_validation_files/v42_summary.tsv', header = TRUE, stringsAsFactors = FALSE)
+
+cubids_summary
+```
+
+
+
+```{r summary cubids calculations, include=TRUE}
+
+# Define a function to process each image type categirt
+process_image_type <- function(df, pattern, extra_pattern = NULL, exclude_pattern = NULL, image_type) {
+  filtered_data <- df %>%
+    filter(grepl(pattern, KeyParamGroup, ignore.case = TRUE)) %>%
+    filter(!grepl("fmap", KeyParamGroup, ignore.case = TRUE))  # Exclude fmap rows
+
+  # Apply extra inclusion filter if provided
+  if (!is.null(extra_pattern)) {
+    filtered_data <- filtered_data %>%
+      filter(grepl(extra_pattern, KeyParamGroup, ignore.case = TRUE))
+  }
+
+  # Apply exclusion filter if provided
+  if (!is.null(exclude_pattern)) {
+    filtered_data <- filtered_data %>%
+      filter(!grepl(exclude_pattern, KeyParamGroup, ignore.case = TRUE))
+  }
+
+  # If no data matches the criteria, return NULL
+  if (nrow(filtered_data) == 0) {
+    return(NULL)
+  }
+
+  # Calculate the number of scans in total
+  number_scans_total <- sum(filtered_data$Counts, na.rm = TRUE)
+  
+  # Identify the dominant scan count 
+  number_scans_dominant <- max(filtered_data$Counts, na.rm = TRUE)
+  
+  # Compute percentage (avoid division by zero)
+  percentage_dominant <- ifelse(number_scans_total > 0, 
+                                (number_scans_dominant / number_scans_total) * 100, 
+                                0)
+
+  return(data.frame(
+    `image type` = image_type,
+    `number of scans in dominant group` = number_scans_dominant,
+    `number of scans in total` = number_scans_total,
+    `percentage of scans in dominant group` = percentage_dominant
+  ))
+}
+
+# Define the categories with patterns in cubids_summary data frame
+categories <- list(
+  list(pattern = "T1w", image_type = "T1"),
+  list(pattern = "dwi", image_type = "Diffusion"),
+  list(pattern = "rest", extra_pattern = "run-01", image_type = "resting state fMRI run 01"),
+  list(pattern = "rest", extra_pattern = "run-02", image_type = "resting state fMRI run 02"),
+  list(pattern = "rest", extra_pattern = "run-03", image_type = "resting state fMRI run 03"),
+  list(pattern = "nback", extra_pattern = "run-01", image_type = "task fMRI run 01"),
+  list(pattern = "nback", extra_pattern = "run-02", image_type = "task fMRI run 02"),
+  list(pattern = "asl", image_type = "ASL"),
+  list(pattern = "m0scan", image_type = "m0 scan"),
+  list(pattern = "T2w", extra_pattern = "norm", image_type = "T2w normalized"),  # Ensure only T2w with "norm"
+  list(pattern = "T2w", exclude_pattern = "norm", image_type = "T2w")           # Ensure only T2w without "norm"
+)
+
+# Apply the function to each image type category
+new_df_list <- lapply(categories, function(cat) {
+  process_image_type(cubids_summary, cat$pattern, cat$extra_pattern, cat$exclude_pattern, cat$image_type)
+})
+
+# Combine results while handling NULL cases
+cubids_image_summary <- do.call(rbind, new_df_list)
+
+
+cubids_image_summary
+```
+
+
+
+
+
+
