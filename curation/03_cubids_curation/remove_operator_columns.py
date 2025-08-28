@@ -2,7 +2,7 @@ import os
 import pandas as pd
 
 # Define the root directory for your dataset
-root_dir = "/cbica/projects/executive_function/data/bids/EF_bids_data_DataLad"
+root_dir = "/cbica/projects/executive_function/data/bids/EF_bids_data_DataLad" #CUBIC project path
 
 
 # Walk through the directory to find all scans.tsv files

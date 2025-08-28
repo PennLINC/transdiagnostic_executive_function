@@ -2,8 +2,12 @@ import pandas as pd
 import os
 import glob
 
+"""
+This script anonymizes the acquisition time in the scans.tsv files such that the time is accurate, but the date is set to January 1, 1800
+"""
+
 # Define the base directory
-base_dir = "/cbica/projects/executive_function/data/bids/scans_tsv_temp"
+base_dir = "/cbica/projects/executive_function/data/bids/scans_tsv_temp" #CUBIC project path
 
 # Recursively find all _scans.tsv files
 tsv_files = glob.glob(os.path.join(base_dir, "sub-*/ses-*/*_scans.tsv"))

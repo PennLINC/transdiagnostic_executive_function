@@ -24,5 +24,5 @@ def rename_anat_files(bids_root):
                 os.rename(old_path, new_path)
 
 # Set the BIDS dataset root directory
-bids_root = "/cbica/projects/executive_function/data/bids/EF_bids_data_DataLad"
+bids_root = "/cbica/projects/executive_function/data/bids/EF_bids_data_DataLad" #CUBIC project path
 rename_anat_files(bids_root)

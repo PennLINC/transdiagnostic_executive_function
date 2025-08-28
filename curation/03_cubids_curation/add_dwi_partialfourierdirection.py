@@ -3,7 +3,7 @@ import json
 from glob import glob
 
 # Define the base directory
-base_dir = "/cbica/projects/executive_function/data/bids/EF_bids_data_DataLad"
+base_dir = "/cbica/projects/executive_function/data/bids/EF_bids_data_DataLad" #CUBIC project path
 
 # Dry run: set to True to preview changes without saving
 dry_run = False
@@ -21,7 +21,7 @@ for dwi_file in glob(os.path.join(base_dir, "sub-*", "ses-*", "dwi", "*_dwi.json
             continue
         
         # Add PartialFourierDirection field
-        proposed_change = {"PartialFourierDirection": "y"}
+        proposed_change = {"PartialFourierDirection": "y"} 
         
         # Show proposed changes
         print(f"\nFile: {dwi_file}")

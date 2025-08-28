@@ -2,7 +2,7 @@ import os
 import shutil
 
 # Set the root directory where all subjects are located
-root_dir = '/cbica/projects/executive_function/data/bids/EF_bids_data_DataLad'
+root_dir = '/cbica/projects/executive_function/data/bids/EF_bids_data_DataLad' #CUBIC project path
 
 # Loop through each subject directory
 for subject_dir in os.listdir(root_dir):

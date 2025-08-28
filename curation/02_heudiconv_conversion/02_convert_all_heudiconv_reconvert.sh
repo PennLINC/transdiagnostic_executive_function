@@ -8,8 +8,8 @@
 #SBATCH --error=/cbica/projects/executive_function/code/heudiconv/logs/heudiconv_%A_%a.err  # Error log
 
 # Define paths
-base_dir="/cbica/projects/executive_function/data/bids/sourcedata/EFR01"
-output_dir="/cbica/projects/executive_function/data/bids/EF_bids_data_reconverted"
+base_dir="/cbica/projects/executive_function/data/bids/sourcedata/EFR01" #CUBIC project path to data downloaded from Flywheel
+output_dir="/cbica/projects/executive_function/data/bids/EF_bids_data_reconverted" #CUBIC project path
 
 # Step 1: Get all subject IDs
 subjects=("20124" "20125" "20141" "20236" "20333" "20335" "20336" "20347" "20350" "20305" "19861" "20139" "20214" "20259" "20410" "20253" "20399" "20188" "20252" "20352" "20149")
@@ -37,7 +37,7 @@ for session_dir in "${session_dirs[@]}"; do
 
     # Run heudiconv with dynamic session renaming
     heudiconv \
-        -f /cbica/projects/executive_function/dropbox/heuristic_cubic_2_reconvert.py \
+        -f /cbica/projects/executive_function/dropbox/heuristic_cubic_2_reconvert.py \  # corresponds to 02_heuristic_reconvert.py in github folder
         -o "$output_dir" \
         --files $session_dir/ACQUISITIONS/*/FILES/*/*.dcm \
         -s "$subID" \

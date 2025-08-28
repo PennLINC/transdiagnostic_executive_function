@@ -2,7 +2,7 @@ import os
 import json
 
 # Define the root directory where your BIDS dataset is located
-bids_root = '/cbica/projects/executive_function/data/bids/EF_bids_data_DataLad'
+bids_root = '/cbica/projects/executive_function/data/bids/EF_bids_data_DataLad' #CUBIC project path
 
 # Define the fields to add and update for ASL JSON files
 asl_update_fields = {

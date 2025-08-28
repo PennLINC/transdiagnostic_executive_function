@@ -2,8 +2,14 @@ import os
 import pandas as pd
 from datetime import datetime, timedelta
 
+"""
+This script anonymizes acquisition time in the sessions.tsv files, while still maintaining accurate relative times in between sessions. 
+Session 1 for each subject is set to the 15th of the original month in 1800.
+Subsequent sessions are adjusted accordingly such that the distance between acquisition times for each session are still accurate.
+"""
+
 # Path to the scans_tsv_temp2 directory
-base_dir = "/cbica/projects/executive_function/data/bids/scans_tsv_temp2"
+base_dir = "/cbica/projects/executive_function/data/bids/scans_tsv_temp2" #CUBIC project path
 
 # Function to round time to the nearest hour
 def round_to_nearest_hour(dt):

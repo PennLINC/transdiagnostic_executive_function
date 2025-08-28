@@ -16,7 +16,7 @@ library(dplyr)
 
 ```{r clean original demographics csv file}
 # Read the demographics CSV file
-demographic_data <- read.csv("/Users/bsevchik/projects/EF_clinical/demographics/efr_demographics_original.csv")
+demographic_data <- read.csv("/Users/bsevchik/projects/EF_clinical/demographics/efr_demographics_original.csv") # local path
 demographic_data
 
 # Read participants_scanned csv
@@ -35,18 +35,19 @@ demographic_data <- demographic_data %>%
 demographic_data
 
 
-# Only include subjects that were scanned
+# Only include subjects that were scanned/have T1 scans
 demographic_data_scanned <- demographic_data %>%
   filter(participant_id %in% participants_scanned_df$participant_id)
 demographic_data_scanned
-write.csv(demographic_data_scanned, "/Users/bsevchik/projects/EF_clinical/demographics/demographics_data_scanned.csv", row.names = FALSE)
+write.csv(demographic_data_scanned, "/Users/bsevchik/projects/EF_clinical/demographics/demographics_data_scanned.csv", row.names = FALSE) # local path
 
 
 
 ```
 
 ```{r edit study groups to be correct}
-# change study groups that were wrong in both demographic data & clinical diagnostic data
+# change study groups that were wrong in both demographic data & clinical diagnostic data. The inaccuracies were identified and corrected after consultation with the study team.
+
 UPDATED_demographic_data_scanned <- demographic_data_scanned %>%
   mutate(
     study_group = case_when(
@@ -56,7 +57,7 @@ UPDATED_demographic_data_scanned <- demographic_data_scanned %>%
   )
 UPDATED_demographic_data_scanned
 
-# have to do this again bc some additional subjects wrong in demographic data but not wrong in clinical diagnostic data - confirmed with Oracle search
+# have to do this again bc some additional subjects wrong in demographic data but not wrong in clinical diagnostic data - confirmed with members of team and in storage database
 UPDATED_demographic_data_scanned <- UPDATED_demographic_data_scanned %>%
   mutate(
     study_group = case_when(
@@ -67,12 +68,12 @@ UPDATED_demographic_data_scanned <- UPDATED_demographic_data_scanned %>%
   )
 UPDATED_demographic_data_scanned
 
-write.csv(UPDATED_demographic_data_scanned, "/Users/bsevchik/projects/EF_clinical/demographics/UPDATED_demographic_data_scanned.csv", row.names = FALSE)
+write.csv(UPDATED_demographic_data_scanned, "/Users/bsevchik/projects/EF_clinical/demographics/UPDATED_demographic_data_scanned.csv", row.names = FALSE) # local path
 
 
 
 ```
-UPDATED_demographic_data_scanned is the final csv file. This contains fixed study groups as well, and only participants that were actually scanned as well.
+UPDATED_demographic_data_scanned is the final csv file. This contains fixed study groups and only participants that were actually scanned.
 
 
 
@@ -80,10 +81,10 @@ UPDATED_demographic_data_scanned is the final csv file. This contains fixed stud
 
 
 
-######
-
+Create summary tables for demographic info.
 
 ```{r demographic tables}
+
 # Table 1: Diagnosis 
 diagnosis_table <- UPDATED_demographic_data_scanned %>%
   mutate(study_group = if_else(is.na(study_group), "N/A", study_group)) %>%
@@ -120,121 +121,13 @@ print(age_mean)
 ```
 
 
-```{r pie charts}
-# Diagnosis Pie Chart
-png(filename = "/Users/bsevchik/projects/EF_clinical/demographics/diagnosis_pie_chart.png", 
-    width = 3000, height = 2000, res = 300)
-
-diagnosis_pie_chart <- ggplot(diagnosis_table, aes(x = "", y = n, fill = study_group)) +
-  geom_bar(width = 1, stat = "identity") +
-  coord_polar("y", start = 0) +
-  labs(title = "Diagnosis", fill = "Diagnosis") +
-  theme_void() +
-  theme(plot.title = element_text(hjust = 0.5)) +
-  geom_label_repel(aes(label = paste0(round(percent, 1), "%")),
-                   position = position_stack(vjust = 0.5),
-                   size = 4,  # Keep text readable
-                   box.padding = 0.5,  # Adds space around text to prevent overlap
-                   point.padding = 0.3, 
-                   direction = "both", # Allows free movement
-                   show.legend = FALSE) + # Removes extra label in legend
-  scale_fill_manual(values = c("ADHD" = "#B6A6E9", "PRO/CHR" = "#4394E5", "TD/NC" = "#AFDC8F", "Unknown" = "#F8AE54")) +
-guides(fill = guide_legend(title = NULL))  # Removes the legend title
-diagnosis_pie_chart
-
-print(diagnosis_pie_chart)
-dev.off()
-
-# Sex Pie Chart
-png(filename = "/Users/bsevchik/projects/EF_clinical/demographics/sex_pie_chart.png", 
-    width = 3000, height = 2000, res = 300)
-
-sex_pie_chart <- ggplot(sex_table, aes(x = "", y = n, fill = sex)) +
-  geom_bar(width = 1, stat = "identity") +
-  coord_polar("y", start = 0) +
-  labs(title = "Sex", fill = "Sex") +
-  theme_void() +
-  theme(plot.title = element_text(hjust = 0.5)) +
-  geom_label_repel(aes(label = paste0(round(percent, 1), "%")),
-                   position = position_stack(vjust = 0.5),
-                   size = 4,  # Keep text readable
-                   box.padding = 0.5,  # Adds space around text to prevent overlap
-                   point.padding = 0.3, 
-                   direction = "both", # Allows free movement
-                   show.legend = FALSE) +  # Removes extra label in legend
-  scale_fill_manual(values = c("M" = "#B6A6E9", "F" = "#4394E5")) +
-  guides(fill = guide_legend(title = NULL))  # Removes the legend title
-sex_pie_chart
-print(sex_pie_chart)
-dev.off()
-
-
-# Ethnicity Pie Chart
-#ethnicity_pie_chart <- ggplot(ethnicity_table, aes(x = "", y = n, fill = ethnic)) +
-  #geom_bar(width = 1, stat = "identity") +
-  #coord_polar("y", start = 0) +
-  #labs(title = "Ethnicity", fill = "Ethnic") +
-  #theme_void() +
-  #theme(plot.title = element_text(hjust = 0.5)) +
-  #geom_text(aes(label = paste0(round(percent, 1), "%")),
-            #position = position_stack(vjust = 0.5))
-#ethnicity_pie_chart
-
-
-# Ethnicity Pie Chart
-png(filename = "/Users/bsevchik/projects/EF_clinical/demographics/ethnicity_pie_chart.png", 
-    width = 3000, height = 2000, res = 300)
-
-ethnicity_pie_chart <- ggplot(ethnicity_table, aes(x = "", y = n, fill = ethnicity)) +
-  geom_bar(width = 1, stat = "identity") +
-  coord_polar("y", start = 0) +
-  labs(title = "Ethnicity", fill = "Ethnicity") +
-  theme_void() +
-  theme(plot.title = element_text(hjust = 0.5)) +
-  geom_label_repel(aes(label = paste0(round(percent, 1), "%")),
-                   position = position_stack(vjust = 0.5),
-                   size = 4,  # Keep text readable
-                   box.padding = 0.5,  # Adds space around text to prevent overlap
-                   point.padding = 0.3, 
-                   direction = "both", # Allows free movement
-                   show.legend = FALSE) +  # Removes extra label in legend
-   scale_fill_manual(values = c("Hispanic" = "#B6A6E9", "N/A" = "#4394E5", "Non - Hispanic" = "#AFDC8F")) +
-  guides(fill = guide_legend(title = NULL))  # Removes the legend title
-ethnicity_pie_chart
-print(ethnicity_pie_chart)
-dev.off()
-
-
-# Race pie chart
-png(filename = "/Users/bsevchik/projects/EF_clinical/demographics/race_pie_chart.png", 
-    width = 3000, height = 2000, res = 300)
-
-race_pie_chart <- ggplot(race_table, aes(x = "", y = n, fill = race)) +
-  geom_bar(width = 1, stat = "identity") +
-  coord_polar("y", start = 0) +
-  labs(title = "Race", fill = "Race") +
-  theme_void() +
-  theme(plot.title = element_text(hjust = 0.5)) +
-  geom_label_repel(aes(label = paste0(round(percent, 1), "%")),
-                   position = position_stack(vjust = 0.5),
-                   size = 4,  # Keep text readable
-                   box.padding = 0.5,  # Adds space around text to prevent overlap
-                   point.padding = 0.3, 
-                   direction = "both", # Allows free movement
-                   show.legend = FALSE) +  # Removes extra label in legend
-   scale_fill_manual(values = c("Asian" = "#B6A6E9", "Black or African American" = "#4394E5", "More than one race" = "#AFDC8F", "Unknown or not reported" = "#F8AE54", "White" = "#92C5F9")) +
-  guides(fill = guide_legend(title = NULL))  # Removes the legend title
-race_pie_chart
-print(race_pie_chart)
-dev.off()
-
-```
+Create bar charts to visualize demographic info.
 
 ```{r bar charts}
 
 # Diagnosis Bar Chart
 png(filename = "/Users/bsevchik/projects/EF_clinical/demographics/diagnosis_bar_chart.png", 
-    width = 2000, height = 2000, res = 300)
+    width = 2000, height = 2000, res = 300) # local path
 
 ggplot(diagnosis_table, aes(x = reorder(study_group, -percent), y = percent, fill = study_group)) +
   geom_col() +
@@ -253,7 +146,7 @@ dev.off()
 
 # Sex Bar Chart
 png(filename = "/Users/bsevchik/projects/EF_clinical/demographics/sex_bar_chart.png", 
-    width = 2000, height = 2000, res = 300)
+    width = 2000, height = 2000, res = 300) # local path
 
 ggplot(sex_table, aes(x = sex, y = percent, fill = sex)) +
   geom_col() +
@@ -272,7 +165,7 @@ dev.off()
 
 # Ethnicity Bar Chart
 png(filename = "/Users/bsevchik/projects/EF_clinical/demographics/ethnicity_bar_chart.png", 
-    width = 2000, height = 2000, res = 300)
+    width = 2000, height = 2000, res = 300) # local path
 
 ggplot(ethnicity_table, aes(x = ethnicity, y = percent, fill = ethnicity)) +
   geom_col() +
@@ -291,7 +184,7 @@ dev.off()
 
 # Race Bar Chart
 png(filename = "/Users/bsevchik/projects/EF_clinical/demographics/race_bar_chart.png", 
-    width = 3000, height = 2000, res = 300)
+    width = 3000, height = 2000, res = 300) # local path
 
 ggplot(race_table, aes(x = reorder(race, -percent), y = percent, fill = race)) +
   geom_col() +
@@ -319,65 +212,9 @@ dev.off()
 
 
 
-```{r stacked bar chart example}
-png(filename = "/Users/bsevchik/projects/EF_clinical/demographics/race_diagnosis_bar_chart.png", 
-    width = 3000, height = 2000, res = 300)
-
-race_diagnosis_bar_chart <- UPDATED_demographic_data_scanned %>%
-  count(study_group, race) %>%
-  group_by(study_group) %>%
-  mutate(percent = (n / sum(n)) * 100) %>%
-  ggplot(aes(x = study_group, y = percent, fill = race)) +
-  geom_bar(stat = "identity", position = "fill") +
-  scale_y_continuous(labels = scales::percent_format(scale = 1)) +  # Convert to percentage
-  labs(title = "Race Distribution by Study Group", x = "Group", y = "Percentage") +
-  theme_minimal() +
-  theme(plot.title = element_text(hjust = 0.5)) +
-  scale_fill_manual(values = c("Asian" = "#B6A6E9", "Black or African American" = "#4394E5", "More than one race" = "#AFDC8F", "Unknown or not reported" = "#F8AE54", "White" = "#92C5F9")) +
-  geom_text(aes(label = paste0(round(percent, 1), "%")), 
-            position = position_fill(vjust = 0.5), size = 3.5, color = "black")
-race_diagnosis_bar_chart
-print(race_diagnosis_bar_chart)
-dev.off()
-```
-
-```{r violin plot for age}
-png(filename = "/Users/bsevchik/projects/EF_clinical/demographics/age_violin_plot.png", 
-    width = 3000, height = 2000, res = 300)
-
-# Create the violin plot with jittered points
-age_violin_plot <- ggplot(UPDATED_demographic_data_scanned, aes(x = "", y = age)) +
-  geom_violin(fill = "#92C5F9", color = "black", alpha = 0.7) +  # Violin plot
-  geom_boxplot(width = 0.1, fill = "white", outlier.shape = NA) +  # Boxplot inside violin
-  geom_jitter(width = 0.1, color = "black", size = 1.5, alpha = 0.6) +  # Individual points
-  labs(title = "Age Distribution of Study Sample at Intake",
-       y = "Age",
-       x = "") +
-  theme_minimal() +
-  theme(plot.title = element_text(hjust = 0.5))
-age_violin_plot
-print(age_violin_plot)
-dev.off()
-
-
-png(filename = "/Users/bsevchik/projects/EF_clinical/demographics/age_histogram.png", 
-    width = 3000, height = 2000, res = 300)
-# Histogram for age
-age_histogram <- ggplot(UPDATED_demographic_data_scanned, aes(x = age)) +
-  geom_histogram(binwidth = 5, fill = "steelblue", color = "white") +
-  labs(title = "Histogram of Ages", x = "Age", y = "Count") +
-  theme_minimal()
-age_histogram
-print(age_histogram)
-dev.off()
-
-
-```
-
-
 ```{r histogram for age}
 png(filename = "/Users/bsevchik/projects/EF_clinical/demographics/age_histogram.png", 
-    width = 2300, height = 2000, res = 300, bg = "transparent")
+    width = 2300, height = 2000, res = 300, bg = "transparent") # local path
 
 age_histogram <- ggplot(demographic_data, aes(x = age)) +
   geom_histogram(binwidth = 1, fill = "#92C5F9", color = "black", alpha = 0.9) +

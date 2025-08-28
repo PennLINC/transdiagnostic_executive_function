@@ -17,7 +17,7 @@ library(dplyr)
 
 ```{r load cubids summary, include=TRUE}
 # Read cubids summary tsv file
-cubids_summary <- read.delim('/Users/bsevchik/projects/EF_cubids_validation/final_cubids_validation_files/v42_summary.tsv', header = TRUE, stringsAsFactors = FALSE)
+cubids_summary <- read.delim('/Users/bsevchik/projects/EF_cubids_validation/final_cubids_validation_files/v42_summary.tsv', header = TRUE, stringsAsFactors = FALSE) # local path - replace
 
 cubids_summary
 ```
@@ -25,6 +25,7 @@ cubids_summary
 
 
 ```{r summary cubids calculations, include=TRUE}
+### Identify % dominant scans for each image modality
 
 # Define a function to process each image type categirt
 process_image_type <- function(df, pattern, extra_pattern = NULL, exclude_pattern = NULL, image_type) {

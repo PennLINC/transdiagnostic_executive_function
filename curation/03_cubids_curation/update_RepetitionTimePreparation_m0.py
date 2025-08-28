@@ -3,7 +3,7 @@ import glob
 import json
 
 # Base directory containing the dataset
-base_dir = "/cbica/projects/executive_function/data/bids/EF_bids_data_DataLad"
+base_dir = "/cbica/projects/executive_function/data/bids/EF_bids_data_DataLad" #CUBIC project path
 
 # Pattern to find all m0scan.json files
 file_pattern = os.path.join(base_dir, "sub-*/ses-*/perf/*m0scan.json")

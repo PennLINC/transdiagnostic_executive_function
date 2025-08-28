@@ -2,7 +2,7 @@ import os
 import re
 
 # Define the base directory
-base_dir = "/cbica/projects/executive_function/data/bids/EF_bids_data_DataLad"
+base_dir = "/cbica/projects/executive_function/data/bids/EF_bids_data_DataLad" #CUBIC project path
 
 # Iterate over subjects
 for subject in os.listdir(base_dir):
@@ -24,7 +24,7 @@ for subject in os.listdir(base_dir):
                 match = re.search(r'acq-VARIANTObliquity_([^_]+)_', filename)
                 if match:
                     modality = match.group(1)  # Extract the part to move
-                    new_filename = filename.replace(f'VARIANTObliquity_{modality}_', f'{modality}VARIANTObliquity_')
+                    new_filename = filename.replace(f'VARIANTObliquity_{modality}_', f'{modality}VARIANTObliquity_') #switching names of files that were in the wrong order
                     
                     # Rename the file
                     old_filepath = os.path.join(fmap_path, filename)

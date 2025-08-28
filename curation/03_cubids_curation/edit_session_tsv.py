@@ -2,7 +2,7 @@ import os
 import pandas as pd
 
 # Path to the scans_tsv_temp2 directory
-scans_tsv_temp2_dir = '/cbica/projects/executive_function/data/bids/scans_tsv_temp2'
+scans_tsv_temp2_dir = '/cbica/projects/executive_function/data/bids/scans_tsv_temp2' #CUBIC project path
 
 # Loop through all subject directories in the scans_tsv_temp2 directory
 for subject_dir in os.listdir(scans_tsv_temp2_dir):

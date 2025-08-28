@@ -2,7 +2,7 @@ import os
 import json
 
 # Define the base directory containing all subject folders
-base_dir = '/cbica/projects/executive_function/data/bids/EF_bids_data_DataLad'
+base_dir = '/cbica/projects/executive_function/data/bids/EF_bids_data_DataLad' #CUBIC project path
 
 # Loop through all subject and session directories
 for root, dirs, files in os.walk(base_dir):

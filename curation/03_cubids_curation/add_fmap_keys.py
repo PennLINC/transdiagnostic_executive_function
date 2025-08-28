@@ -4,7 +4,7 @@ import re
 from glob import glob
 
 # Define the base directory
-base_dir = '/cbica/projects/executive_function/data/bids/EF_bids_data_DataLad'
+base_dir = '/cbica/projects/executive_function/data/bids/EF_bids_data_DataLad' #CUBIC project path
 
 # Iterate over all fmap JSON files
 for fmap_file in glob(os.path.join(base_dir, "sub-*", "ses-*", "fmap", "*.json")):

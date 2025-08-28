@@ -4,6 +4,8 @@ import json
 import os
 from pathlib import Path
 
+# Create asl context tsv files.
+
 
 def create_aslcontext_tsv(json_path, first_volume_type):
     """Creates an aslcontext.tsv file based on ASL JSON metadata."""
@@ -89,3 +91,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+# Code to run this script in terminal: python create_aslcontext.py /cbica/projects/executive_function/data/bids/EF_bids_data_DataLad label
+    # use 'label' in this command as it is label-first

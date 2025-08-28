@@ -4,6 +4,8 @@ output: html_document
 date: "2025-07-10"
 ---
 
+This script summarizes diagnostic information and creates summary tables and sankey plot, to visualize clinical diagnostic phenotypes.
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
@@ -17,8 +19,8 @@ library(webshot)
 ```
 
 ```{r load in csvs}
-# Load in final clinical diagnosis df (cleaned up from clinical_verification.Rmd script)
-clinical_diagnosis_df <- read.csv('/Users/bsevchik/projects/EF_clinical/final_clinical_CNB/clinical/UPDATED_clinical_scanned_clean.csv')
+# Load in final clinical diagnosis df (cleaned up from clinical_data_cleaning.Rmd script)
+clinical_diagnosis_df <- read.csv('/Users/bsevchik/projects/EF_clinical/final_clinical_CNB/clinical/UPDATED_clinical_scanned_clean.csv') # local path
 
 ```
 
@@ -57,7 +59,7 @@ dxsum_avg_summary <- clinical_diagnosis_df %>%
 dxsum_avg_summary
 
 ```
-TD/NC will be wrong bc dx_none counts as 1, but should count as 0 - can fix later
+TD/NC will be wrong bc dx_none counts as 1, but should count as 0.
 
 
 ```{r summarize diagnoses}
@@ -95,182 +97,7 @@ summary_df <- summary_df %>%
 
 # View or export the result
 print(summary_df)
-#write.csv(summary_df, file = #"/Users/bsevchik/projects/EF_clinical/final_clinical_CNB/clinical/diagnoses_wideform.csv", row.names = FALSE)
-
-```
-
-
-
-```{r figure of distribution}
-#NOTE: this plot might not be accurate since many people have multiple diagnoses
-
-
-# Assuming `summary_df` is your 3-row summary table with counts
-# Convert wide to long format
-summary_long <- summary_df %>%
-  pivot_longer(cols = starts_with("dx_"),
-               names_to = "diagnosis",
-               values_to = "count")
-
-# Normalize to proportions within each study_group
-summary_long <- summary_long %>%
-  group_by(study_group) %>%
-  mutate(prop = count / sum(count))
-
-# Define labels for ggplot key (change this once you figure out what exact labels mean)
-diagnosis_labels <- c(
-  dx_adhd = "ADHD",
-  dx_adhd_remit = "ADHD (Remitted)",
-  dx_bp = "BPD",
-  dx_bp_remit = "BPD (Remitted)",
-  dx_mdd = "MDD",
-  dx_mdd_remit = "MDD (Remitted)",
-  dx_moodnos = "Mood Disorder NOS",
-  dx_moodnos_remit = "Mood Disorder NOS (Remitted)",
-  dx_none = "No Diagnosis",
-  dx_other = "Other",
-  dx_other_remit = "Other (Remitted)",
-  dx_prodromal = "CHR/Prodromal Psychosis",
-  dx_prodromal_remit = "CHR/Prodromal Psychosis (Remitted)",
-  dx_psychosis = "Psychosis",
-  dx_psychosis_remit = "Psychosis (Remitted)",
-  dx_scz = "Schizophrenia",
-  dx_scz_remit = "Schizophrenia (Remitted)",
-  dx_ptsd = "PTSD",
-  dx_ptsd_remit = "PTSD (Remitted)"
-)
-#Replace diagnosis values using new names
-summary_long <- summary_long %>%
-  mutate(diagnosis = recode(diagnosis, !!!diagnosis_labels))
-summary_long #use this if you want to include in graph key/figure label label where count might = 0 (longer figure key/legend)
-summary_long_no0 <- summary_long %>%
-  filter(count != 0)
-summary_long_no0 #use this if you only want graph to show labels where count does not = 0
-write.csv(summary_long_no0, file = "/Users/bsevchik/projects/EF_clinical/final_clinical_CNB/clinical/summary_long_no0.csv", row.names = FALSE)
-
-
-# Plot: stacked bar of proportions
-ggplot(summary_long_no0, aes(x = study_group, y = prop, fill = diagnosis)) +
-  geom_bar(stat = "identity") +
-  labs(title = "Proportion of Diagnoses by Study Group",
-       x = "Study Group", y = "Proportion") +
-  scale_y_continuous(labels = scales::percent_format()) +
-  theme_minimal()
-
-#Save out plot
-#ggsave("/Users/bsevchik/projects/EF_clinical/clinical_diagnosis/diagnosis_plot.png", width = 8, height = 6, #dpi = 300)
-
-```
-
-
-
-
-
-```{r sankey plot without percentages}
-# Disambiguate labels (some have repeat names)
-summary_long_no0 <- summary_long_no0 %>%
-  mutate(
-    source_label = paste(study_group, "Group"),
-    target_label = diagnosis  # or paste("Dx:", diagnosis) to be extra safe
-  )
-
-# Create nodes
-nodes <- data.frame(name = unique(c(summary_long_no0$source_label, summary_long_no0$target_label)))
-
-# Map node names to indices
-summary_long_no0 <- summary_long_no0 %>%
-  mutate(source = match(source_label, nodes$name) - 1,
-         target = match(target_label, nodes$name) - 1)
-
-# Create links
-links <- summary_long_no0 %>%
-  select(source, target, value = count)
-
-# Plot
-sankeyNetwork(Links = links,
-              Nodes = nodes,
-              Source = "source",
-              Target = "target",
-              Value = "value",
-              NodeID = "name",
-              fontSize = 12,
-              nodeWidth = 30)
-
-
-```
-
-```{r sankey plot with percentages - proportion based on total number of diagnoses out of total diagnoses count (total diagnosis count will be higher than participant count)}
-# Load packages
-library(dplyr)
-library(networkD3)
-library(htmlwidgets)
-
-
-# Step 1: Calculate total count
-total_count <- sum(summary_long_no0$count)
-
-# Step 2: Create clean source/target labels
-summary_long_no0 <- summary_long_no0 %>%
-  mutate(
-    source_label = study_group,
-    target_label = diagnosis
-  )
-
-# Step 3: Compute total flow per source and target
-source_flows <- summary_long_no0 %>%
-  group_by(source_label) %>%
-  summarise(source_total = sum(count), .groups = "drop") %>%
-  mutate(
-    source_pct = round(100 * source_total / total_count, 1),
-    source_label_pct = paste0(source_label, " (", source_pct, "%)")
-  )
-
-target_flows <- summary_long_no0 %>%
-  group_by(target_label) %>%
-  summarise(target_total = sum(count), .groups = "drop") %>%
-  mutate(
-    target_pct = round(100 * target_total / total_count, 1),
-    target_label_pct = paste0(target_label, " (", target_pct, "%)")
-  )
-
-# Step 4: Join percent labels back to main dataframe
-summary_long_labeled <- summary_long_no0 %>%
-  left_join(source_flows, by = "source_label") %>%
-  left_join(target_flows, by = "target_label")
-
-# Step 5: Create nodes and links
-nodes <- data.frame(name = unique(c(summary_long_labeled$source_label_pct,
-                                    summary_long_labeled$target_label_pct)))
-
-links <- summary_long_labeled %>%
-  mutate(
-    source = match(source_label_pct, nodes$name) - 1,
-    target = match(target_label_pct, nodes$name) - 1
-  ) %>%
-  select(source, target, value = count)
-
-# Step 6: Plot Sankey
-sankey_plot <- sankeyNetwork(Links = links,
-              Nodes = nodes,
-              Source = "source",
-              Target = "target",
-              Value = "value",
-              NodeID = "name",
-              fontSize = 12,
-              nodeWidth = 30)
-
-
-saveWidget(sankey_plot,
-           file = "/Users/bsevchik/projects/EF_clinical/final_clinical_CNB/clinical/diagnosis_sankey_plot_1.html",
-           selfcontained = TRUE)
-
-
-webshot2::webshot(
-  url = "/Users/bsevchik/projects/EF_clinical/final_clinical_CNB/clinical/diagnosis_sankey_plot_1.html",
-  file = "/Users/bsevchik/projects/EF_clinical/final_clinical_CNB/clinical/diagnosis_sankey_plot_1.png",
-  vwidth = 800,   # Try 600–1000 for a less wide plot
-  vheight = 500   # Tweak height to match
-)
+#write.csv(summary_df, file = #"/Users/bsevchik/projects/EF_clinical/final_clinical_CNB/clinical/diagnoses_wideform.csv", row.names = FALSE) # local path
 
 ```
 
@@ -388,7 +215,7 @@ webshot2::webshot(
   vwidth = 1000,
   vheight = 500,
   zoom = 3.83
-)
+) # local paths - correspond to 'clinical/clinical_figures/' + '/diagnosis_sankey_plot.html' and + '/diagnosis_sankey_plot.png' in github folder
 
 
 ```
