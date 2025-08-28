@@ -9,8 +9,8 @@ import matplotlib.pyplot as plt
 # Paths
 # ----------------------
 project_path = '/cbica/projects/executive_function/'
-inpath_qc = os.path.join(project_path, 'EF_dataset/derivatives/freesurfer-post_BABS_EF_full_project_outputs/freesurfer-post/')
-outpath = os.path.join(project_path, 'EF_dataset_figures/concatenated_data/')
+inpath_qc = os.path.join(project_path, 'EF_dataset/derivatives/freesurfer-post_BABS_EF_full_project_outputs/freesurfer-post/') #CUBIC project path - replace
+outpath = os.path.join(project_path, 'EF_dataset_figures/concatenated_data/') #CUBIC project path - replace
 os.makedirs(outpath, exist_ok=True)
 
 # ----------------------

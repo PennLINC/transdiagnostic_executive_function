@@ -4,8 +4,8 @@ import numpy as np
 import os
 
 project_path = '/cbica/projects/executive_function/'
-inpath_qc = project_path + 'EF_dataset/derivatives/xcpd_BABS_EF_full_project_outputs/xcpd'
-outpath = project_path + 'EF_dataset_figures/concatenated_data/'
+inpath_qc = project_path + 'EF_dataset/derivatives/xcpd_BABS_EF_full_project_outputs/xcpd' #CUBIC project path - replace
+outpath = project_path + 'EF_dataset_figures/concatenated_data/' #CUBIC project path - replace
 
 fileNames_qc = sorted(glob.glob(os.path.join(
     inpath_qc, 'sub-*', 'ses-*', 'func',

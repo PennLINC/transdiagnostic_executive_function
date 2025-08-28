@@ -7,8 +7,8 @@ from glob import glob
 # -------------------------------
 # Configuration
 # -------------------------------
-input_base = "/cbica/projects/executive_function/EF_dataset/derivatives/qsirecon_BABS_EF_full_project_outputs/qsirecon/derivatives/qsirecon-DSIStudio"
-output_dir = "/cbica/projects/executive_function/EF_dataset_figures/concatenated_data"
+input_base = "/cbica/projects/executive_function/EF_dataset/derivatives/qsirecon_BABS_EF_full_project_outputs/qsirecon/derivatives/qsirecon-DSIStudio" #CUBIC project path - replace
+output_dir = "/cbica/projects/executive_function/EF_dataset_figures/concatenated_data" #CUBIC project path - replace
 os.makedirs(output_dir, exist_ok=True)
 concat_csv_path = os.path.join(output_dir, "concatenated_bundle_volume.csv")
 plot_total_path = os.path.join(output_dir, "concat_bundle_volume_histogram.png")

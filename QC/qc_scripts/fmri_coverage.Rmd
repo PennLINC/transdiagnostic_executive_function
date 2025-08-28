@@ -9,16 +9,19 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r load packages, include=FALSE}
+# Load required packages
 library(tidyverse)
 library(dplyr)
 ```
 
 ```{r read in csv}
+# Read in necessary csv with fmri coverage info
 coverage_df <- read.csv('/Users/bsevchik/projects/EF_processing/concat_qc/concat_xcpd_qc_coverage_row_sums_pass_fail.csv')
 coverage_df
 ```
 
 ```{r create new summary df of coverage < 50%}
+# Create new summary data frame where coverage is <50%
 
 # Filter rows where FAIL? == "X"
 fail_df <- coverage_df %>% 
@@ -44,7 +47,7 @@ final_df <- fail_df %>%
   select(subject, num_below_0.5, below_0.5_columns)
 
 print(final_df)
-write.csv(final_df, "/Users/bsevchik/projects/EF_processing/concat_qc/fmri_coverage_outliers.csv", row.names = FALSE)
+write.csv(final_df, "/Users/bsevchik/projects/EF_processing/concat_qc/fmri_coverage_outliers.csv", row.names = FALSE) # local path
 
 
 

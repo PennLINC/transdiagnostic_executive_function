@@ -10,9 +10,9 @@ project_path = '/cbica/projects/executive_function/'
 # concatenating
 ################
 # path to unzipped xcpd data
-inpath_qc = project_path + 'EF_dataset/derivatives/xcpd_BABS_EF_full_project_outputs/xcpd/'
+inpath_qc = project_path + 'EF_dataset/derivatives/xcpd_BABS_EF_full_project_outputs/xcpd/' #CUBIC project path - replace
 # outpath to save concatentaed qc data
-outpath = project_path + 'EF_dataset_figures/concatenated_data/'
+outpath = project_path + 'EF_dataset_figures/concatenated_data/' #CUBIC project path - replace
 
 # get all filenames for qc data
 fileNames_qc = sorted(glob.glob(inpath_qc + 'sub-*/ses-*/func/' +
@@ -43,11 +43,11 @@ df_main_qc = pd.DataFrame(columns=list(col_names_max) + list(subj_qc.columns))
 for iSubj in range(len(subjList_qc)):
     # load each subject file
     subj_qc = pd.read_csv(fileNames_qc[iSubj], delimiter='\t')
-    # Calculate the mean across rows (each subj file has multiple rows)
-    mean_series = subj_qc.mean(axis=0)
-    # Convert the mean Series to a dataframe with one row + reset index
-    subj_qc_mean = pd.DataFrame(mean_series).T
-    subj_qc_mean = subj_qc_mean.reset_index(drop=True)
+    # Calculate the median across rows (each subj file has multiple rows)
+    median_series = subj_qc.median(axis=0)
+    # Convert the median Series to a dataframe with one row + reset index
+    subj_qc_median = pd.DataFrame(median_series).T
+    subj_qc_median = subj_qc_median.reset_index(drop=True)
 
     # get column values from filenames and make a temporary dataframe
     split_name = fileNames_qc[iSubj].split('/')[-1].split('_')
@@ -59,26 +59,26 @@ for iSubj in range(len(subjList_qc)):
     df_temp.loc[0] = col_vals
 
     # first combine temp dataframe with info from filenames with qc info
-    df_subj_qc = pd.concat([df_temp, subj_qc_mean], axis=1)
+    df_subj_qc = pd.concat([df_temp, subj_qc_median], axis=1)
 
     # then add subj-level full qc info to the empty df_main_qc generated above
     df_main_qc = pd.concat([df_main_qc, df_subj_qc], ignore_index=True)
 
-df_main_qc.to_csv(outpath + 'concat_xcpd_qc.csv',
+df_main_qc.to_csv(outpath + 'concat_xcpd_qc_median.csv',
                   index=False)
 
 ################
 # plotting
 ################
-# plot the distribution using sns.histplot or sns.distplot
+# plot the median FD distribution
 plt.ion()
 # sns.histplot(df_main_qc['framewise_displacement'], kde=True, bins=20)
 sns.displot(df_main_qc['framewise_displacement'], kde=True, bins=20)
-plt.title('Mean FD distribution')
-plt.xlabel('Mean FD')
+plt.title('Median FD distribution')
+plt.xlabel('Median FD')
 plt.ylabel('Density')
 plt.tight_layout()
-plt.savefig(outpath + 'concat_xcpd_qc_histogram.png',
+plt.savefig(outpath + 'concat_xcpd_qc_histogram_median.png',
             bbox_inches='tight', dpi=300,
             transparent=True)
 plt.close()

@@ -7,9 +7,9 @@ import matplotlib.pyplot as plt
 # -------------------------------
 # Configuration
 # -------------------------------
-input_csv = "/cbica/projects/executive_function/EF_dataset_figures/concatenated_data/concatenated_bundle_volume.csv"
-output_csv = "/cbica/projects/executive_function/EF_dataset_figures/concatenated_data/row_sum_bundle_volume.csv"
-plot_path = "/cbica/projects/executive_function/EF_dataset_figures/concatenated_data/row_bundle_outlier_distribution.png"
+input_csv = "/cbica/projects/executive_function/EF_dataset_figures/concatenated_data/concatenated_bundle_volume.csv" #CUBIC project path
+output_csv = "/cbica/projects/executive_function/EF_dataset_figures/concatenated_data/row_sum_bundle_volume.csv" #CUBIC project path
+plot_path = "/cbica/projects/executive_function/EF_dataset_figures/concatenated_data/row_bundle_outlier_distribution.png" #CUBIC project path
 
 # -------------------------------
 # Load data and define columns

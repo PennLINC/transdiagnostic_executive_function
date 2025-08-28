@@ -4,9 +4,9 @@ import matplotlib.pyplot as plt
 import os
 
 # File paths
-input_csv = "/cbica/projects/executive_function/EF_dataset_figures/concatenated_data/concat_xcpd_qc_coverage.csv"
-output_csv = "/cbica/projects/executive_function/EF_dataset_figures/concatenated_data/concat_xcpd_qc_coverage_col_sums.csv"
-output_plot_dir = "/cbica/projects/executive_function/EF_dataset_figures/concatenated_data/"
+input_csv = "/cbica/projects/executive_function/EF_dataset_figures/concatenated_data/concat_xcpd_qc_coverage.csv" #CUBIC project path - replace
+output_csv = "/cbica/projects/executive_function/EF_dataset_figures/concatenated_data/concat_xcpd_qc_coverage_col_sums.csv" #CUBIC project path - replace
+output_plot_dir = "/cbica/projects/executive_function/EF_dataset_figures/concatenated_data/" #CUBIC project path - replace
 output_plot_file = os.path.join(output_plot_dir, "col_sum_histogram.png")
 
 # Metadata columns to exclude

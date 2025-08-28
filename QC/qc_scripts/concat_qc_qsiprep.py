@@ -8,8 +8,8 @@ import matplotlib.pyplot as plt
 
 
 project_path = '/cbica/projects/executive_function/'
-inpath_qc = project_path + 'EF_dataset/derivatives/qsiprep_BABS_EF_full_project_outputs/qsiprep'
-outpath = project_path + 'EF_dataset_figures/concatenated_data/'
+inpath_qc = project_path + 'EF_dataset/derivatives/qsiprep_BABS_EF_full_project_outputs/qsiprep' #CUBIC project path - replace
+outpath = project_path + 'EF_dataset_figures/concatenated_data/' #CUBIC project path - replace
 
 fileNames_qc = sorted(glob.glob(os.path.join(
     inpath_qc, 'sub-*', 'ses-*', 'dwi',
@@ -42,10 +42,9 @@ df_main_qc.to_csv(os.path.join(outpath, 'concat_qsiprep_qc.csv'), index=False)
 ################
 # plotting
 ################
-# plot the distribution using sns.histplot or sns.distplot
+# plot the distribution of mean FD
 plt.ion()
 sns.set_context(font_scale=1.5)
-# sns.histplot(df_main_qc['framewise_displacement'], kde=True, bins=20)
 sns.displot(df_main_qc['raw_neighbor_corr'], kde=True, bins=20)
 plt.title('Mean Neighborhood Corr distribution')
 plt.xlabel('Mean Neighborhood Corr')
@@ -59,7 +58,6 @@ plt.close()
 
 plt.ion()
 sns.set_context(font_scale=1.5)
-# sns.histplot(df_main_qc['framewise_displacement'], kde=True, bins=20)
 sns.displot(df_main_qc['mean_fd'], kde=True, bins=20)
 plt.title('Mean FD distribution')
 plt.xlabel('Mean FD')
@@ -79,7 +77,7 @@ plt.ion()
 sns.set(style='whitegrid')
 sns.set_context(font_scale=1.5)
 
-# Create scatterplot
+# Create scatterplot of mean FD vs. raw neighborhood corr
 scatter_plot = sns.scatterplot(
     data=df_main_qc,
     x='mean_fd',

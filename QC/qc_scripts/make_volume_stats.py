@@ -3,7 +3,7 @@ import pandas as pd
 from glob import glob
 
 # Set base path to the top-level DSIStudio directory
-base_dir = "/cbica/projects/executive_function/EF_dataset/derivatives/qsirecon_BABS_EF_full_project_outputs/qsirecon/derivatives/qsirecon-DSIStudio"
+base_dir = "/cbica/projects/executive_function/EF_dataset/derivatives/qsirecon_BABS_EF_full_project_outputs/qsirecon/derivatives/qsirecon-DSIStudio" #CUBIC project path
 
 # Find all *_bundlestats.csv files recursively
 bundlestats_files = glob(os.path.join(base_dir, "sub-*", "ses-*", "dwi", "*_bundlestats.csv"))

@@ -4,9 +4,9 @@ import matplotlib.pyplot as plt
 import os
 
 # --- File paths ---
-input_csv = "/cbica/projects/executive_function/EF_dataset_figures/concatenated_data/concat_xcpd_qc_coverage.csv"
-output_csv = "/cbica/projects/executive_function/EF_dataset_figures/concatenated_data/concat_xcpd_qc_coverage_row_sums.csv"
-output_dir = "/cbica/projects/executive_function/EF_dataset_figures/concatenated_data/"
+input_csv = "/cbica/projects/executive_function/EF_dataset_figures/concatenated_data/concat_xcpd_qc_coverage.csv" #CUBIC project path
+output_csv = "/cbica/projects/executive_function/EF_dataset_figures/concatenated_data/concat_xcpd_qc_coverage_row_sums.csv" #CUBIC project path
+output_dir = "/cbica/projects/executive_function/EF_dataset_figures/concatenated_data/" #CUBIC project path
 output_plot_regular = os.path.join(output_dir, "row_sum_histogram_trimmed.png")
 output_plot_log = os.path.join(output_dir, "row_sum_histogram_logy_trimmed.png")
 output_plot_bar = os.path.join(output_dir, "row_sum_barplot.png")
