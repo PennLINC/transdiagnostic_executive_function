@@ -1,3 +1,13 @@
+# Plot reconstructed individual bundles for a few subjects
+
+# This script is run locally, not on cubic computing cluster. The first step before running this script is to datalad get, unzip, and copy over the necessary derivatives from cubic to local.
+    # Necessary derivatives: "sub-{subid}_ses-{sesid}_space-ACPC_desc-preproc_T1w.nii.gz” from qsiprep_anat outputs and the brain mask from qsiprep_anat outputs: sub-{sub-id}_ses-{ses-id}_space-ACPC_desc-brain_mask.nii.gz
+# Create a new environment: micromamba create --name dipy python=3.11 nibabel numpy dipy fury matplotlib
+                        #   pip install pyAFQ
+                        #   micromamba activare dipy
+# After these initial steps, then you can run this script.
+
+
 import gzip
 import shutil
 from pathlib import Path
@@ -165,8 +175,8 @@ def visualize_bundles(data_root, out_dir, subid, sesid, out_png, interactive=Fal
 
 
 if __name__ == "__main__":
-    data_root = Path("/Users/bsevchik/projects/qsirecon")
-    out_dir = Path("/Users/bsevchik/projects/inividual_bundles")
+    data_root = Path("/Users/bsevchik/projects/qsirecon") #local path - replace
+    out_dir = Path("/Users/bsevchik/projects/inividual_bundles") #local path - replace
     out_dir.mkdir(parents=True, exist_ok=True)
 
     camera_positions6 = {

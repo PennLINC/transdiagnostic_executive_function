@@ -12,8 +12,8 @@ from nilearn import image, maskers, plotting
 
 
 if __name__ == "__main__":
-    in_dir = "/cbica/projects/executive_function/EF_dataset/derivatives/aslprep_BABS_EF_full_project_outputs/aslprep"
-    out_dir = "/cbica/projects/executive_function/EF_dataset_figures/figures/aslprep_figures"
+    in_dir = "/cbica/projects/executive_function/EF_dataset/derivatives/aslprep_BABS_EF_full_project_outputs/aslprep" #CUBIC project path
+    out_dir = "/cbica/projects/executive_function/EF_dataset_figures/figures/aslprep_figures" #CUBIC project path
     template = tflow.get("MNI152NLin6Asym", resolution="01", desc="brain", suffix="T1w", extension="nii.gz")
     mask = tflow.get("MNI152NLin6Asym", resolution="01", desc="brain", suffix="mask", extension="nii.gz")
 
