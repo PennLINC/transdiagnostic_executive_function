@@ -8,75 +8,61 @@ nav_order: 3
 ---
 
 
-# Project Page Template
-
-When you begin your project, use this template to fill out some critical information in the initial headers of your GitHub Pages site. Also see the [Project Setup page](https://pennlinc.github.io/docs/LabHome/ProjectSetup/).
-
-
 ### Project Title
 
-Brief and informative title; not always the same as the manuscript title
+Transdiagnostic Executive Function: An Open, Fully Processed, Longitudinal Data Resource
 
 ### Brief Project Description
+Executive function (EF) is a crucial aspect of human development.
+Deficits in EF that emerge in adolescence represent a transdiagnostic symptom associated with many
+forms of psychopathology, including attention deficit hyperactivity disorder (ADHD) and psychosis-
+spectrum (PS).
+There are relatively few open data resources specifically tailored to evaluate the development of EF across
+clinical diagnoses. Here, we introduce a new data resource that combines longitudinal multi-modal
+imaging data (sMRI, dMRI, fMRI, ASL, & QSM) with rich clinical and cognitive phenotyping data.
 
-Try to make this no more than three highly accessible sentences.
+### Project Lead
 
-### Project Lead(s)
+Brooke L. Sevchik
 
-Anticipated First Author(s)
+### Faculty Lead
 
-### Faculty Lead(s)
-
-Anticipated Last Author(s)
-
-### Analytic Replicator
-
-Team member who replicates analyses, as stipulated in the [Project Reproducibility  Guide](https://pennlinc.github.io/docs/LabHome/ReproSystem/)
+Theodore D. Satterthwaite
 
 ### Collaborators
 
-Include people here as they make contributions (useful as our memory is imperfect and it is bad to forget contributions in long-running projects)
+Brooke L. Sevchik, Golia Shafiei, Kristin Murtha, Juliette B.H. Brook, Lia Brodrick, Kahini Mehta, Sage Rush,
+Matt Cieslak, Steven L. Meisler, Taylor Salo, S. Parker Singleton, Tien T. Tong, Mrugank Salunke, Dani S. Bassett, Monica E. Calkins, Mark A. Elliott, Raquel E. Gur, Ruben C. Gur, Tyler M. Moore, Kosha Ruparel, Russell T. Shinohara, M. Dylan Tisdall, Daniel H. Wolf, David R. Roalf, Theodore D. Satterthwaite
 
 ### Project Start Date
 
-Date that project began
+September 2024
 
 ### Current Project Status
 
-See the [Stages of a Project](https://pennlinc.github.io/docs/LabHome/ProjectStages/) page
-
-### Dataset
-
-E.g., PNC, HBN, GRMPY, etc
+In preparation
 
 ### Github repo
 
-Link to github repository for the project
+<https://github.com/PennLINC/transdiagnostic_executive_function>
 
 ### Path to data on filesystem
 
-Full path to project path on relevant computing cluster (i.e., CUBIC, PMACS, etc)
+/cbica/projects/executive_function
 
 ### Slack Channel
 
-For project communication
+#efr01_grmpyr01_opendata
 
-### Trello board
+### Conference presentations
 
-For task tracking and keeping project meetings on track; provide link.
-
-### Google Drive Folder
-
-A good place to aggregate and share articles, manuscript drafts, etc; provide link.
-
-### Zotero library
-
-Shared library name for references
-
-### Current work products
-
-I.e., citations to poster presentations, links to preprints, final publication citation
+- Poster to be presented at Flux Congress, September 2025
 
 ### Code documentation
 
-This section is the bulk of the project page, and can be broken up as best fits the project.  Remember that this should be acessible prose that allows your replicator, reviewer, or interested reader to step through your code and understand how the code corresponds to the findings described in the paper. At a minimum, there should be clear documentation regarding sample selection (e.g., inclusion/exclusion), preprocessing (e.g., container version, data freeze), and hypothesis testing (usually in the form of an analytic notebook).   See the [Project Reproducibility  Guide](https://pennlinc.github.io/docs/LabHome/ReproSystem/) for more information.
+
+
+
+
+
+
