@@ -5,11 +5,12 @@ import zipfile
 import numpy as np
 # import datalad.api as dl
 
+# This script grabs one of the necessary files to run create_T1_QC_slices.ipynb in qc_scripts github folder. These files are necessary to then create slices for manual T1 ratings.
 
-datapath = '/cbica/projects/executive_function/EF_dataset/'
+datapath = '/cbica/projects/executive_function/EF_dataset/' #CUBIC project path
 fmriprep_anat_path = os.path.join(datapath,
-                         'derivatives/fmriprepANAT_BABS_EF_full_project_outputs/')
-MNI_path = os.path.join(fmriprep_anat_path, 'QC/T1w_space-MNI/')
+                         'derivatives/fmriprepANAT_BABS_EF_full_project_outputs/') #CUBIC project path
+MNI_path = os.path.join(fmriprep_anat_path, 'QC/T1w_space-MNI/') #CUBIC project path
 
 # # uncomment if using datalad get from within python
 # ds = dl.Dataset(datapath)
@@ -20,7 +21,7 @@ file_list.sort()
 for f in range(len(file_list)):
     # # uncomment if using datalad get from within python
     # ds.get(file_list[f])
-    # # but instead of this ^ , I did datalad get in batches
+    # # but instead of this ^ , I did datalad get manually
     # # (e.g. datalad get sub-0*_xcp-0-3-0.zip)
     # # then unzip with this script, then drop
 
