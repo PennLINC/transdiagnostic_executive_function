@@ -84,6 +84,7 @@ UPDATED_demographic_data_scanned is the final csv file. This contains fixed stud
 Create summary tables for demographic info.
 
 ```{r demographic tables}
+# figures saved out to local paths but can be found in demographics/demographic_figures folder in github
 
 # Table 1: Diagnosis 
 diagnosis_table <- UPDATED_demographic_data_scanned %>%
@@ -183,7 +184,7 @@ dev.off()
 
 
 # Race Bar Chart
-png(filename = "/Users/bsevchik/projects/EF_clinical/demographics/race_bar_chart.png", 
+png(filename = "/Users/bsevchik/projects/EF_clinical/demographics/race_bar_chart.png", # local path
     width = 3000, height = 2000, res = 300) # local path
 
 ggplot(race_table, aes(x = reorder(race, -percent), y = percent, fill = race)) +
