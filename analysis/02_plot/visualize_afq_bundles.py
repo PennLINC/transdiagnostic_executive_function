@@ -4,7 +4,7 @@
     # Necessary derivatives: "sub-{subid}_ses-{sesid}_space-ACPC_desc-preproc_T1w.nii.gz” from qsiprep_anat outputs and the brain mask from qsiprep_anat outputs: sub-{sub-id}_ses-{ses-id}_space-ACPC_desc-brain_mask.nii.gz
 # Create a new environment: micromamba create --name dipy python=3.11 nibabel numpy dipy fury matplotlib
                         #   pip install pyAFQ
-                        #   micromamba activare dipy
+                        #   micromamba activate dipy
 # After these initial steps, then you can run this script.
 
 
