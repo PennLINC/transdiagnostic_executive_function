@@ -89,7 +89,6 @@ Imaging Data:
 
 Clinical and Demographic Data:
 1. Clean and organize clinical data into usable format. Consult with other members of team to correct any mistakes in original clinical data. Visualize clinical diagnoses (sankey plot).
-   + `/clinical/clinical_data_cleaning.Rmd` cleans the data, investigates potential errors in the data, and corrects mistakes
    + `/clinical/clinical_diagnostic_distribution.Rmd` summarizes clinical diagnostic information and produces the sankey plot visualization stored in `/clinical/clinical_figures`
 3. Clean and organize demographic data into usable format. Consult with other members of team to correct any mistakes in original demographic data. Visualize demographic info with bar plots and histograms.
    + `/demographics/demographics_org.Rmd` organizes, summarizes, and plots demographics data, as well as corrects any mistakes in original demographic data. The resulting plots are stored in `/demographics/demographic_figures`
