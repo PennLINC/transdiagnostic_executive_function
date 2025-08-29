@@ -31,7 +31,7 @@ Theodore D. Satterthwaite
 
 ### Collaborators
 
-Brooke L. Sevchik, Golia Shafiei, Kristin Murtha, Juliette B.H. Brook, Lia Brodrick, Kahini Mehta, Sage Rush,
+Golia Shafiei, Kristin Murtha, Juliette B.H. Brook, Lia Brodrick, Kahini Mehta, Sage Rush,
 Matt Cieslak, Steven L. Meisler, Taylor Salo, S. Parker Singleton, Tien T. Tong, Mrugank Salunke, Dani S. Bassett, Monica E. Calkins, Mark A. Elliott, Raquel E. Gur, Ruben C. Gur, Tyler M. Moore, Kosha Ruparel, Russell T. Shinohara, M. Dylan Tisdall, Daniel H. Wolf, David R. Roalf, Theodore D. Satterthwaite
 
 ### Project Start Date
