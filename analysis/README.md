@@ -1,8 +1,7 @@
 The environment used for most of the scripts in the `analysis` folder is the `babs` environment, for which the python requirements can be found
 in `/python_requirements/babs_requirements.txt`.
 <br>The `visualize_afq_bundles.py` script is run locally with the `dipy` environment, for which the python requirements can be found in `/python_requirements/dipy_requirements.txt`.
-+ Note that this code will not work for file names with a VARIANT in the acquisition field. As such, when copying over the files from preprocessing outputs to the local folder
-+ to run this script, manually change the names if there is a variant in the acquisition field. Instructions for running this script are found commented at the top of the script.
++ Note that this code will not work for file names with a VARIANT in the acquisition field. As such, when copying over the files from preprocessing outputs to the local folder to run this script, manually change the names if there is a variant in the acquisition field. Instructions for running this script are found commented at the top of the script.
 
 
 The scripts in this folder include:
