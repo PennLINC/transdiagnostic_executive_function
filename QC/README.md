@@ -6,5 +6,6 @@ The QC scripts contained here include:
 + `T1_QC_slices.ipynb` creates and visually displays the slices used to manually evaluate T1 scans for QC.
 + `fmri_coverage.Rmd` is used to investigate more details about the scans that have coverage <50%.
 + `excluded_scans_*.csv` are scans that did NOT pass QC and are later passed into python scripts in the analysis folder to exclude these scans from group average plots.
++ `/QC/qc_csvs/qc_summary.csv` contains a summary record of which scans for which modalities are recommended 'passes' versus 'fails' based on our criteria for high quality vs. poor quality scans
 
 All scans regardless of pass/fail status are included in the raw dataset.
