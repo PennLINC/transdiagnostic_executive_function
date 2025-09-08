@@ -2,7 +2,7 @@ import os
 import re
 
 """
-This script re-names certain files with an obliquity variant to a BIDS-valid name for these files.
+This script re-names certain files with an obliquity variant to a BIDS-valid name for these files. The script before this one to rename the files using a python script rather than using CuBIDs apply due to a bug in CuBIDS named the files in an incorrect order, which this script resolves.
 """
 
 # Define the base directory
