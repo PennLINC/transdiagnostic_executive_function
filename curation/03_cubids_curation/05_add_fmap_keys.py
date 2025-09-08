@@ -3,6 +3,10 @@ import json
 import re
 from glob import glob
 
+"""
+This script adds in required fmap keys to fmap json files (B0FieldIdentifier, ParallelReductionFactorinPlane, and PartialFourierDirection).
+"""
+
 # Define the base directory
 base_dir = '/cbica/projects/executive_function/data/bids/EF_bids_data_DataLad' #CUBIC project path
 
