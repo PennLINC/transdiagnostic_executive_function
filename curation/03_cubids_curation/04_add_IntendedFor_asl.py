@@ -1,6 +1,10 @@
 import os
 import json
 
+"""
+This script adds the IntendedFor key into json sidecars for M0 scans (the ASL NIfTI file that the M0 scan is intended for).
+"""
+
 # Define the base directory containing all subject folders
 base_dir = '/cbica/projects/executive_function/data/bids/EF_bids_data_DataLad' #CUBIC project path
 
