@@ -234,7 +234,25 @@ print(age_histogram)
 dev.off()
 ```
 
+```{r stacked bar plot - age & sex}
+png(filename = "/Users/bsevchik/Documents/GitHub/transdiagnostic_executive_function/demographics/demographic_figures/age_sex_stacked_bar_chart.png", 
+    width = 2500, height = 2000, res = 300)
 
+ggplot(UPDATED_demographic_data_scanned, aes(x = age, fill = sex)) +
+  geom_bar(position = "stack") +
+  labs(title = "Age by Sex Distribution",
+       x = "Age (Years)",
+       y = "Count",
+       fill = "Sex") +
+  theme_minimal(base_size = 20) +
+  theme(
+    plot.title = element_text(hjust = 0.5)
+  ) +
+  scale_fill_manual(values = c("M" = "#B6A6E9", "F" = "#4394E5"))
+
+dev.off()
+
+```
 
 
 
