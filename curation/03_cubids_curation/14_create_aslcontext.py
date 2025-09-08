@@ -4,7 +4,9 @@ import json
 import os
 from pathlib import Path
 
-# Create asl context tsv files.
+"""
+This script creates the required ASL context tsv files.
+"""
 
 
 def create_aslcontext_tsv(json_path, first_volume_type):
