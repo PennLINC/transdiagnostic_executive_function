@@ -1,5 +1,9 @@
 import os
 
+"""
+This script renames fmap obliquity variants - it should have occured in the CuBIDS apply stage, but ran this python script due to bug in CuBIDS.
+"""
+
 # Define base directory
 base_dir = "/cbica/projects/executive_function/data/bids/EF_bids_data_DataLad"
 
