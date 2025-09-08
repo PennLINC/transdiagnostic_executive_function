@@ -3,7 +3,7 @@ import pandas as pd
 from datetime import datetime, timedelta
 
 """
-This script anonymizes acquisition time in the sessions.tsv files, while still maintaining accurate relative times in between sessions. 
+This script creates session.tsv files for each subject. It anonymizes acquisition time using information from scans.tsv files in a temporary non-DataLad tracked dataset (to avoid sharing PHI), while still maintaining accurate relative times in between sessions. 
 Session 1 for each subject is set to the 15th of the original month in 1800. Time is rounded to the nearest hour.
 Subsequent sessions are adjusted accordingly such that the distance between acquisition times for each session are still accurate.
 """
