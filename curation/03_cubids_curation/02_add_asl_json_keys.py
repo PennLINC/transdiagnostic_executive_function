@@ -1,6 +1,10 @@
 import os
 import json
 
+"""
+This script adds in required json keys into ASL and M0 scan json files that were originally missing.
+"""
+
 # Define the root directory where your BIDS dataset is located
 bids_root = '/cbica/projects/executive_function/data/bids/EF_bids_data_DataLad' #CUBIC project path
 
