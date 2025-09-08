@@ -2,6 +2,10 @@ import os
 import json
 from glob import glob
 
+"""
+This script adds in the PartialFourierDirection key into the jsons that accompany DWI NIfTI files.
+"""
+
 # Define the base directory
 base_dir = "/cbica/projects/executive_function/data/bids/EF_bids_data_DataLad" #CUBIC project path
 
