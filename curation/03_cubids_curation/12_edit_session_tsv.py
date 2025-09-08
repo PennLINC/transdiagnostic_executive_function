@@ -1,6 +1,10 @@
 import os
 import pandas as pd
 
+"""
+Once sessions.tsv files are created, this script makes the tsv files BIDS-compliant by renaming the 'datetime' column name in original created sessions.tsv file to 'acq_time'.
+"""
+
 # Path to the scans_tsv_temp2 directory
 scans_tsv_temp2_dir = '/cbica/projects/executive_function/data/bids/scans_tsv_temp2' #CUBIC project path
 
