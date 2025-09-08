@@ -1,6 +1,10 @@
 import os
 import re
 
+"""
+This script switches the order of entities that were misordered in certain files in the dataset to be BIDS compliant.
+"""
+
 def rename_anat_files(bids_root):
     # Define the regex pattern to match the incorrect filenames
     pattern = re.compile(r"(sub-\d+_ses-\d+)_run-(\d+)_rec-norm_(T[12]w)\.(nii\.gz|json)")
