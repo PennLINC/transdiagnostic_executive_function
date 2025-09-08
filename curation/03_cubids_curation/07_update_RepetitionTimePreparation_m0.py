@@ -2,6 +2,10 @@ import os
 import glob
 import json
 
+"""
+This script explicitly sets RepetitionTimePreparation to 5 for M0 scan json files after consultation with team for correct value.
+"""
+
 # Base directory containing the dataset
 base_dir = "/cbica/projects/executive_function/data/bids/EF_bids_data_DataLad" #CUBIC project path
 
