@@ -1,6 +1,10 @@
 import os
 import shutil
 
+"""
+This script makes the sessions.tsv files BIDS-compliant by renaming the file from 'sessions.tsv' to 'sub-{id}_sessions.tsv'.
+"""
+
 # Set the root directory where all subjects are located
 root_dir = '/cbica/projects/executive_function/data/bids/EF_bids_data_DataLad' #CUBIC project path
 
