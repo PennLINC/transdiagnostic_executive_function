@@ -77,6 +77,7 @@ Imaging Data:
 5. Preprocess the imaging data using BABS software.
    + `/preprocessing/babs_yaml_files` contains the yaml files for each BIDS App we ran
    + `/preprocessing/make_container_babs.sh` is an optional helper script to make a container for BIDS Apps
+   + Note that MEGRE sequences for QSM were not preprocessed; we did not run any BIDS Apps on them through BABS
 9. Complete quality control (using python scripts to concatenate data from individual scans into summary csv files and visualize the distribution of QC metrics for each modality) on the preprocessed scans and note which images are of poor quality or high quality.
     + `/analysis/unzip` folder contains some scripts necessary to unzip the files needed to grab the QC metrics for each modality, which should be run before the scripts in `QC/qc_scripts`
     + `/QC/qc_scripts` contains the Python scripts necessary for generating concatenated csv files with QC metrics for each modality and visualize distributions of the QC metrics, as well as a script to create and visualize the slices necessary for manual T1 QC ratings
