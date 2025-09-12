@@ -4,6 +4,10 @@ import json
 import sys
 from pathlib import Path
 
+"""
+This script organizes the files for multi-echo gradient-recalled echo sequence for QSM so that it is BIDS valid (moves from swi to anat folder and renames files with appropriate naming).
+"""
+
 def decide_part_from_imagetype(image_type_list):
     """
     Decide 'mag' or 'phase' based on ImageType list.
