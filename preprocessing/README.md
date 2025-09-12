@@ -14,3 +14,5 @@ The following BIDS Apps were run with BABS:
 + QSIRecon for diffusion post-processing
 + ASLPrep for ASL preprocessing
 + freesurfer-post to get Euler numbers added as a covariate for T1 QC
+
+Note that MEGRE sequences for QSM were **not** preprocessed; we did not run any BIDS Apps on them through BABS.
