@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Add `"Units": "arbitrary"` to MEGRE phase JSON sidecars.
+This script adds `"Units": "arbitrary"` to MEGRE phase JSON sidecars.
 
 Targets files matching:
   sub-*/ses-*/anat/sub-*_ses-*_echo-*_part-phase_MEGRE.json
