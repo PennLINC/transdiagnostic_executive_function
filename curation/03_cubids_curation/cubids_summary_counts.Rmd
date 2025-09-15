@@ -11,13 +11,14 @@ library(tidyverse)
 library(ggplot2)
 library(ggrepel)
 library(dplyr)
+library(stringr)
 ```
 
 
 
 ```{r load cubids summary, include=TRUE}
 # Read cubids summary tsv file
-cubids_summary <- read.delim('/Users/bsevchik/projects/EF_cubids_validation/final_cubids_validation_files/v42_summary.tsv', header = TRUE, stringsAsFactors = FALSE) # local path - replace
+cubids_summary <- read.delim('/Users/bsevchik/Documents/GitHub/transdiagnostic_executive_function/curation/03_cubids_curation/final_cubids_docs/v48_summary.tsv', header = TRUE, stringsAsFactors = FALSE) # local path - replace
 
 cubids_summary
 ```
@@ -97,7 +98,66 @@ cubids_image_summary
 ```
 
 
+```{r fmri-variant-breakdown, message=FALSE, warning=FALSE}
 
+base <- cubids_summary %>%
+  filter(!str_detect(KeyParamGroup, regex("fmap", ignore_case = TRUE)))
 
+is_rest  <- str_detect(base$KeyParamGroup, regex("task-rest|\\brest\\b", ignore_case = TRUE))
+is_nback <- str_detect(base$KeyParamGroup, regex("task-nback|\\bnback\\b", ignore_case = TRUE))
 
+# Helper function
+compute_variant_stats <- function(df, scope_label) {
+  if (nrow(df) == 0) {
+    return(NULL)
+  }
+  total <- sum(df$Counts, na.rm = TRUE)
+  dominant_ct <- max(df$Counts, na.rm = TRUE)
+  not_dom <- total - dominant_ct
+  
+  kpg <- df$KeyParamGroup
+  var_numvol_mask <- str_detect(kpg, regex("VARIANTNumVolumes", ignore_case = TRUE)) |
+                     str_detect(kpg, regex("VARIANTNumVolumesObliquity", ignore_case = TRUE))
+  var_obliq_mask  <- str_detect(kpg, regex("VARIANTObliquity", ignore_case = TRUE))
+  
+  var_numvol_ct <- sum(df$Counts[var_numvol_mask], na.rm = TRUE)
+  var_obliq_ct  <- sum(df$Counts[var_obliq_mask],  na.rm = TRUE)
+  
+  tibble(
+    scope = scope_label,
+    total_scans = total,
+    dominant_scans = dominant_ct,
+    not_dominant_scans = not_dom,
+    variant_numvolumes_count = var_numvol_ct,
+    variant_obliquity_count = var_obliq_ct,
+    pct_variant_numvolumes_of_total = round(100 * var_numvol_ct / total, 2),
+    pct_variant_obliquity_of_total  = round(100 * var_obliq_ct  / total, 2),
+    pct_variant_numvolumes_of_not_dominant = if (not_dom > 0) round(100 * var_numvol_ct / not_dom, 2) else NA_real_,
+    pct_variant_obliquity_of_not_dominant  = if (not_dom > 0) round(100 * var_obliq_ct  / not_dom, 2) else NA_real_
+  )
+}
+
+runs <- c("run-01", "run-02", "run-03")
+
+# Build per-task *only per-run*, no "all runs" rows
+build_for_task <- function(task_label, task_mask) {
+  task_df <- base[task_mask, , drop = FALSE]
+  out <- list()
+  for (r in runs) {
+    run_df <- task_df %>% filter(str_detect(KeyParamGroup, regex(r, ignore_case = TRUE)))
+    out[[length(out) + 1]] <- compute_variant_stats(run_df, paste(task_label, r))
+  }
+  bind_rows(out)
+}
+
+rest_tbl  <- build_for_task("rest",  is_rest)
+nback_tbl <- build_for_task("nback", is_nback)
+
+variant_summary_tbl <- bind_rows(rest_tbl, nback_tbl) %>%
+  mutate(scope = factor(scope, levels = c(paste("rest", runs), paste("nback", runs)))) %>%
+  arrange(scope)
+
+variant_summary_tbl
+
+```
 
