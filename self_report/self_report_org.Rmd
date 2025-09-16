@@ -1,0 +1,128 @@
+---
+title: "self_report_org"
+output: html_document
+date: "2025-09-16"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+```
+
+
+```{r load packages, include=FALSE}
+library(tidyverse)
+library(dplyr)
+```
+
+```{r load necessary files}
+library(tidyverse)
+library(dplyr)
+
+# 1) Load the two CSVs
+participants_path <- "/Users/bsevchik/projects/EF_clinical/participants.csv"
+selfreports_path  <- "/Users/bsevchik/projects/EF_clinical/self-report/ef_selfreports_no_phi.csv"
+```
+
+
+```{r clean and filter}
+
+participants <- read.csv(participants_path, stringsAsFactors = FALSE, check.names = FALSE)
+ef_selfreports <- read.csv(selfreports_path, stringsAsFactors = FALSE, check.names = FALSE)
+
+# 2) Keep only rows in ef_selfreports where 'bblid' matches the number after 'sub-'
+#    in the 'participant_id' column of participants.csv.
+
+# extract the numeric ID immediately following "sub-" (e.g., "sub-12345" -> "12345")
+extract_sub_id <- function(x) {
+  # returns the first run of digits after "sub-"
+  m <- regexpr("(?<=sub-)[0-9]+", x, perl = TRUE)
+  out <- ifelse(m > 0, regmatches(x, m), NA_character_)
+  return(out)
+}
+
+participant_bblids <- extract_sub_id(as.character(participants$participant_id))
+participant_bblids <- participant_bblids[!is.na(participant_bblids) & nzchar(participant_bblids)]
+
+# ensure both sides are character for a clean match
+ef_selfreports$bblid <- as.character(ef_selfreports$bblid)
+
+ef_selfreports_scanned <- ef_selfreports[ef_selfreports$bblid %in% participant_bblids, , drop = FALSE]
+
+# 3) Drop any columns where all values are NA
+keep_cols <- vapply(ef_selfreports_scanned, function(col) !all(is.na(col)), logical(1))
+ef_selfreports_scanned <- ef_selfreports_scanned[, keep_cols, drop = FALSE]
+
+ef_selfreports_scanned
+
+#write.csv(ef_seflreports_scanned, "/Users/bsevchik/projects/EF_clinical/self-report/ef_seflreports_scanned.csv", row.names = FALSE)
+
+#number of unique bblids to check
+
+```
+
+
+
+
+```{r create separate csvs for each self-report scale}
+# Define mapping of scale names to keywords
+scales <- list(
+  ALES       = c("ales_v2", "ales", "ales_complete"),
+  ALS18      = c("als18", "als18_complete"),
+  ARI        = c("ari_proband_complete", "ari"),
+  ASRM       = c("asrm", "asrm_complete"),
+  BDI        = c("bdi1a_child", "beck_depression_inventory_modified_child_bdi1a_complete"),
+  BISBAS     = c("bisbas_child", "behavioral_inhibitionactivation_system_child_versi_complete"),
+  `ESWAN-ADHD` = c("eswan_adhd_proband_complete", "eswan_adhd"),
+  `ESWAN-DMDD` = c("eswan_dmdd", "eswan_dmdd_proband_complete"),
+  MAPSSR     = c("mapssr", "mapssr_complete"),
+  PANAS      = c("panas", "child_panas_complete"),
+  PPA        = c("ppa", "ppa_complete"),
+  PRIME      = c("prime_sr_d_wolf", "prime_sr_v2", "prime", 
+                 "prime_screen_selfreport_complete", "prime_screen_selfreport_v2_complete"),
+  RPAS       = c("rpas", "rpas_complete"),
+  RSAS       = c("rsas", "rsas_complete"),
+  Substance  = c("substance", "substance_complete"),
+  TannerBoy  = c("tanner_boy", "tanner_developmental_boys_complete"),
+  TannerGirl = c("tanner_girl", "tanner_developmental_girls_complete"),
+  WolfIMEM   = c("wolf_im_em", "wolf_imem_short_complete")
+)
+
+# Directory where CSVs will be saved (adjust as needed)
+outdir <- "/Users/bsevchik/projects/EF_clinical/self-report/scale_csvs"
+if (!dir.exists(outdir)) dir.create(outdir, recursive = TRUE)
+
+# Generate CSV for each scale
+for (scale in names(scales)) {
+  keywords <- scales[[scale]]
+  
+  # Find matching columns (case-insensitive, partial matches allowed)
+  keep_cols <- grep(
+    paste(keywords, collapse = "|"),
+    names(ef_seflreports_scanned),
+    ignore.case = TRUE,
+    value = TRUE
+  )
+  
+  # Always keep identifiers if they exist
+  id_cols <- intersect(c("bblid", "participant_id", "scales_id"), names(ef_seflreports_scanned))
+  keep_cols <- unique(c(id_cols, keep_cols))
+  
+  # Drop unwanted columns with "collateral" or "_c"
+  keep_cols <- keep_cols[!grepl("collateral|_c", keep_cols, ignore.case = TRUE)]
+  
+  # Subset the dataframe
+  df_out <- ef_seflreports_scanned[, keep_cols, drop = FALSE]
+  
+  # Save CSV
+  out_path <- file.path(outdir, paste0(scale, ".csv"))
+  write.csv(df_out, out_path, row.names = FALSE)
+  
+  message("Wrote: ", out_path, " (", length(keep_cols), " columns)")
+}
+
+
+```
+
+
+
