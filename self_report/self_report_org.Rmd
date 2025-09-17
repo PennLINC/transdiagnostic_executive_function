@@ -68,10 +68,10 @@ ef_selfreports_scanned
 # Define mapping of scale names to keywords
 scales <- list(
   ALES       = c("ales_v2", "ales", "ales_complete"),
-  ALS18      = c("als18", "als18_complete"),
+  ALS18      = c("als", "als18_complete"),
   ARI        = c("ari_proband_complete", "ari"),
   ASRM       = c("asrm", "asrm_complete"),
-  BDI        = c("bdi1a_child", "beck_depression_inventory_modified_child_bdi1a_complete"),
+  BDI        = c("bdi_child", "beck_depression_inventory_modified_child_bdi1a_chi_complete"),
   BISBAS     = c("bisbas_child", "behavioral_inhibitionactivation_system_child_versi_complete"),
   `ESWAN-ADHD` = c("eswan_adhd_proband_complete", "eswan_adhd"),
   `ESWAN-DMDD` = c("eswan_dmdd", "eswan_dmdd_proband_complete"),
@@ -80,9 +80,8 @@ scales <- list(
   PPA        = c("ppa", "ppa_complete"),
   PRIME      = c("prime_sr_d_wolf", "prime_sr_v2", "prime", 
                  "prime_screen_selfreport_complete", "prime_screen_selfreport_v2_complete"),
-  RPAS       = c("rpas", "rpas_complete"),
-  RSAS       = c("rsas", "rsas_complete"),
-  Substance  = c("substance", "substance_complete"),
+  RPAS       = c("phys_anhed", "rpas_complete"),
+  RSAS       = c("soc_anhed", "rsas_complete"),
   TannerBoy  = c("tanner_boy", "tanner_developmental_boys_complete"),
   TannerGirl = c("tanner_girl", "tanner_developmental_girls_complete"),
   WolfIMEM   = c("wolf_im_em", "wolf_imem_short_complete")
@@ -108,8 +107,12 @@ for (scale in names(scales)) {
   id_cols <- intersect(c("bblid", "participant_id", "scales_id"), names(ef_seflreports_scanned))
   keep_cols <- unique(c(id_cols, keep_cols))
   
-  # Drop unwanted columns with "collateral" or "_c"
-  keep_cols <- keep_cols[!grepl("collateral|_c", keep_cols, ignore.case = TRUE)]
+  # Drop unwanted columns with "collateral" or "_c"; keep 'ch' or 'co' so 'child' and 'complete' are fine, but 'comments' is not
+keep_cols <- keep_cols[!grepl("collateral|_c(?![ho])|admin_scales|comments", 
+                              keep_cols, ignore.case = TRUE, perl = TRUE)]
+
+
+
   
   # Subset the dataframe
   df_out <- ef_seflreports_scanned[, keep_cols, drop = FALSE]
