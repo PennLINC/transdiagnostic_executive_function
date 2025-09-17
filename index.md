@@ -19,7 +19,7 @@ forms of psychopathology, including attention deficit hyperactivity disorder (AD
 spectrum (PS).
 There are relatively few open data resources specifically tailored to evaluate the development of EF across
 clinical diagnoses. Here, we introduce a new data resource that combines longitudinal multi-modal
-imaging data (sMRI, dMRI, fMRI, ASL, & QSM) with rich clinical and cognitive phenotyping data.
+imaging data (sMRI, dMRI, fMRI, ASL, & MEGRE for QSM) with rich clinical and cognitive phenotyping data.
 
 ### Project Lead
 
