@@ -56,7 +56,7 @@ In preparation
 
 ### Conference presentations
 
-- Poster to be presented at Flux Congress, September 2025
+- Flux Congress, September 2025
 
 ### Code documentation
 
