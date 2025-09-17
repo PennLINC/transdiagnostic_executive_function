@@ -1,6 +1,6 @@
 ---
 layout: default
-title: Project Template
+title: Transdiagnostic Executive Function
 parent: Documentation
 has_children: false
 has_toc: false
