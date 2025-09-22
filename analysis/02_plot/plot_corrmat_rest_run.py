@@ -7,7 +7,7 @@ import pandas as pd
 if __name__ == "__main__":
     # Load parcel dseg info
     dseg_file = (
-        "/cbica/projects/executive_function/EF_dataset/derivatives/xcpd_BABS_EF_full_project_outputs/xcpd/atlases/atlas-4S1056Parcels/" #CUBIC project path
+        "/cbica/projects/executive_function/EF_dataset/derivatives/xcpd_BABS_EF_full_project_outputs/xcpd/atlases/atlas-4S1056Parcels/"
         "atlas-4S1056Parcels_dseg.tsv"
     )
     dseg_df = pd.read_table(dseg_file)
@@ -59,7 +59,7 @@ if __name__ == "__main__":
         )
     )
 
-    for task in ["rest_run-01"]:
+    for task in ["rest"]:
         # --- Exclude scans based on CSV ---
         excluded_scans = pd.read_csv(
             "/cbica/projects/executive_function/EF_dataset_figures/processing_scripts/excluded_scans_corrmat.csv"
@@ -78,12 +78,12 @@ if __name__ == "__main__":
         exclude_indices = [i for i, name in enumerate(region_labels) if name in excluded_regions]
 
         # --- Count total before filtering ---
-        rest_run_01_all = [cm for cm in corrmats if "task-rest_run-01" in cm]
-        print(f"Total rest_run-01 scans found: {len(rest_run_01_all)}")
+        rest_run_all = [cm for cm in corrmats if "task-rest" in cm]
+        print(f"Total rest scans found: {len(rest_run_all)}")
 
         # --- Filter correlation matrices ---
         selected_corrmats = [
-            cm for cm in rest_run_01_all 
+            cm for cm in rest_run_all 
             if not any(f"/{sub}/" in cm or f"/{sub}_" in cm for sub in excluded_scans)
         ]
         print(f"Included scans after exclusion: {len(selected_corrmats)}")
