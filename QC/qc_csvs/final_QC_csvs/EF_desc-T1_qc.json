@@ -1,0 +1,86 @@
+{
+    "participant_id": {
+        "LongName": "Participant identifier",
+        "Description": "The participant identifier indicates the participant that was scanned."
+    },
+    "session_id": {
+        "LongName": "Session identifier",
+        "Description": "The session identifier indicates the longitudinal session at which the participant was scanned.",
+        "Levels": {
+            "ses-1": "The first neuroimaging session; all participants went through at least one neuroimaging session",
+            "ses-2": "The second neuroimaging session (not all participants have a second session)",
+            "ses-3": "The third neuroimaging session (not all participants have a third session)"
+        }
+    },
+    "euler_LH": {
+        "LongName": "Euler Number for the Right Hemisphere",
+        "Description": "A measure of the topological complexity of the reconstructed cortical surface as calculated by the sum of the vertices and faces subtracted by the number of faces. Lower values below an ideal value of 2 indicate more defects in surface reconstruction.",
+        "TermURL": "https://doi.org/10.1016/j.neuroimage.2017.12.059"
+    },
+    "euler_RH": {
+        "LongName": "Euler Number for the Left Hemisphere",
+        "Description": "A measure of the topological complexity of the reconstructed cortical surface as calculated by the sum of the vertices and faces subtracted by the number of faces. Lower values below an ideal value of 2 indicate more defects in surface reconstruction.",
+        "TermURL": "https://doi.org/10.1016/j.neuroimage.2017.12.059"
+    },
+    "rater_1_slice_1": {
+        "LongName": "Rater 1's rating of the first slice (sagittal slice at x = 0.4)",
+        "Description": "A value between 0 and 1, with 1 indicating good-quality data and 0 indicating bad-quality data."
+    },
+    "rater_1_slice_2": {
+        "LongName": "Rater 1's rating of the second slice (sagittal slice at x = 0.6)",
+        "Description": "A value between 0 and 1, with 1 indicating good-quality data and 0 indicating bad-quality data."
+    },
+    "rater_1_slice_3": {
+        "LongName": "Rater 1's rating of the third slice (axial slice at z = 0.5)",
+        "Description": "A value between 0 and 1, with 1 indicating good-quality data and 0 indicating bad-quality data."
+    },
+    "rater_1_slice_4": {
+        "LongName": "Rater 1's rating of the fourth slice (axial slice at z = 0.6)",
+        "Description": "A value between 0 and 1, with 1 indicating good-quality data and 0 indicating bad-quality data."
+    },
+    "rater_2_slice_1": {
+        "LongName": "Rater 2's rating of the first slice (sagittal slice at x = 0.4)",
+        "Description": "A value between 0 and 1, with 1 indicating good-quality data and 0 indicating bad-quality data."
+    },
+    "rater_2_slice_2": {
+        "LongName": "Rater 2's rating of the second slice (sagittal slice at x = 0.6)",
+        "Description": "A value between 0 and 1, with 1 indicating good-quality data and 0 indicating bad-quality data."
+    },
+    "rater_2_slice_3": {
+        "LongName": "Rater 2's rating of the third slice (axial slice at z = 0.5)",
+        "Description": "A value between 0 and 1, with 1 indicating good-quality data and 0 indicating bad-quality data."
+    },
+    "rater_2_slice_4": {
+        "LongName": "Rater 2's rating of the fourth slice (axial slice at z = 0.6)",
+        "Description": "A value between 0 and 1, with 1 indicating good-quality data and 0 indicating bad-quality data."
+    },
+    "final_rating_slice_1": {
+        "LongName": "Final rating of the first slice (sagittal slice at x = 0.4), after consensus was reached among team members",
+        "Description": "A value between 0 and 1, with 1 indicating good-quality data and 0 indicating bad-quality data."
+    },
+    "final_rating_slice_2": {
+        "LongName": "Final rating of the second slice (sagittal slice at x = 0.6), after consensus was reached among team members",
+        "Description": "A value between 0 and 1, with 1 indicating good-quality data and 0 indicating bad-quality data."
+    },
+    "final_rating_slice_3": {
+        "LongName": "Final rating of the third slice (axial slice at z = 0.5), after consensus was reached among team members",
+        "Description": "A value between 0 and 1, with 1 indicating good-quality data and 0 indicating bad-quality data."
+    },
+    "final_rating_slice_4": {
+        "LongName": "Final rating of the fourth slice (axial slice at z = 0.6), after consensus was reached among team members",
+        "Description": "A value between 0 and 1, with 1 indicating good-quality data and 0 indicating bad-quality data."
+    },
+    "across_slices_final_average": {
+        "LongName": "Average rating across slices, from final ratings",
+        "Description": "A value between 0 and 1, with 1 indicating good-quality data and 0 indicating bad-quality data."
+    },
+    "qc_determination": {
+        "LongName": "QC Determination",
+        "Description": "The final determination of the scan's quality.",
+        "Levels": {
+            "Fail": "The scan fails QC",
+            "Artifact": "The scan includes an artifact that makes it of questionable quality",
+            "Pass": "The scan passes QC and should be included in analyses"
+        }
+    }
+}
