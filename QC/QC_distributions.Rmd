@@ -1,0 +1,353 @@
+---
+title: "T1_QC_distribution"
+author: "Brooke Sevchik"
+date: "2025-09-24"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r load T1 QC excel}
+# install.packages(c("readxl", "dplyr", "stringr", "janitor", "ggplot2"))
+library(readxl)
+library(dplyr)
+library(stringr)
+library(janitor)
+library(ggplot2)
+
+# --- 1) Read & clean ---
+# The screenshot shows two header rows; skip the first two so row 3 is the header.
+qc <- read_excel("/Users/bsevchik/projects/QC_docs/T1_QC_pass_fail.xlsx", skip=1) |> 
+  clean_names()  # subid, sesid, s1_score, s3_score, a2_score, a3_score, avg, pass_fail
+
+
+# Normalize labels and ensure numeric AVG
+qc_clean <- qc |>
+  mutate(
+    pass_fail = str_to_lower(as.character(pass_fail)),
+    pass_fail = case_when(
+      str_detect(pass_fail, "pass") ~ "pass",
+      str_detect(pass_fail, "fail") ~ "fail",
+      str_detect(pass_fail, "artifact") ~ "artifact",
+      TRUE ~ NA_character_
+    ),
+    avg = suppressWarnings(as.numeric(avg))
+  ) |>
+  filter(!is.na(avg), !is.na(pass_fail))
+
+# --- 2) Quick check of counts (optional) ---
+table(qc_clean$pass_fail)
+
+# --- 3) Histogram of AVG ratings (0–1), colored by status ---
+p <- ggplot(qc_clean, aes(x = avg, fill = pass_fail)) +
+  geom_histogram(binwidth = 0.05, boundary = 0, closed = "left", alpha = 0.85, color = "white") +
+  scale_x_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.1)) +
+  labs(
+    title = "Distribution of Average T1 QC Ratings",
+    x = "Average rating (0–1)",
+    y = "Count",
+    fill = "QC status"
+  ) +
+  theme_minimal(base_size = 13)
+
+print(p)
+
+# Save if you want
+ggsave("/Users/bsevchik/projects/QC_docs/T1_QC_avg_histogram.png", p, width = 7, height = 4.5, dpi = 300)
+
+# --- Optional: faceted view to compare shapes without stacking ---
+p_facets <- ggplot(qc_clean, aes(x = avg)) +
+  geom_histogram(binwidth = 0.05, boundary = 0, closed = "left") +
+  scale_x_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.1)) +
+  labs(title = "Average Ratings by QC Status", x = "Average rating (0–1)", y = "Count") +
+  facet_wrap(~ pass_fail, ncol = 1) +
+  theme_minimal(base_size = 13)
+# print(p_facets)
+# ggsave("T1_QC_avg_histogram_faceted.png", p_facets, width = 6, height = 7, dpi = 300)
+
+
+```
+
+
+```{r fMRI distribution}
+
+
+# --- 1) Read & clean ---
+# If your copy really has two header rows, set header_skip <- 2.
+header_skip <- 0  # change to 2 if needed
+
+qc_fMRI <- read_csv(
+  "/Users/bsevchik/Documents/GitHub/transdiagnostic_executive_function/QC/qc_csvs/final_QC_csvs/EF_desc-fMRI_qc.csv",
+  skip = header_skip,
+  show_col_types = FALSE
+)
+
+qc_clean_fMRI <- qc_fMRI %>%
+  mutate(
+    # normalize & sanitize the label
+    pass_fail = str_trim(str_to_lower(as.character(qc_determination))),
+    pass_fail = case_when(
+      str_detect(pass_fail, "^pass$") ~ "pass",
+      str_detect(pass_fail, "^fail$") ~ "fail",
+      TRUE ~ NA_character_
+    )
+  ) %>%
+  # keep rows where qc_determination is present and recognizable
+  filter(!is.na(qc_determination), !is.na(pass_fail))
+
+# --- 2) Counts of 'pass' and 'fail' in qc_determination ---
+pass_fail_counts <- qc_clean_fMRI %>%
+  count(pass_fail, name = "n") %>%
+  arrange(desc(n))
+
+print(pass_fail_counts)
+# Or if you prefer a base-R style table:
+# print(table(qc_clean_fMRI$pass_fail, useNA = "no"))
+
+# --- 3) Number of PARTICIPANTS with at least one 'pass' ---
+# Assumes participant_id column (present in your file).
+participants_with_any_pass <- qc_clean_fMRI %>%
+  group_by(participant_id) %>%
+  summarize(any_pass = any(pass_fail == "pass", na.rm = TRUE), .groups = "drop")
+
+n_participants_with_pass <- sum(participants_with_any_pass$any_pass)
+total_participants <- nrow(participants_with_any_pass)
+
+cat(
+  sprintf(
+    "Participants with at least one pass: %d out of %d (%.1f%%)\n",
+    n_participants_with_pass,
+    total_participants,
+    100 * n_participants_with_pass / total_participants
+  )
+)
+
+
+```
+
+
+```{r diffusion distribution}
+
+# FIRST FOR SCALAR MAPS
+
+# --- 1) Read & clean ---
+# If your copy really has two header rows, set header_skip <- 2.
+header_skip <- 0  # change to 2 if needed
+
+qc_diffusion <- read_csv(
+  "/Users/bsevchik/Documents/GitHub/transdiagnostic_executive_function/QC/qc_csvs/final_QC_csvs/EF_desc-diffusion_qc.csv",
+  skip = header_skip,
+  show_col_types = FALSE
+)
+
+qc_clean_diffusion <- qc_diffusion %>%
+  mutate(
+    # normalize & sanitize the label
+    pass_fail = str_trim(str_to_lower(as.character(qc_determination_scalar_maps))),
+    pass_fail = case_when(
+      str_detect(pass_fail, "^pass$") ~ "pass",
+      str_detect(pass_fail, "^fail$") ~ "fail",
+      TRUE ~ NA_character_
+    )
+  ) %>%
+  # keep rows where qc_determination is present and recognizable
+  filter(!is.na(qc_determination_scalar_maps), !is.na(pass_fail))
+
+# --- 2) Counts of 'pass' and 'fail' in qc_determination ---
+pass_fail_counts <- qc_clean_diffusion %>%
+  count(pass_fail, name = "n") %>%
+  arrange(desc(n))
+
+print(pass_fail_counts)
+# Or if you prefer a base-R style table:
+# print(table(qc_clean_fMRI$pass_fail, useNA = "no"))
+
+# --- 3) Number of PARTICIPANTS with at least one 'pass' ---
+# Assumes participant_id column (present in your file).
+participants_with_any_pass <- qc_clean_diffusion %>%
+  group_by(participant_id) %>%
+  summarize(any_pass = any(pass_fail == "pass", na.rm = TRUE), .groups = "drop")
+
+n_participants_with_pass <- sum(participants_with_any_pass$any_pass)
+total_participants <- nrow(participants_with_any_pass)
+
+cat(
+  sprintf(
+    "Participants with at least one pass: %d out of %d (%.1f%%)\n",
+    n_participants_with_pass,
+    total_participants,
+    100 * n_participants_with_pass / total_participants
+  )
+)
+
+
+# NOW FOR BUNDLES
+
+# --- 1) Read & clean ---
+# If your copy really has two header rows, set header_skip <- 2.
+header_skip <- 0  # change to 2 if needed
+
+qc_diffusion_bundles <- read_csv(
+  "/Users/bsevchik/Documents/GitHub/transdiagnostic_executive_function/QC/qc_csvs/final_QC_csvs/EF_desc-diffusion_qc.csv",
+  skip = header_skip,
+  show_col_types = FALSE
+)
+
+qc_clean_diffusion_bundles <- qc_diffusion_bundles %>%
+  mutate(
+    # normalize & sanitize the label
+    pass_fail = str_trim(str_to_lower(as.character(qc_determination_bundles))),
+    pass_fail = case_when(
+      str_detect(pass_fail, "^pass$") ~ "pass",
+      str_detect(pass_fail, "^fail$") ~ "fail",
+      TRUE ~ NA_character_
+    )
+  ) %>%
+  # keep rows where qc_determination is present and recognizable
+  filter(!is.na(qc_determination_bundles), !is.na(pass_fail))
+
+# --- 2) Counts of 'pass' and 'fail' in qc_determination ---
+pass_fail_counts <- qc_clean_diffusion_bundles %>%
+  count(pass_fail, name = "n") %>%
+  arrange(desc(n))
+
+print(pass_fail_counts)
+# Or if you prefer a base-R style table:
+# print(table(qc_clean_fMRI$pass_fail, useNA = "no"))
+
+# --- 3) Number of PARTICIPANTS with at least one 'pass' ---
+# Assumes participant_id column (present in your file).
+participants_with_any_pass <- qc_clean_diffusion_bundles %>%
+  group_by(participant_id) %>%
+  summarize(any_pass = any(pass_fail == "pass", na.rm = TRUE), .groups = "drop")
+
+n_participants_with_pass <- sum(participants_with_any_pass$any_pass)
+total_participants <- nrow(participants_with_any_pass)
+
+cat(
+  sprintf(
+    "Participants with at least one pass: %d out of %d (%.1f%%)\n",
+    n_participants_with_pass,
+    total_participants,
+    100 * n_participants_with_pass / total_participants
+  )
+)
+
+
+```
+
+
+```{r ASL distribution}
+
+# --- 1) Read & clean ---
+# If your copy really has two header rows, set header_skip <- 2.
+header_skip <- 0  # change to 2 if needed
+
+qc_ASL <- read_csv(
+  "/Users/bsevchik/Documents/GitHub/transdiagnostic_executive_function/QC/qc_csvs/final_QC_csvs/EF_desc-asl_qc.csv",
+  skip = header_skip,
+  show_col_types = FALSE
+)
+
+qc_clean_ASL <- qc_ASL %>%
+  mutate(
+    # normalize & sanitize the label
+    pass_fail = str_trim(str_to_lower(as.character(qc_determination))),
+    pass_fail = case_when(
+      str_detect(pass_fail, "^pass$") ~ "pass",
+      str_detect(pass_fail, "^fail$") ~ "fail",
+      TRUE ~ NA_character_
+    )
+  ) %>%
+  # keep rows where qc_determination is present and recognizable
+  filter(!is.na(qc_determination), !is.na(pass_fail))
+
+# --- 2) Counts of 'pass' and 'fail' in qc_determination ---
+pass_fail_counts <- qc_clean_fMRI %>%
+  count(pass_fail, name = "n") %>%
+  arrange(desc(n))
+
+print(pass_fail_counts)
+# Or if you prefer a base-R style table:
+# print(table(qc_clean_fMRI$pass_fail, useNA = "no"))
+
+# --- 3) Number of PARTICIPANTS with at least one 'pass' ---
+# Assumes participant_id column (present in your file).
+participants_with_any_pass <- qc_clean_fMRI %>%
+  group_by(participant_id) %>%
+  summarize(any_pass = any(pass_fail == "pass", na.rm = TRUE), .groups = "drop")
+
+n_participants_with_pass <- sum(participants_with_any_pass$any_pass)
+total_participants <- nrow(participants_with_any_pass)
+
+cat(
+  sprintf(
+    "Participants with at least one pass: %d out of %d (%.1f%%)\n",
+    n_participants_with_pass,
+    total_participants,
+    100 * n_participants_with_pass / total_participants
+  )
+)
+
+```
+
+
+```{r T1 distribution}
+
+
+# --- 1) Read & clean ---
+# If your copy really has two header rows, set header_skip <- 2.
+header_skip <- 0  # change to 2 if needed
+
+qc_T1 <- read_csv(
+  "/Users/bsevchik/Documents/GitHub/transdiagnostic_executive_function/QC/qc_csvs/final_QC_csvs/EF_desc-T1_qc.csv",
+  skip = header_skip,
+  show_col_types = FALSE
+)
+
+qc_clean_T1 <- qc_T1 %>%
+  mutate(
+    # normalize & sanitize the label
+    pass_fail = str_trim(str_to_lower(as.character(qc_determination))),
+    pass_fail = case_when(
+      str_detect(pass_fail, "^pass$") ~ "pass",
+      str_detect(pass_fail, "^fail$") ~ "fail",
+      str_detect(pass_fail, "^artifact$") ~ "artifact",
+      TRUE ~ NA_character_
+    )
+  ) %>%
+  # keep rows where qc_determination is present and recognizable
+  filter(!is.na(qc_determination), !is.na(pass_fail))
+
+# --- 2) Counts of 'pass' and 'fail' in qc_determination ---
+pass_fail_counts <- qc_clean_T1 %>%
+  count(pass_fail, name = "n") %>%
+  arrange(desc(n))
+
+print(pass_fail_counts)
+# Or if you prefer a base-R style table:
+# print(table(qc_clean_fMRI$pass_fail, useNA = "no"))
+
+# --- 3) Number of PARTICIPANTS with at least one 'pass' ---
+# Assumes participant_id column (present in your file).
+participants_with_any_pass <- qc_clean_T1 %>%
+  group_by(participant_id) %>%
+  summarize(any_pass = any(pass_fail == "pass", na.rm = TRUE), .groups = "drop")
+
+n_participants_with_pass <- sum(participants_with_any_pass$any_pass)
+total_participants <- nrow(participants_with_any_pass)
+
+cat(
+  sprintf(
+    "Participants with at least one pass: %d out of %d (%.1f%%)\n",
+    n_participants_with_pass,
+    total_participants,
+    100 * n_participants_with_pass / total_participants
+  )
+)
+
+
+```
+
