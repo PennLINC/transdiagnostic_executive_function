@@ -1,0 +1,31 @@
+{
+    "participant_id": {
+        "LongName": "Participant identifier",
+        "Description": "The participant identifier indicates the participant that was scanned."
+    },
+    "session_id": {
+        "LongName": "Session identifier",
+        "Description": "The session identifier indicates the longitudinal session at which the participant was scanned.",
+        "Levels": {
+            "ses-1": "The first neuroimaging session; all participants went through at least one neuroimaging session",
+            "ses-2": "The second neuroimaging session (not all participants have a second session)",
+            "ses-3": "The third neuroimaging session (not all participants have a third session)"
+        }
+    },
+    "mean_FD": {
+        "LongName": "Mean Framewise Displacement",
+        "Description": "A measure of overall head movement, creating by adding the frame-to-frame differences in head motion parameters and taking the average over all time points"
+    },
+    "raw_neighborhood_corr": {
+        "LongName": "Raw Neighborhood Correlation",
+        "Description": "A measure of the similarity of diffusion-weighted images to their immediate spatial neighbors; checks how well intensity patterns in each voxel agree with those in its local 3D neighborhood"
+    },
+    "qc_determination": {
+        "LongName": "QC Determination",
+        "Description": "The final determination of the scan's quality.",
+        "Levels": {
+            "Fail": "The scan fails QC",
+            "Pass": "The scan passes QC and should be included in analyses"
+        }
+    }
+}
