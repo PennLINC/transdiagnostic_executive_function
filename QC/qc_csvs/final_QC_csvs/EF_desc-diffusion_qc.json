@@ -28,11 +28,19 @@
         "LongName": "Number of Missing Bundles",
         "Description": "For that subject and session, the number of bundles they are missing completely (N/A)"
     },
-    "qc_determination": {
-        "LongName": "QC Determination",
-        "Description": "The final determination of the scan's quality.",
+    "qc_determination_scalar_maps": {
+        "LongName": "QC Determination for Scalar Maps",
+        "Description": "The final determination of the scan's quality based on mean FD and raw neighborhood correlation. This is used to determine scans to exclude when plotting scalar maps for diffusion",
         "Levels": {
-            "Fail": "The scan fails QC. A scan failed for use in scalar map figures if it had a mean FD > 2.8, determined based on the visual scatterplot outliers of neighbohorhood corr vs. mean FD. A scan failed from a bundle basis if a subject/session had greater than 30 outlier bundles.",
+            "Fail": "The scan fails QC. A scan failed for use in scalar map figures if it had a mean FD > 2.8, determined based on the visual scatterplot outliers of neighbohorhood corr vs. mean FD.",
+            "Pass": "The scan passes QC and should be included in analyse."
+        }
+    },
+    "qc_determination_bundles": {
+        "LongName": "QC Determination for Bundles",
+        "Description": "The final determination of the scan's quality based on the number of outlier bundles.",
+        "Levels": {
+            "Fail": "A scan failed from a bundle basis if a subject/session had greater than 30 outlier bundles.",
             "Pass": "The scan passes QC and should be included in analyse."
         }
     }
