@@ -1,3 +1,3 @@
 # Transdiagnostic Executive Function
 
-Reproducibility details found here: {insert github pages link once published}
+Reproducibility details found here: https://pennlinc.github.io/transdiagnostic_executive_function/
