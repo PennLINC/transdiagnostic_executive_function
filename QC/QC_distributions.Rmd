@@ -240,14 +240,14 @@ qc_clean_ASL <- qc_ASL %>%
   filter(!is.na(qc_determination), !is.na(pass_fail))
 
 # --- 2) Counts of 'pass' and 'fail' in qc_determination ---
-pass_fail_counts <- qc_clean_fMRI %>%
+pass_fail_counts <- qc_clean_ASL %>%
   count(pass_fail, name = "n") %>%
   arrange(desc(n))
 
 print(pass_fail_counts)
 
 # --- 3) Number of PARTICIPANTS with at least one 'pass' ---
-participants_with_any_pass <- qc_clean_fMRI %>%
+participants_with_any_pass <- qc_clean_ASL %>%
   group_by(participant_id) %>%
   summarize(any_pass = any(pass_fail == "pass", na.rm = TRUE), .groups = "drop")
 
