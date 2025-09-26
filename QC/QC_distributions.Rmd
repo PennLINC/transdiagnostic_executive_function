@@ -108,6 +108,20 @@ cat(
   )
 )
 
+# --- 4) Number of SESSIONS with at least one 'pass' ---
+session_level <- qc_clean_fMRI %>%
+  group_by(participant_id, session_id) %>%
+  summarise(
+    session_pass = any(pass_fail == "pass"),
+    .groups = "drop"
+  )
+total_sessions <- nrow(session_level)
+sessions_with_at_least_one_pass <- sum(session_level$session_pass)
+sessions_without_pass <- total_sessions - sessions_with_at_least_one_pass
+
+cat(sprintf("Total sessions: %d\n", total_sessions))
+cat(sprintf("Sessions with ≥1 pass: %d\n", sessions_with_at_least_one_pass))
+cat(sprintf("Sessions with 0 passes: %d\n", sessions_without_pass))
 
 ```
 
