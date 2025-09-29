@@ -1,0 +1,294 @@
+---
+title: "EF_feather_plot.Rmd"
+author: "Brooke Sevchik"
+date: "2025-09-24"
+output: html_document
+---
+
+# Pre-Plotting
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r load libraries}
+library(dplyr)
+library(tidyr)
+library(lubridate)
+library(ggplot2)
+library(forcats)
+library(ssh)
+```
+
+```{r load in necessary files}
+# Load in acq_time_data and input data from cubic - requires you to mount cubic onto laptop for this to run
+
+input_data <- read.csv('/Volumes/cbica/projects/executive_function/code/data/input_data_feather_plot.csv')
+
+acq_time_data <- read.csv('/Volumes/cbica/projects/executive_function/data/bids/EF_bids_data/all_session_times.csv')
+
+scanned_participants <- read.csv('/Users/bsevchik/projects/EF_clinical/participants.csv')
+
+# Load in subject data from remote server (will prompt password)
+session <- ssh_connect("bsevchik@bblrepo1.pmacs.upenn.edu")  # will prompt once for password
+csv_text <- ssh_exec_internal(session, "cat /data/secure/bit_dwh/oracle/subject.csv")
+subject_data <- read.csv(text = rawToChar(csv_text$stdout))
+ssh_disconnect(session)
+
+
+```
+
+
+
+Get DOB for participants in EF
+```{r dob}
+# just select columns you need
+subject_data <- subject_data %>%
+  select(BBLID, DOBIRTH)
+
+# Strip "sub-" from scanned_participants IDs
+scanned_ids <- scanned_participants %>%
+  mutate(BBLID = sub("^sub-", "", participant_id)) %>%
+  pull(BBLID)
+
+# Filter subject_data to only keep matching IDs
+subject_data <- subject_data %>%
+  filter(BBLID %in% scanned_ids)
+subject_data
+```
+
+
+Add in columns 'session-id' (all filled in with value '1') and acq_time (leave blank for time)
+```{r add new columns}
+# Add new columns
+input_data$session_id <- "1"
+input_data$acq_time   <- ""            # leave blank for now
+input_data$dob        <- ""  #leave blank for now
+
+```
+
+Now, using acq_time_data, fill in subsequent sessions for each participant, and fill in acquisition time for each session.
+```{r load in necessary files}
+
+library(dplyr)
+library(tidyr)
+
+# Ensure input_data has consistent types
+input_data <- input_data %>%
+  mutate(
+    participant_id = as.character(participant_id),  # e.g., "1"
+    session_id     = as.character(session_id),      # currently "1" for all
+    acq_time       = as.character(acq_time)
+  )
+
+# Normalize acq_time_data: strip "sub-" and "ses-"
+acq_norm <- acq_time_data %>%
+  mutate(
+    subject          = sub("^sub-", "", as.character(subject)),  # "sub-1" -> "1"
+    session          = as.character(session),
+    acquisition_time = as.character(acquisition_time),
+    session_id       = sub("^ses-", "", session)                 # "ses-1" -> "1"
+  ) %>%
+  filter(session_id %in% c("1","2","3"))
+
+# --- 1) Update acq_time for session 1 in input_data
+acq_s1 <- acq_norm %>%
+  filter(session_id == "1") %>%
+  select(participant_id = subject, session_id, acq_time = acquisition_time)
+
+input_s1_updated <- input_data %>%
+  left_join(acq_s1, by = c("participant_id","session_id")) %>%
+  mutate(acq_time = dplyr::coalesce(acq_time.y, acq_time.x)) %>%
+  select(-acq_time.x, -acq_time.y)
+
+# --- 2) Add rows for sessions 2–3, leaving other columns blank
+acq_s23 <- acq_norm %>%
+  filter(session_id %in% c("2","3")) %>%
+  transmute(participant_id = subject, session_id, acq_time = acquisition_time)
+
+all_cols   <- names(input_s1_updated)
+blank_cols <- setdiff(all_cols, c("participant_id","session_id","acq_time"))
+
+if (nrow(acq_s23) == 0) {
+  # No ses-2/3 rows exist; create a 0-row skeleton
+  new_rows <- input_s1_updated[0, all_cols]
+} else {
+  new_rows <- acq_s23
+  
+  # Decide which blanks should be "" vs NA based on target column types
+  is_char <- sapply(input_s1_updated[blank_cols], function(x) is.character(x) || is.factor(x))
+  is_num  <- sapply(input_s1_updated[blank_cols], is.numeric)
+  
+  for (cn in names(is_char)[is_char]) new_rows[[cn]] <- rep_len("", nrow(new_rows))
+  for (cn in names(is_num)[is_num])   new_rows[[cn]] <- rep(NA_real_, nrow(new_rows))
+  
+  other_cols <- setdiff(blank_cols, c(names(is_char)[is_char], names(is_num)[is_num]))
+  for (cn in other_cols) new_rows[[cn]] <- rep(NA_character_, nrow(new_rows))
+  
+  new_rows <- new_rows %>% select(all_of(all_cols))
+}
+
+# --- 3) Combine and tidy
+updated_input <- bind_rows(input_s1_updated, new_rows) %>%
+  arrange(participant_id, suppressWarnings(as.integer(session_id)))
+
+
+```
+
+Fill in DOB for each participant
+```{r add DOB}
+# Ensure join keys are the same type
+subject_data <- subject_data %>% mutate(BBLID = as.character(BBLID))
+updated_input <- updated_input %>% mutate(participant_id = as.character(participant_id))
+
+# Join DOBIRTH onto updated_input and overwrite dob
+updated_input <- updated_input %>%
+  left_join(subject_data %>% select(BBLID, DOBIRTH),
+            by = c("participant_id" = "BBLID")) %>%
+  mutate(dob = dplyr::coalesce(DOBIRTH, dob)) %>%
+  select(-DOBIRTH)
+```
+
+Now, fill in study_group, sex, race, and ethnicity blanks for session 2 and 3 with the same info as from session 1. 
+```{r fill in demographics info}
+demog_cols <- c("study_group","sex","race","ethnicity")
+
+# ensure character so "" checks work
+updated_input <- updated_input %>%
+  mutate(across(any_of(demog_cols), ~as.character(.)))
+
+# build lookup from session 1
+demog_lookup <- updated_input %>%
+  filter(session_id == "1") %>%
+  select(participant_id, dplyr::all_of(demog_cols)) %>%
+  distinct()
+
+# join ses-1 values
+updated_input <- updated_input %>%
+  left_join(demog_lookup, by = "participant_id", suffix = c("", ".s1"))
+
+# fill only for sessions 2/3 where blank/NA
+fill_mask <- updated_input$session_id %in% c("2","3")
+for (cn in demog_cols) {
+  s1_col <- paste0(cn, ".s1")
+  # if target col is missing/blank and it's session 2/3, copy from s1
+  to_fill <- fill_mask & (is.na(updated_input[[cn]]) | updated_input[[cn]] == "")
+  updated_input[[cn]][to_fill] <- updated_input[[s1_col]][to_fill]
+}
+
+# clean up helper columns
+updated_input <- updated_input %>% select(-dplyr::ends_with(".s1"))
+
+
+```
+
+
+Now, calculate age (in months & years) for sessions 2 and 3, using info from acq_time for all sessions and DOB
+```{r calculate age}
+
+# Start with the combined data
+df <- if (exists("updated_input")) updated_input else input_data
+
+df <- df %>%
+  mutate(
+    # Ensure strings
+    dob_chr = as.character(dob),
+    acq_chr = as.character(acq_time),
+
+    # Parse DOB (support "YYYY-MM-DD" and "MM/DD/YYYY")
+    dob_date = dplyr::coalesce(
+      suppressWarnings(ymd(dob_chr, quiet = TRUE)),
+      suppressWarnings(mdy(dob_chr, quiet = TRUE))
+    ),
+
+    # Parse acquisition time (supports "YYYY-MM-DDTHH:MM:SS[.ffffff]")
+    acq_dt = suppressWarnings(ymd_hms(acq_chr, quiet = TRUE, tz = "UTC")),
+    acq_date = dplyr::coalesce(as_date(acq_dt),
+                               suppressWarnings(ymd(acq_chr, quiet = TRUE)))
+  ) %>%
+  rowwise() %>%
+  mutate(
+    age_months = if (is.na(dob_date) || is.na(acq_date))
+      NA_integer_ else as.integer(floor(time_length(interval(dob_date, acq_date), "months"))),
+    age = if (is.na(dob_date) || is.na(acq_date))
+      NA_real_ else round(time_length(interval(dob_date, acq_date), "years"), 2)
+  ) %>%
+  ungroup() %>%
+  select(-dob_chr, -acq_chr, -acq_dt)  # keep dob_date & acq_date if you find them useful
+
+updated_input <- df
+
+
+# Get average age across essions
+mean_age <- mean(updated_input$age)
+print(mean_age)
+
+```
+
+
+
+
+
+
+
+
+# Plotting
+
+```{r feather plot code}
+
+df <- updated_input %>%
+  mutate(
+    session_id = factor(session_id, levels = c("1","2","3")),
+    age = as.numeric(age)
+  ) %>%
+  filter(!is.na(age))  # need age to place points/lines
+
+# Order participants by baseline (session 1) age; if missing, fall back to min age
+id_order <- df %>%
+  group_by(participant_id) %>%
+  summarize(
+    baseline_age = suppressWarnings(min(age[session_id == "1"], na.rm = TRUE)),
+    any_age      = suppressWarnings(min(age, na.rm = TRUE)),
+    .groups = "drop"
+  ) %>%
+  mutate(baseline_age = ifelse(is.infinite(baseline_age), any_age, baseline_age)) %>%
+  arrange(baseline_age) %>%
+  mutate(y_index = row_number())
+
+# attach y-position to each row
+df_plot <- df %>% left_join(id_order, by = "participant_id")
+
+# one segment per participant spanning min→max observed age
+seg_df <- df_plot %>%
+  group_by(participant_id, y_index) %>%
+  summarize(xmin = min(age, na.rm = TRUE),
+            xmax = max(age, na.rm = TRUE),
+            .groups = "drop") %>%
+  filter(is.finite(xmin), is.finite(xmax))
+
+# ——— Feather plot (segments + colored session points) ———
+p <- ggplot() +
+  geom_segment(data = seg_df,
+               aes(x = xmin, xend = xmax, y = y_index, yend = y_index),
+               linewidth = 0.7, color = "grey80") +
+  geom_point(data = df_plot,
+             aes(x = age, y = y_index, color = session_id),
+             size = 2.2) +
+  scale_y_continuous(breaks = id_order$y_index, labels = id_order$participant_id) +
+  labs(x = "Age (years)", y = "Participant", color = "Session") +
+  theme_minimal(base_size = 12) +
+  theme(
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor = element_blank(),
+    axis.text.y  = element_blank(),
+    axis.ticks.y = element_blank()
+  )
+
+p
+
+ggsave("/Users/bsevchik/projects/EF_clinical/feather_plot/feather_plot.png", p,
+       width = 8, height = 12, dpi = 300)  # make height bigger
+
+```
+
+
