@@ -29,9 +29,7 @@ for f in range(len(file_list)):
     fileNames = np.array(fileNames)
 
     # define file types you want from fmriprep_anat outputs
-    dataTypes = ['_space-MNI152NLin6Asym_res-1_desc-preproc_T1w.nii.gz',
-						     '_desc-preproc_T1w.nii.gz']
-
+    dataTypes = ['_from-T1w_to-MNI152NLin6Asym_mode-image_xfm.h5']
 
     wantedFiles = []
     for dataType in dataTypes:
