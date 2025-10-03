@@ -226,9 +226,17 @@ print(mean_age)
 ```
 
 
+```{r change df to deal with subject with incomplete session}
+# Remove the row for subject 20812 at session 1
+updated_input <- updated_input %>%
+  filter(!(participant_id == "20812" & session_id == "1"))
 
-
-
+# Change subject 20812, session 2 -> session 1, session 3 -> session 2
+updated_input <- updated_input %>%
+  mutate(session_id = ifelse(participant_id == "20812" & session_id == "2", "1",
+                      ifelse(participant_id == "20812" & session_id == "3", "2",
+                             session_id)))
+```
 
 
 
