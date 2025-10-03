@@ -120,6 +120,45 @@ age_mean <- mean(UPDATED_demographic_data_scanned$age)
 print(age_range)
 print(age_mean)
 ```
+```{r look at age and sex distribution across study groups}
+# Age summary by study group
+age_summary <- UPDATED_demographic_data_scanned %>%
+  group_by(study_group) %>%
+  summarise(
+    age_min = min(age, na.rm = TRUE),
+    age_max = max(age, na.rm = TRUE),
+    age_mean = round(mean(age, na.rm = TRUE), 2),
+    n = n()
+  ) %>%
+  arrange(study_group)
+
+age_summary
+
+# Sex summary by study group
+sex_summary <- UPDATED_demographic_data_scanned %>%
+  mutate(sex = if_else(is.na(sex), "N/A", sex)) %>%
+  group_by(study_group, sex) %>%
+  summarise(n = n(), .groups = "drop") %>%
+  arrange(study_group, sex)
+sex_summary
+
+# One-way ANOVA
+anova_age <- aov(age ~ study_group, data = UPDATED_demographic_data_scanned)
+summary(anova_age)
+
+
+
+# Contingency table of sex by group
+sex_table <- table(UPDATED_demographic_data_scanned$study_group,
+                   UPDATED_demographic_data_scanned$sex)
+#Chi-square test
+chisq.test(sex_table)
+
+
+```
+
+```
+
 
 
 Create bar charts to visualize demographic info.
