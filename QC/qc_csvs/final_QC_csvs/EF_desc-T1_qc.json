@@ -13,12 +13,12 @@
         }
     },
     "euler_LH": {
-        "LongName": "Euler Number for the Right Hemisphere",
+        "LongName": "Euler Number for the Left Hemisphere",
         "Description": "A measure of the topological complexity of the reconstructed cortical surface as calculated by the sum of the vertices and faces subtracted by the number of faces. Lower values below an ideal value of 2 indicate more defects in surface reconstruction.",
         "TermURL": "https://doi.org/10.1016/j.neuroimage.2017.12.059"
     },
     "euler_RH": {
-        "LongName": "Euler Number for the Left Hemisphere",
+        "LongName": "Euler Number for the Right Hemisphere",
         "Description": "A measure of the topological complexity of the reconstructed cortical surface as calculated by the sum of the vertices and faces subtracted by the number of faces. Lower values below an ideal value of 2 indicate more defects in surface reconstruction.",
         "TermURL": "https://doi.org/10.1016/j.neuroimage.2017.12.059"
     },
@@ -76,7 +76,7 @@
     },
     "qc_determination": {
         "LongName": "QC Determination",
-        "Description": "The final determination of the scan's quality.",
+        "Description": "The final categorical determination of the scan's quality.",
         "Levels": {
             "Fail": "The scan fails QC",
             "Artifact": "The scan includes an artifact that makes it of questionable quality",
