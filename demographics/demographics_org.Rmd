@@ -188,7 +188,6 @@ chisq.test(sex_table)
 
 ```
 
-```
 
 
 
