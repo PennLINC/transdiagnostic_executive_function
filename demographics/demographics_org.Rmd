@@ -324,7 +324,26 @@ dev.off()
 ```
 
 
+```{r stacked bar plot as PDF}
+# Define the plot as an object so we can reuse it
+age_sex_plot <- ggplot(UPDATED_demographic_data_scanned, aes(x = age, fill = sex)) +
+  geom_bar(position = "stack") +
+  labs(title = "Age by Sex Distribution",
+       x = "Age (Years)",
+       y = "Count",
+       fill = "Sex") +
+  theme_minimal(base_size = 20) +
+  theme(
+    plot.title = element_text(hjust = 0.5)
+  ) +
+  scale_fill_manual(values = c("M" = "#B6A6E9", "F" = "#4394E5"))
 
+# Save as vector PDF
+ggsave("/Users/bsevchik/projects/EF_final_figures/01_input/R_fig2_participants/age_sex_stacked_bar_chart.pdf",
+       plot = age_sex_plot,
+       width = 10, height = 8, device = cairo_pdf)
+
+```
 
 
 
