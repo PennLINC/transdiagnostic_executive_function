@@ -100,7 +100,50 @@ print(summary_df)
 #write.csv(summary_df, file = #"/Users/bsevchik/projects/EF_clinical/final_clinical_CNB/clinical/diagnoses_wideform.csv", row.names = FALSE) # local path
 
 ```
+```{r distribution}
+# Assuming `summary_df` is your 3-row summary table with counts
+# Convert wide to long format
+summary_long <- summary_df %>%
+  pivot_longer(cols = starts_with("dx_"),
+               names_to = "diagnosis",
+               values_to = "count")
 
+# Normalize to proportions within each study_group
+summary_long <- summary_long %>%
+  group_by(study_group) %>%
+  mutate(prop = count / sum(count))
+
+# Define labels for ggplot key (change this once you figure out what exact labels mean)
+diagnosis_labels <- c(
+  dx_adhd = "ADHD",
+  dx_adhd_remit = "ADHD (Remitted)",
+  dx_bp = "BPD",
+  dx_bp_remit = "BPD (Remitted)",
+  dx_mdd = "MDD",
+  dx_mdd_remit = "MDD (Remitted)",
+  dx_moodnos = "Mood Disorder NOS",
+  dx_moodnos_remit = "Mood Disorder NOS (Remitted)",
+  dx_none = "No Diagnosis",
+  dx_other = "Other",
+  dx_other_remit = "Other (Remitted)",
+  dx_prodromal = "CHR/Prodromal Psychosis",
+  dx_prodromal_remit = "CHR/Prodromal Psychosis (Remitted)",
+  dx_psychosis = "Psychosis",
+  dx_psychosis_remit = "Psychosis (Remitted)",
+  dx_scz = "Schizophrenia",
+  dx_scz_remit = "Schizophrenia (Remitted)",
+  dx_ptsd = "PTSD",
+  dx_ptsd_remit = "PTSD (Remitted)"
+)
+#Replace diagnosis values using new names
+summary_long <- summary_long %>%
+  mutate(diagnosis = recode(diagnosis, !!!diagnosis_labels))
+summary_long #use this if you want to include in graph key/figure label label where count might = 0 (longer figure key/legend)
+summary_long_no0 <- summary_long %>%
+  filter(count != 0)
+summary_long_no0 #use this if you only want graph to show labels where count does not = 0
+
+```
 
 ```{r sankey plot with percentages - proportion based on percentage of unique participants in dataset who have that diagnosis out of total participants, and left side is based on percentage of unique participants with that study_group }
 
@@ -217,6 +260,27 @@ webshot2::webshot(
   zoom = 3.83
 ) # local paths - correspond to 'clinical/clinical_figures/' + '/diagnosis_sankey_plot.html' and + '/diagnosis_sankey_plot.png' in github folder
 
+
+### Save as vector PDF
+library(htmlwidgets)
+library(rsvg)
+library(chromote)
+
+html_file <- "/Users/bsevchik/projects/EF_final_figures/01_input/R_fig2_participants/sankey_plot.html"
+svg_file  <- "/Users/bsevchik/projects/EF_final_figures/01_input/R_fig2_participants/sankey_plot.svg"
+pdf_file  <- "/Users/bsevchik/projects/EF_final_figures/01_input/R_fig2_participants/sankey_plot.pdf"
+
+saveWidget(sankey_plot, file = html_file, selfcontained = TRUE)
+
+b <- ChromoteSession$new()
+on.exit(b$close(), add = TRUE)
+b$Page$navigate(paste0("file://", normalizePath(html_file)))
+b$wait_for_load_event()
+
+svg_txt <- b$Runtime$evaluate('document.querySelector("svg").outerHTML')$result$value
+writeLines(svg_txt, svg_file)
+
+rsvg_pdf(svg_file, pdf_file)
 
 ```
 
