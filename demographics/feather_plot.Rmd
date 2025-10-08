@@ -296,6 +296,7 @@ p
 
 ggsave("/Users/bsevchik/projects/EF_clinical/feather_plot/feather_plot.png", p,
        width = 8, height = 12, dpi = 300)  # make height bigger
+ggsave("/Users/bsevchik/projects/EF_final_figures/01_input/R_fig2_participants/feather_plot.pdf", p, device = "pdf", width = 8, height = 12, dpi = 300)  # make height bigger
 
 ```
 
