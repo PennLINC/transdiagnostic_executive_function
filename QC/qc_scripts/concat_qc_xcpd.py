@@ -10,9 +10,9 @@ project_path = '/cbica/projects/executive_function/'
 # concatenating
 ################
 # path to unzipped xcpd data
-inpath_qc = project_path + 'EF_dataset/derivatives/xcpd_BABS_EF_full_project_outputs/xcpd/' #CUBIC project path - replace
+inpath_qc = project_path + 'EF_dataset/derivatives/xcpd_BABS_EF_full_project_outputs/xcpd/'
 # outpath to save concatentaed qc data
-outpath = project_path + 'EF_dataset_figures/concatenated_data/' #CUBIC project path - replace
+outpath = project_path + 'EF_dataset_figures/concatenated_data/'
 
 # get all filenames for qc data
 fileNames_qc = sorted(glob.glob(inpath_qc + 'sub-*/ses-*/func/' +
@@ -70,15 +70,22 @@ df_main_qc.to_csv(outpath + 'concat_xcpd_qc_median.csv',
 ################
 # plotting
 ################
-# plot the median FD distribution
+# plot the distribution using sns.histplot or sns.distplot
 plt.ion()
+
+# save out text as text
+import matplotlib as mpl
+mpl.rcParams['pdf.fonttype'] = 42   # keep text as TrueType
+mpl.rcParams['ps.fonttype'] = 42
+mpl.rcParams['svg.fonttype'] = 'none'
+
 # sns.histplot(df_main_qc['framewise_displacement'], kde=True, bins=20)
 sns.displot(df_main_qc['framewise_displacement'], kde=True, bins=20)
 plt.title('Median FD distribution')
 plt.xlabel('Median FD')
 plt.ylabel('Density')
 plt.tight_layout()
-plt.savefig(outpath + 'concat_xcpd_qc_histogram_median.png',
+plt.savefig(outpath + 'concat_xcpd_qc_histogram_median.pdf',
             bbox_inches='tight', dpi=300,
             transparent=True)
 plt.close()

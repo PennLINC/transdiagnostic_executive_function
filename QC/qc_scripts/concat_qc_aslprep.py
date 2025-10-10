@@ -9,8 +9,8 @@ import matplotlib.pyplot as plt
 # Paths
 # ----------------------
 project_path = '/cbica/projects/executive_function/'
-inpath_qc = os.path.join(project_path, 'EF_dataset/derivatives/aslprep_BABS_EF_full_project_outputs/aslprep/') #CUBIC project path - replace
-outpath = os.path.join(project_path, 'EF_dataset_figures/concatenated_data/') #CUBIC project path - replace
+inpath_qc = os.path.join(project_path, 'EF_dataset/derivatives/aslprep_BABS_EF_full_project_outputs/aslprep/')
+outpath = os.path.join(project_path, 'EF_dataset_figures/concatenated_data/')
 os.makedirs(outpath, exist_ok=True)
 
 # ----------------------
@@ -66,13 +66,21 @@ print(f"Saved concatenated QC file to: {qc_output_path}")
 # Plot QEI distribution
 # ----------------------
 plt.ion()
+
+# save out text as text
+import matplotlib as mpl
+mpl.rcParams['pdf.fonttype'] = 42   # keep text as TrueType
+mpl.rcParams['ps.fonttype'] = 42
+mpl.rcParams['svg.fonttype'] = 'none'
+
+
 sns.displot(df_main_qc['qei_cbf'].astype(float), kde=True, bins=20)
 plt.title('Mean QEI Distribution')
 plt.xlabel('Mean QEI')
 plt.ylabel('Density')
 plt.tight_layout()
 
-plot_output_path = os.path.join(outpath, 'concat_aslprep_qc_histogram.png')
+plot_output_path = os.path.join(outpath, 'concat_aslprep_qc_histogram.pdf')
 plt.savefig(plot_output_path, bbox_inches='tight', dpi=300, transparent=True)
 plt.close()
 print(f"Saved QEI histogram to: {plot_output_path}")
