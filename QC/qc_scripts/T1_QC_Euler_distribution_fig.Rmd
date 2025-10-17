@@ -88,7 +88,7 @@ pd <- position_dodge(width = 0.7)
 
 p_box <- ggplot(qc_long, aes(x = qc_determination, y = euler,
                              fill = hemisphere)) +
-  geom_boxplot(position = pd, width = 0.6, outlier.shape = 16, alpha = 0.85) +
+  geom_boxplot(position = pd, width = 0.6, outlier.shape = NA, alpha = 0.85) +
   labs(
     x = "QC determination",
     y = "Euler number",
