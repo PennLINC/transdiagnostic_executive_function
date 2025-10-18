@@ -261,31 +261,244 @@ webshot2::webshot(
 ) # local paths - correspond to 'clinical/clinical_figures/' + '/diagnosis_sankey_plot.html' and + '/diagnosis_sankey_plot.png' in github folder
 
 
-### Save as vector PDF
-library(htmlwidgets)
-library(rsvg)
-library(chromote)
-
-html_file <- "/Users/bsevchik/projects/EF_final_figures/01_input/R_fig2_participants/sankey_plot.html"
-svg_file  <- "/Users/bsevchik/projects/EF_final_figures/01_input/R_fig2_participants/sankey_plot.svg"
-pdf_file  <- "/Users/bsevchik/projects/EF_final_figures/01_input/R_fig2_participants/sankey_plot.pdf"
-
-saveWidget(sankey_plot, file = html_file, selfcontained = TRUE)
-
-b <- ChromoteSession$new()
-on.exit(b$close(), add = TRUE)
-b$Page$navigate(paste0("file://", normalizePath(html_file)))
-b$wait_for_load_event()
-
-svg_txt <- b$Runtime$evaluate('document.querySelector("svg").outerHTML')$result$value
-writeLines(svg_txt, svg_file)
-
-rsvg_pdf(svg_file, pdf_file)
-
 ```
 
 
+```{r sankey plot with percentages - no labels}
+
+# =========================
+# Libraries
+# =========================
+library(dplyr)
+library(tidyr)
+library(networkD3)
+library(htmlwidgets)
+library(htmltools)
+
+# =========================
+# Data prep (as in your code)
+# =========================
+
+# Ensure all TD/NC participants have dx_none == 1
+clinical_diagnosis_df <- clinical_diagnosis_df %>%
+  mutate(dx_none = ifelse(study_group == "TD/NC", 1, dx_none))
+
+# Clean source/target labels from your summary table
+summary_long_no0 <- summary_long_no0 %>%
+  mutate(
+    source_label = study_group,
+    target_label = diagnosis
+  )
+
+# Total unique participants
+total_participants <- clinical_diagnosis_df %>%
+  distinct(bblid) %>%
+  nrow()
+
+# % per study group (left)
+source_flows <- clinical_diagnosis_df %>%
+  group_by(source_label = study_group) %>%
+  summarise(unique_participants = n_distinct(bblid), .groups = "drop") %>%
+  mutate(
+    source_pct = round(100 * unique_participants / total_participants, 1),
+    source_label_pct = paste0(source_label, " (", source_pct, "%)")
+  )
+
+# % per diagnosis (right)
+dx_cols <- grep("^dx_", names(clinical_diagnosis_df), value = TRUE)
+dx_cols <- setdiff(dx_cols, "dx_pscat")  # Exclude if necessary
+
+long_dx <- clinical_diagnosis_df %>%
+  select(bblid, all_of(dx_cols)) %>%
+  pivot_longer(cols = all_of(dx_cols), names_to = "diagnosis", values_to = "has_dx") %>%
+  filter(has_dx == 1)
+
+target_flows <- long_dx %>%
+  group_by(target_label = diagnosis) %>%
+  summarise(unique_participants = n_distinct(bblid), .groups = "drop") %>%
+  mutate(
+    target_pct = round(100 * unique_participants / total_participants, 1)
+  )
+
+# Readable diagnosis labels
+diagnosis_labels <- c(
+  dx_adhd = "ADHD",
+  dx_adhd_remit = "ADHD (Remitted)",
+  dx_bp = "BPD",
+  dx_bp_remit = "BPD (Remitted)",
+  dx_mdd = "MDD",
+  dx_mdd_remit = "MDD (Remitted)",
+  dx_moodnos = "Mood Disorder NOS",
+  dx_moodnos_remit = "Mood Disorder NOS (Remitted)",
+  dx_none = "No Diagnosis",
+  dx_other = "Other",
+  dx_other_remit = "Other (Remitted)",
+  dx_prodromal = "CHR/Prodromal Psychosis",
+  dx_prodromal_remit = "CHR/Prodromal Psychosis (Remitted)",
+  dx_psychosis = "Psychosis",
+  dx_psychosis_remit = "Psychosis (Remitted)",
+  dx_scz = "Schizophrenia",
+  dx_scz_remit = "Schizophrenia (Remitted)",
+  dx_ptsd = "PTSD",
+  dx_ptsd_remit = "PTSD (Remitted)"
+)
+
+target_flows <- target_flows %>%
+  mutate(target_label = recode(target_label, !!!diagnosis_labels)) %>%
+  mutate(target_label_pct = paste0(target_label, " (", target_pct, "%)"))
+
+# Join % labels back to main summary
+summary_long_labeled <- summary_long_no0 %>%
+  left_join(source_flows, by = "source_label") %>%
+  left_join(target_flows, by = "target_label")
+
+# =========================
+# Nodes & Links (plain data.frames)
+# =========================
+nodes <- data.frame(
+  name = unique(c(
+    as.character(summary_long_labeled$source_label_pct),
+    as.character(summary_long_labeled$target_label_pct)
+  )),
+  stringsAsFactors = FALSE, check.names = FALSE
+)
+nodes <- nodes[!is.na(nodes$name) & nodes$name != "", , drop = FALSE]
+
+links <- summary_long_labeled %>%
+  mutate(
+    source = match(source_label_pct, nodes$name) - 1,
+    target = match(target_label_pct, nodes$name) - 1
+  ) %>%
+  select(source, target, value = count) %>%
+  as.data.frame()
+
+# =========================
+# Color mapping (matches your screenshot)
+# =========================
+# Base label (strip " (..%)")
+nodes$base <- sub(" \\([^)]+\\)$", "", nodes$name)
+
+# Palette keyed by base labels
+group_palette <- c(
+  "ADHD"                     = "#1f77b4",
+  "PRO/CHR"                  = "#ff7f0e",
+  "TD/NC"                    = "#aec7e8",
+  "CHR/Prodromal Psychosis"  = "#e377c2",
+  "Psychosis"                = "#9467bd",
+  "MDD"                      = "#c5b0d5",
+  "Mood Disorder NOS"        = "#fdae6b",
+  "BPD"                      = "#2ca02c",
+  "PTSD"                     = "#98df8a",
+  "No Diagnosis"             = "#d62728"
+)
+
+nodes$group <- nodes$base
+used_groups <- intersect(unique(nodes$group), names(group_palette))
+
+colourScale_js <- htmlwidgets::JS(
+  sprintf(
+    'd3.scaleOrdinal().domain(%s).range(%s)',
+    jsonlite::toJSON(unbox = FALSE, used_groups),
+    jsonlite::toJSON(unbox = FALSE, unname(group_palette[used_groups]))
+  )
+)
+
+# =========================
+# Sankey (NO on-graph labels)
+# =========================
+sankey_plot <- sankeyNetwork(
+  Links       = links,
+  Nodes       = nodes,
+  Source      = "source",
+  Target      = "target",
+  Value       = "value",
+  NodeID      = "name",   # keep NodeID for widget internals…
+  fontSize    = 0,        # …but hide the labels
+  nodeWidth   = 30,
+  nodePadding = 20,
+  colourScale = colourScale_js
+)
+
+# Extra safety: hide any node text via D3
+sankey_plot <- htmlwidgets::onRender(
+  sankey_plot,
+  htmlwidgets::JS("function(el){ d3.select(el).selectAll('.node text').style('display','none'); }")
+)
+
+# ---- Legend (left/right, with exact colors and %s) ----
+left_items <- source_flows %>%
+  distinct(base = source_label, label = source_label_pct) %>%
+  filter(!is.na(base), base != "")
+
+right_items <- target_flows %>%
+  distinct(base = target_label, label = target_label_pct) %>%
+  filter(!is.na(base), base != "")
+
+safe_color <- function(key) {
+  if (is.null(key) || length(key) == 0 || is.na(key) || !(key %in% names(group_palette))) {
+    "#999999"  # fallback color
+  } else {
+    group_palette[[key]]
+  }
+}
+
+make_li <- function(text, base_key) {
+  col <- safe_color(base_key)
+  htmltools::tags$li(
+    htmltools::tags$span(style = sprintf(
+      "display:inline-block;width:14px;height:14px;background:%s;margin-right:8px;vertical-align:middle;border-radius:3px;",
+      col
+    )),
+    htmltools::tags$span(text)
+  )
+}
+
+legend_html <- htmltools::tags$div(
+  style = "margin-top: 18px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;",
+  htmltools::tags$div(
+    style = "display:flex; gap:48px; align-items:flex-start; flex-wrap:wrap;",
+    htmltools::tags$div(
+      htmltools::tags$h4("Study Group (Left)"),
+      htmltools::tags$ul(style="list-style:none; padding-left:0; margin-top:8px;",
+        lapply(seq_len(nrow(left_items)), function(i) make_li(left_items$label[i], left_items$base[i])))
+    ),
+    htmltools::tags$div(
+      htmltools::tags$h4("Diagnosis (Right)"),
+      htmltools::tags$ul(style="list-style:none; padding-left:0; margin-top:8px;",
+        lapply(seq_len(nrow(right_items)), function(i) make_li(right_items$label[i], right_items$base[i])))
+    )
+  )
+)
+
+# >>> KEY CHANGE: append legend to the *widget* (no browsable/tagList) <<<
+widget_with_legend <- htmlwidgets::appendContent(sankey_plot, legend_html)
+
+# ---- Save HTML (non-selfcontained) and then PNG via file:// ----
+out_html <- "/Users/bsevchik/projects/EF_clinical/final_clinical_CNB/clinical/diagnosis_sankey_plot_legend.html"
+out_png  <- "/Users/bsevchik/projects/EF_clinical/final_clinical_CNB/clinical/diagnosis_sankey_plot_legend.png"
+
+htmlwidgets::saveWidget(
+  widget = widget_with_legend,
+  file   = out_html,
+  selfcontained = FALSE   # more reliable for complex widgets
+)
+
+# Use a temporary HTML for the snapshot to avoid asset path surprises
+tmp_html <- file.path(tempdir(), "sankey_legend_tmp.html")
+htmlwidgets::saveWidget(
+  widget = widget_with_legend,
+  file   = tmp_html,
+  selfcontained = FALSE
+)
+
+webshot2::webshot(
+  url     = paste0("file://", normalizePath(tmp_html)),
+  file    = out_png,
+  vwidth  = 1000,
+  vheight = 650,
+  zoom    = 3.83
+)
 
 
-
+```
 

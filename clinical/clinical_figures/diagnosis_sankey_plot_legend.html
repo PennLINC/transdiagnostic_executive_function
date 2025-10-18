@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<style>body{background-color:white;}</style>
+<link href="diagnosis_sankey_plot_legend_files/htmltools-fill-0.5.8.1/fill.css" rel="stylesheet" />
+<script src="diagnosis_sankey_plot_legend_files/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+<script src="diagnosis_sankey_plot_legend_files/d3-4.9.1/d3.min.js"></script>
+<script src="diagnosis_sankey_plot_legend_files/sankey-1/sankey.js"></script>
+<script src="diagnosis_sankey_plot_legend_files/sankeyNetwork-binding-0.4.1/sankeyNetwork.js"></script>
+  <title>sankeyNetwork</title>
+</head>
+<body>
+<div id="htmlwidget_container">
+  <div class="sankeyNetwork html-widget html-fill-item" id="htmlwidget-5b6a276e5cb4ea2ef676" style="width:960px;height:500px;"></div>
+  <div style="margin-top: 18px; font-family: -apple-system, BlinkMacSystemFont, &#39;Segoe UI&#39;, Roboto, Helvetica, Arial, sans-serif;">
+    <div style="display:flex; gap:48px; align-items:flex-start; flex-wrap:wrap;">
+      <div>
+        <h4>Study Group (Left)</h4>
+        <ul style="list-style:none; padding-left:0; margin-top:8px;">
+          <li>
+            <span style="display:inline-block;width:14px;height:14px;background:#1f77b4;margin-right:8px;vertical-align:middle;border-radius:3px;"></span>
+            <span>ADHD (20.5%)</span>
+          </li>
+          <li>
+            <span style="display:inline-block;width:14px;height:14px;background:#ff7f0e;margin-right:8px;vertical-align:middle;border-radius:3px;"></span>
+            <span>PRO/CHR (52.3%)</span>
+          </li>
+          <li>
+            <span style="display:inline-block;width:14px;height:14px;background:#aec7e8;margin-right:8px;vertical-align:middle;border-radius:3px;"></span>
+            <span>TD/NC (27.3%)</span>
+          </li>
+        </ul>
+      </div>
+      <div>
+        <h4>Diagnosis (Right)</h4>
+        <ul style="list-style:none; padding-left:0; margin-top:8px;">
+          <li>
+            <span style="display:inline-block;width:14px;height:14px;background:#1f77b4;margin-right:8px;vertical-align:middle;border-radius:3px;"></span>
+            <span>ADHD (51.5%)</span>
+          </li>
+          <li>
+            <span style="display:inline-block;width:14px;height:14px;background:#2ca02c;margin-right:8px;vertical-align:middle;border-radius:3px;"></span>
+            <span>BPD (2.3%)</span>
+          </li>
+          <li>
+            <span style="display:inline-block;width:14px;height:14px;background:#c5b0d5;margin-right:8px;vertical-align:middle;border-radius:3px;"></span>
+            <span>MDD (11.4%)</span>
+          </li>
+          <li>
+            <span style="display:inline-block;width:14px;height:14px;background:#fdae6b;margin-right:8px;vertical-align:middle;border-radius:3px;"></span>
+            <span>Mood Disorder NOS (7.6%)</span>
+          </li>
+          <li>
+            <span style="display:inline-block;width:14px;height:14px;background:#d62728;margin-right:8px;vertical-align:middle;border-radius:3px;"></span>
+            <span>No Diagnosis (27.3%)</span>
+          </li>
+          <li>
+            <span style="display:inline-block;width:14px;height:14px;background:#e377c2;margin-right:8px;vertical-align:middle;border-radius:3px;"></span>
+            <span>CHR/Prodromal Psychosis (46.2%)</span>
+          </li>
+          <li>
+            <span style="display:inline-block;width:14px;height:14px;background:#999999;margin-right:8px;vertical-align:middle;border-radius:3px;"></span>
+            <span>CHR/Prodromal Psychosis (Remitted) (0.8%)</span>
+          </li>
+          <li>
+            <span style="display:inline-block;width:14px;height:14px;background:#9467bd;margin-right:8px;vertical-align:middle;border-radius:3px;"></span>
+            <span>Psychosis (6.1%)</span>
+          </li>
+          <li>
+            <span style="display:inline-block;width:14px;height:14px;background:#98df8a;margin-right:8px;vertical-align:middle;border-radius:3px;"></span>
+            <span>PTSD (3.8%)</span>
+          </li>
+          <li>
+            <span style="display:inline-block;width:14px;height:14px;background:#999999;margin-right:8px;vertical-align:middle;border-radius:3px;"></span>
+            <span>PTSD (Remitted) (0.8%)</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+<script type="application/json" data-for="htmlwidget-5b6a276e5cb4ea2ef676">{"x":{"links":{"source":[0,0,0,0,1,2,2,2,2,2,2,2],"target":[3,4,5,6,7,8,9,3,10,4,5,6],"value":[2,1,27,1,32,61,8,8,15,2,41,4]},"nodes":{"name":["ADHD (20.5%)","TD/NC (27.3%)","PRO/CHR (52.3%)","Mood Disorder NOS (7.6%)","BPD (2.3%)","ADHD (51.5%)","PTSD (3.8%)","No Diagnosis (27.3%)","CHR/Prodromal Psychosis (46.2%)","Psychosis (6.1%)","MDD (11.4%)"],"group":["ADHD (20.5%)","TD/NC (27.3%)","PRO/CHR (52.3%)","Mood Disorder NOS (7.6%)","BPD (2.3%)","ADHD (51.5%)","PTSD (3.8%)","No Diagnosis (27.3%)","CHR/Prodromal Psychosis (46.2%)","Psychosis (6.1%)","MDD (11.4%)"]},"options":{"NodeID":"name","NodeGroup":"name","LinkGroup":null,"colourScale":"d3.scaleOrdinal().domain([\"ADHD\",\"TD/NC\",\"PRO/CHR\",\"Mood Disorder NOS\",\"BPD\",\"PTSD\",\"No Diagnosis\",\"CHR/Prodromal Psychosis\",\"Psychosis\",\"MDD\"]).range([\"#1f77b4\",\"#aec7e8\",\"#ff7f0e\",\"#fdae6b\",\"#2ca02c\",\"#98df8a\",\"#d62728\",\"#e377c2\",\"#9467bd\",\"#c5b0d5\"])","fontSize":0,"fontFamily":null,"nodeWidth":30,"nodePadding":20,"units":"","margin":{"top":null,"right":null,"bottom":null,"left":null},"iterations":32,"sinksRight":true}},"evals":[],"jsHooks":{"render":[{"code":"function(el){ d3.select(el).selectAll('.node text').style('display','none'); }","data":null}]}}</script>
+<script type="application/htmlwidget-sizing" data-for="htmlwidget-5b6a276e5cb4ea2ef676">{"viewer":{"width":450,"height":350,"padding":10,"fill":true},"browser":{"width":960,"height":500,"padding":10,"fill":true}}</script>
+</body>
+</html>
