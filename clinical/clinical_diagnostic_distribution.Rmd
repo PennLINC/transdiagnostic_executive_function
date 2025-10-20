@@ -263,8 +263,344 @@ webshot2::webshot(
 
 ```
 
+``` {r sankey no labels pt 2}
+# Load packages
+library(dplyr)
+library(tidyr)
+library(networkD3)
+library(htmlwidgets)
+library(htmltools)
+library(webshot2)
 
-```{r sankey plot with percentages - no labels}
+# Ensure all TD/NC participants have dx_none == 1
+clinical_diagnosis_df <- clinical_diagnosis_df %>%
+  mutate(dx_none = ifelse(study_group == "TD/NC", 1, dx_none))
+
+# Step 1: Create clean source/target labels
+summary_long_no0 <- summary_long_no0 %>%
+  mutate(
+    source_label = study_group,
+    target_label = diagnosis
+  )
+
+# Step 2: Get total number of unique participants
+total_participants <- clinical_diagnosis_df %>%
+  distinct(bblid) %>%
+  nrow()
+
+# Step 3: Compute % of participants per study group (left side of Sankey)
+source_flows <- clinical_diagnosis_df %>%
+  group_by(source_label = study_group) %>%
+  summarise(unique_participants = n_distinct(bblid), .groups = "drop") %>%
+  mutate(
+    source_pct = round(100 * unique_participants / total_participants, 1),
+    source_label_pct = paste0(source_label, " (", source_pct, "%)")
+  )
+
+# Step 4: Compute % of participants per diagnosis (right side of Sankey)
+dx_cols <- grep("^dx_", names(clinical_diagnosis_df), value = TRUE)
+dx_cols <- setdiff(dx_cols, "dx_pscat")  # Exclude if necessary
+
+long_dx <- clinical_diagnosis_df %>%
+  select(bblid, all_of(dx_cols)) %>%
+  pivot_longer(cols = all_of(dx_cols), names_to = "diagnosis", values_to = "has_dx") %>%
+  filter(has_dx == 1)
+
+target_flows <- long_dx %>%
+  group_by(target_label = diagnosis) %>%
+  summarise(unique_participants = n_distinct(bblid), .groups = "drop") %>%
+  mutate(
+    target_pct = round(100 * unique_participants / total_participants, 1)
+  )
+
+# Step 5: Apply readable labels to diagnosis names
+diagnosis_labels <- c(
+  dx_adhd = "ADHD",
+  dx_adhd_remit = "ADHD (Remitted)",
+  dx_bp = "BPD",
+  dx_bp_remit = "BPD (Remitted)",
+  dx_mdd = "MDD",
+  dx_mdd_remit = "MDD (Remitted)",
+  dx_moodnos = "Mood Disorder NOS",
+  dx_moodnos_remit = "Mood Disorder NOS (Remitted)",
+  dx_none = "No Diagnosis",
+  dx_other = "Other",
+  dx_other_remit = "Other (Remitted)",
+  dx_prodromal = "CHR/Prodromal Psychosis",
+  dx_prodromal_remit = "CHR/Prodromal Psychosis (Remitted)",
+  dx_psychosis = "Psychosis",
+  dx_psychosis_remit = "Psychosis (Remitted)",
+  dx_scz = "Schizophrenia",
+  dx_scz_remit = "Schizophrenia (Remitted)",
+  dx_ptsd = "PTSD",
+  dx_ptsd_remit = "PTSD (Remitted)"
+)
+
+target_flows <- target_flows %>%
+  mutate(target_label = recode(target_label, !!!diagnosis_labels)) %>%
+  mutate(target_label_pct = paste0(target_label, " (", target_pct, "%)"))
+
+# Step 6: Join percent labels back to main summary
+summary_long_labeled <- summary_long_no0 %>%
+  left_join(source_flows, by = "source_label") %>%
+  left_join(target_flows, by = "target_label")
+
+# Step 7: Create nodes and links
+nodes <- data.frame(
+  name = unique(c(summary_long_labeled$source_label_pct,
+                  summary_long_labeled$target_label_pct)),
+  stringsAsFactors = FALSE
+)
+
+links <- summary_long_labeled %>%
+  mutate(
+    source = match(source_label_pct, nodes$name) - 1,
+    target = match(target_label_pct, nodes$name) - 1
+  ) %>%
+  select(source, target, value = count)
+
+# Step 8: Plot Sankey (identical), then hide in-graph labels
+sankey_plot <- sankeyNetwork(
+  Links = links,
+  Nodes = nodes,
+  Source = "source",
+  Target = "target",
+  Value  = "value",
+  NodeID = "name",
+  fontSize = 12,
+  nodeWidth = 30
+)
+
+sankey_plot <- htmlwidgets::onRender(
+  sankey_plot,
+  jsCode = "
+  function(el, x) {
+    d3.select(el).selectAll('.node text').text(''); // blank node labels
+  }
+  "
+)
+
+# Step 9: Save Sankey HTML and PNG (same workflow as your original)
+out_html <- "/Users/bsevchik/projects/EF_clinical/final_clinical_CNB/clinical/diagnosis_sankey_plot_blank.html"
+out_png  <- "/Users/bsevchik/projects/EF_clinical/final_clinical_CNB/clinical/diagnosis_sankey_plot_blank.png"
+
+htmlwidgets::saveWidget(
+  sankey_plot,
+  file = out_html,
+  selfcontained = TRUE
+)
+
+webshot2::webshot(
+  url     = out_html,
+  file    = out_png,
+  vwidth  = 1000,
+  vheight = 500,
+  zoom    = 3.83
+)
+
+# ---------- Separate Legend HTML (matching colors & percentages) ----------
+
+# Recreate the exact node color mapping (Category20 cycling by node index)
+d3_schemeCategory20 <- c(
+  "#1f77b4","#aec7e8","#ff7f0e","#ffbb78","#2ca02c",
+  "#98df8a","#d62728","#ff9896","#9467bd","#c5b0d5",
+  "#8c564b","#c49c94","#e377c2","#f7b6d2","#7f7f7f",
+  "#c7c7c7","#bcbd22","#dbdb8d","#17becf","#9edae5"
+)
+node_index  <- seq_len(nrow(nodes))
+node_colors <- d3_schemeCategory20[((node_index - 1) %% length(d3_schemeCategory20)) + 1]
+names(node_colors) <- nodes$name
+
+# Legend labels taken from the same sources used to create nodes
+left_labels  <- unique(summary_long_labeled$source_label_pct)
+right_labels <- unique(summary_long_labeled$target_label_pct)
+
+legend_css <- tags$style(HTML("
+  .legend { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            max-width: 560px; padding: 12px 8px; }
+  .legend h3 { margin: 0 0 8px 0; font-size: 16px; }
+  .legend h4 { margin: 14px 0 8px 0; font-size: 14px; font-weight: 600; }
+  .legend-item { display: flex; align-items: center; margin: 4px 0; font-size: 13px; }
+  .legend-swatch { width: 14px; height: 14px; margin-right: 8px; border-radius: 3px;
+                   border: 1px solid rgba(0,0,0,0.15); }
+"))
+
+legend_html <- tags$html(
+  tags$head(tags$title("Diagnosis Sankey Legend")),
+  tags$body(
+    tags$div(
+      class = "legend",
+      legend_css,
+      tags$h3("Legend"),
+      tags$h4("Study Groups (share of all participants)"),
+      lapply(left_labels, function(lbl) {
+        col <- unname(node_colors[lbl])
+        tags$div(class = "legend-item",
+                 tags$span(class = "legend-swatch", style = paste0("background:", col, ";")),
+                 tags$span(lbl))
+      }),
+      tags$h4("Diagnoses (share of all participants)"),
+      lapply(right_labels, function(lbl) {
+        col <- unname(node_colors[lbl])
+        tags$div(class = "legend-item",
+                 tags$span(class = "legend-swatch", style = paste0("background:", col, ";")),
+                 tags$span(lbl))
+      })
+    )
+  )
+)
+
+legend_file <- "/Users/bsevchik/projects/EF_clinical/final_clinical_CNB/clinical/diagnosis_sankey_legend.html"
+htmltools::save_html(legend_html, file = legend_file, background = "white")
+
+```
+``` {r sankey no labels pt 3}
+# Load packages
+library(dplyr)
+library(tidyr)
+library(networkD3)
+library(htmlwidgets)
+library(htmltools)
+library(webshot2)
+
+# Ensure all TD/NC participants have dx_none == 1
+clinical_diagnosis_df <- clinical_diagnosis_df %>%
+  mutate(dx_none = ifelse(study_group == "TD/NC", 1, dx_none))
+
+# Step 1: Create clean source/target labels
+summary_long_no0 <- summary_long_no0 %>%
+  mutate(
+    source_label = study_group,
+    target_label = diagnosis
+  )
+
+# Step 2: Get total number of unique participants
+total_participants <- clinical_diagnosis_df %>%
+  distinct(bblid) %>%
+  nrow()
+
+# Step 3: Compute % of participants per study group (left side of Sankey)
+source_flows <- clinical_diagnosis_df %>%
+  group_by(source_label = study_group) %>%
+  summarise(unique_participants = n_distinct(bblid), .groups = "drop") %>%
+  mutate(
+    source_pct = round(100 * unique_participants / total_participants, 1),
+    source_label_pct = paste0(source_label, " (", source_pct, "%)")
+  )
+
+# Step 4: Compute % of participants per diagnosis (right side of Sankey)
+dx_cols <- grep("^dx_", names(clinical_diagnosis_df), value = TRUE)
+dx_cols <- setdiff(dx_cols, "dx_pscat")  # Exclude if necessary
+
+long_dx <- clinical_diagnosis_df %>%
+  select(bblid, all_of(dx_cols)) %>%
+  pivot_longer(cols = all_of(dx_cols), names_to = "diagnosis", values_to = "has_dx") %>%
+  filter(has_dx == 1)
+
+target_flows <- long_dx %>%
+  group_by(target_label = diagnosis) %>%
+  summarise(unique_participants = n_distinct(bblid), .groups = "drop") %>%
+  mutate(
+    target_pct = round(100 * unique_participants / total_participants, 1)
+  )
+
+# Step 5: Apply readable labels to diagnosis names
+diagnosis_labels <- c(
+  dx_adhd = "ADHD",
+  dx_adhd_remit = "ADHD (Remitted)",
+  dx_bp = "BPD",
+  dx_bp_remit = "BPD (Remitted)",
+  dx_mdd = "MDD",
+  dx_mdd_remit = "MDD (Remitted)",
+  dx_moodnos = "Mood Disorder NOS",
+  dx_moodnos_remit = "Mood Disorder NOS (Remitted)",
+  dx_none = "No Diagnosis",
+  dx_other = "Other",
+  dx_other_remit = "Other (Remitted)",
+  dx_prodromal = "CHR/Prodromal Psychosis",
+  dx_prodromal_remit = "CHR/Prodromal Psychosis (Remitted)",
+  dx_psychosis = "Psychosis",
+  dx_psychosis_remit = "Psychosis (Remitted)",
+  dx_scz = "Schizophrenia",
+  dx_scz_remit = "Schizophrenia (Remitted)",
+  dx_ptsd = "PTSD",
+  dx_ptsd_remit = "PTSD (Remitted)"
+)
+
+target_flows <- target_flows %>%
+  mutate(target_label = recode(target_label, !!!diagnosis_labels)) %>%
+  mutate(target_label_pct = paste0(target_label, " (", target_pct, "%)"))
+
+# Step 6: Join percent labels back to main summary
+summary_long_labeled <- summary_long_no0 %>%
+  left_join(source_flows, by = "source_label") %>%
+  left_join(target_flows, by = "target_label")
+
+# Step 7: Create nodes and links
+nodes <- data.frame(
+  name = unique(c(summary_long_labeled$source_label_pct,
+                  summary_long_labeled$target_label_pct)),
+  stringsAsFactors = FALSE
+)
+
+links <- summary_long_labeled %>%
+  mutate(
+    source = match(source_label_pct, nodes$name) - 1,
+    target = match(target_label_pct, nodes$name) - 1
+  ) %>%
+  select(source, target, value = count)
+
+# Step 8: Plot Sankey (identical), then hide in-graph labels
+sankey_plot <- sankeyNetwork(
+  Links = links,
+  Nodes = nodes,
+  Source = "source",
+  Target = "target",
+  Value  = "value",
+  NodeID = "name",
+  fontSize = 12,
+  nodeWidth = 30
+)
+
+sankey_plot <- htmlwidgets::onRender(
+  sankey_plot,
+  jsCode = "
+  function(el, x) {
+    d3.select(el).selectAll('.node text').text(''); // blank node labels
+  }
+  "
+)
+
+# Step 9: Save Sankey HTML and PNG (same workflow as your original)
+out_html <- "/Users/bsevchik/projects/EF_clinical/final_clinical_CNB/clinical/diagnosis_sankey_plot_blank.html"
+out_png  <- "/Users/bsevchik/projects/EF_clinical/final_clinical_CNB/clinical/diagnosis_sankey_plot_blank.png"
+
+htmlwidgets::saveWidget(
+  sankey_plot,
+  file = out_html,
+  selfcontained = TRUE
+)
+
+webshot2::webshot(
+  url     = out_html,
+  file    = out_png,
+  vwidth  = 1000,
+  vheight = 500,
+  zoom    = 3.83
+)
+
+
+```
+
+
+
+
+
+
+
+
+
+```{r sankey plot with percentages - no labels OLD?WRONG?}
 
 # =========================
 # Libraries
