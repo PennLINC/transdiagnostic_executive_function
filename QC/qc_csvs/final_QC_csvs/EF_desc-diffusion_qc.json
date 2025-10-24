@@ -17,7 +17,7 @@
         "Description": "A measure of overall head movement, creating by adding the frame-to-frame differences in head motion parameters and taking the average over all time points"
     },
     "raw_neighborhood_corr": {
-        "LongName": "Raw Neighborhood Correlation",
+        "LongName": "Raw Neighboring DWI Correlation",
         "Description": "A measure of the similarity of diffusion-weighted images to their immediate spatial neighbors; checks how well intensity patterns in each voxel agree with those in its local 3D neighborhood"
     },
     "num_outlier_bundles": {
