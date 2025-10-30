@@ -15,34 +15,37 @@ library(dplyr)
 library(stringr)
 library(janitor)
 library(ggplot2)
+library(readr)
 ```
 
 ```{r T1 QC rating distributions}
 
+library(dplyr)
+library(stringr)
+library(ggplot2)
+# library(readr) # if you prefer read_csv()
+
 # --- 1) Read & clean ---
-qc <- read_excel("/Users/bsevchik/projects/QC_docs/T1_QC_pass_fail.xlsx", skip=1) |> 
-  clean_names()
+qc <- read.csv("/Users/bsevchik/Documents/GitHub/transdiagnostic_executive_function/QC/qc_csvs/final_QC_csvs/EF_desc-T1_qc.csv")
 
-
-# Normalize labels and ensure numeric AVG
-qc_clean <- qc |>
+qc_clean <- qc %>%
   mutate(
-    pass_fail = str_to_lower(as.character(pass_fail)),
-    pass_fail = case_when(
-      str_detect(pass_fail, "pass") ~ "pass",
-      str_detect(pass_fail, "fail") ~ "fail",
-      str_detect(pass_fail, "artifact") ~ "artifact",
+    qc_determination = str_to_lower(as.character(qc_determination)),
+    qc_determination = case_when(
+      str_detect(qc_determination, "pass") ~ "pass",
+      str_detect(qc_determination, "fail") ~ "fail",
+      str_detect(qc_determination, "artifact") ~ "artifact",
       TRUE ~ NA_character_
     ),
-    avg = suppressWarnings(as.numeric(avg))
-  ) |>
-  filter(!is.na(avg), !is.na(pass_fail))
+    across_slices_final_average = suppressWarnings(as.numeric(across_slices_final_average))
+  ) %>% 
+  filter(!is.na(across_slices_final_average), !is.na(qc_determination))
 
 # --- 2) Quick check of counts (optional) ---
-table(qc_clean$pass_fail)
+table(qc_clean$qc_determination)
 
 # --- 3) Histogram of AVG ratings (0–1), colored by status ---
-p <- ggplot(qc_clean, aes(x = avg, fill = pass_fail)) +
+p <- ggplot(qc_clean, aes(x = across_slices_final_average, fill = qc_determination)) +
   geom_histogram(binwidth = 0.05, boundary = 0, closed = "left", alpha = 0.85, color = "white") +
   scale_x_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.1)) +
   labs(
@@ -62,6 +65,7 @@ ggsave("/Users/bsevchik/projects/QC_docs/T1_QC_avg_histogram.png", p, width = 7,
 
 
 ```{r fMRI distribution}
+
 # --- 1) Read & clean ---
 header_skip <- 0  # can change if needed
 
