@@ -63,7 +63,7 @@ cat(
     "Participants with at least one pass: %d out of %d (%.1f%%)\n",
     n_participants_with_pass,
     total_participants,
-    100 * n_participants_with_pass / total_participants
+    100 * (n_participants_with_pass / total_participants)
   )
 )
 
