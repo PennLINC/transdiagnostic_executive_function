@@ -1,5 +1,5 @@
 ﻿excluded_scans
-sub-20212_ses-1_task-nback_run-02
+sub-20212_ses-1_task-nback_run-01
 sub-20212_ses-1_task-rest_run-01
 sub-20252_ses-1_task-nback_run-01
 sub-20252_ses-1_task-rest_run-01
@@ -90,7 +90,7 @@ sub-20936_ses-3_task-rest_run-01
 sub-20936_ses-3_task-rest_run-02
 sub-20953_ses-2_task-nback_run-01
 sub-20953_ses-2_task-rest_run-02
-sub-20964_ses-1_task-nback_acq-VARIANTObliquity_run-02
+sub-20964_ses-1_task-nback_acq-VARIANTObliquity_run-01
 sub-20964_ses-1_task-rest_acq-VARIANTObliquity_run-01
 sub-20964_ses-1_task-rest_acq-VARIANTObliquity_run-02
 sub-20976_ses-1_task-nback_run-01
@@ -129,7 +129,7 @@ sub-21154_ses-2_task-rest_run-02
 sub-21161_ses-1_task-rest_acq-VARIANTNumVolumes_run-02
 sub-21161_ses-2_task-rest_run-03
 sub-21193_ses-2_task-nback_run-01
-sub-21197_ses-1_task-nback_run-02
+sub-21197_ses-1_task-nback_run-01
 sub-21197_ses-1_task-rest_acq-VARIANTObliquity_run-01
 sub-21197_ses-1_task-rest_run-02
 sub-21325_ses-1_task-rest_run-02
@@ -146,8 +146,7 @@ sub-21560_ses-1_task-rest_run-01
 sub-21580_ses-1_task-nback_run-01
 sub-21580_ses-1_task-rest_run-02
 sub-21580_ses-2_task-rest_run-01
-sub-21738_ses-1_task-nback_acq-VARIANTNumVolumes_run-01
-sub-21738_ses-1_task-nback_run-02
+sub-21738_ses-1_task-nback_run-01
 sub-21738_ses-1_task-rest_acq-VARIANTNumVolumes_run-02
 sub-21738_ses-1_task-rest_run-01
 sub-21855_ses-1_task-nback_run-01
