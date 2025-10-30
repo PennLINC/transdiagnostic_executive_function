@@ -18,51 +18,6 @@ library(ggplot2)
 library(readr)
 ```
 
-```{r T1 QC rating distributions}
-
-library(dplyr)
-library(stringr)
-library(ggplot2)
-# library(readr) # if you prefer read_csv()
-
-# --- 1) Read & clean ---
-qc <- read.csv("/Users/bsevchik/Documents/GitHub/transdiagnostic_executive_function/QC/qc_csvs/final_QC_csvs/EF_desc-T1_qc.csv")
-
-qc_clean <- qc %>%
-  mutate(
-    qc_determination = str_to_lower(as.character(qc_determination)),
-    qc_determination = case_when(
-      str_detect(qc_determination, "pass") ~ "pass",
-      str_detect(qc_determination, "fail") ~ "fail",
-      str_detect(qc_determination, "artifact") ~ "artifact",
-      TRUE ~ NA_character_
-    ),
-    across_slices_final_average = suppressWarnings(as.numeric(across_slices_final_average))
-  ) %>% 
-  filter(!is.na(across_slices_final_average), !is.na(qc_determination))
-
-# --- 2) Quick check of counts (optional) ---
-table(qc_clean$qc_determination)
-
-# --- 3) Histogram of AVG ratings (0–1), colored by status ---
-p <- ggplot(qc_clean, aes(x = across_slices_final_average, fill = qc_determination)) +
-  geom_histogram(binwidth = 0.05, boundary = 0, closed = "left", alpha = 0.85, color = "white") +
-  scale_x_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.1)) +
-  labs(
-    title = "Distribution of Average T1 QC Ratings",
-    x = "Average rating (0–1)",
-    y = "Count",
-    fill = "QC status"
-  ) +
-  theme_minimal(base_size = 13)
-
-print(p)
-
-# Save 
-ggsave("/Users/bsevchik/projects/QC_docs/T1_QC_avg_histogram.png", p, width = 7, height = 4.5, dpi = 300)
-
-```
-
 
 ```{r fMRI distribution}
 
