@@ -22,7 +22,7 @@
     },
     "run": {
         "LongName": "Run",
-        "Description": "Run number; note that resting state scans were meant to have 2 runs, and nback scans were meant to have 1 run, but there are cases of an unexpected second and or third run if the MRI tech decided to re-do a run.",
+        "Description": "Run number; note that resting state scans were meant to have 2 runs, and nback scans were meant to have 1 run, but there are cases of an unexpected third run for resting-state scans if the MRI tech decided to re-do a run.",
         "Levels": {
             "01": "first run",
             "02": "second run",
