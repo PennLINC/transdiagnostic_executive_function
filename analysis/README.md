@@ -10,3 +10,6 @@ The scripts in this folder include:
   but later more files from the same preprocessing output folder needed to be unzipped.
   + As noted in comments in individual scripts, before running the code the appropriate files must be retrieved through 'datalad get' and subsequently 'datalad drop' to drop the files once unzipped.
     The commented sections of code can be used instead of using datalad manually.
+  + In some scripts, the full derivatives were unzipped for upload to OpenNeuro before running, so the unzipped folders were used in 02_plot instead of using the scripts in 01_unzip.
+
++ 02_plot: Scripts used to create plots used in the manuscript and saved in `neuroimaging_folders`
