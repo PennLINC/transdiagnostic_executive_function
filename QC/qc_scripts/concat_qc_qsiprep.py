@@ -1,4 +1,3 @@
- 
 import glob
 import pandas as pd
 import numpy as np
@@ -52,27 +51,27 @@ mpl.rcParams['ps.fonttype'] = 42
 mpl.rcParams['svg.fonttype'] = 'none'
 
 sns.set_context(font_scale=1.5)
+
 # sns.histplot(df_main_qc['framewise_displacement'], kde=True, bins=20)
 sns.displot(df_main_qc['raw_neighbor_corr'], kde=True, bins=20)
 plt.title('Mean Neighborhood Corr distribution')
 plt.xlabel('Mean Neighborhood Corr')
 plt.ylabel('Density')
 plt.tight_layout()
-plt.savefig(outpath + 'concat_qsiprep_neighborhood_corr_histogram.png',
+plt.savefig(outpath + 'concat_qsiprep_neighborhood_corr_histogram.pdf',
             bbox_inches='tight', dpi=300,
             transparent=True)
 plt.close()
 
 
 plt.ion()
-sns.set_context(font_scale=1.5)
 # sns.histplot(df_main_qc['framewise_displacement'], kde=True, bins=20)
 sns.displot(df_main_qc['mean_fd'], kde=True, bins=20)
 plt.title('Mean FD distribution')
 plt.xlabel('Mean FD')
 plt.ylabel('Density')
 plt.tight_layout()
-plt.savefig(outpath + 'concat_qsiprep_fd_histogram.png',
+plt.savefig(outpath + 'concat_qsiprep_fd_histogram.pdf',
             bbox_inches='tight', dpi=300,
             transparent=True)
 plt.close()
@@ -99,7 +98,7 @@ scatter_plot = sns.scatterplot(
     x='mean_fd',
     y='raw_neighbor_corr',
     s=50,  # marker size
-    alpha=0.7,
+    color = "#27AAE1",
     edgecolor='k'
 )
 
