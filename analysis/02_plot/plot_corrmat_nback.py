@@ -137,89 +137,15 @@ if __name__ == "__main__":
         fig.savefig(f"/cbica/projects/executive_function/EF_dataset_figures/figures/fmriprep_figures/XCPD_task-{task}_Mean.pdf")
         plt.close()
 
-        # --- Compute SD (keep original z -> tanh) ---
-        sd_arr_z = np.nanstd(arr_3d_z, axis=2)
-        sd_arr_z = sd_arr_z[community_order, :][:, community_order]
-        np.fill_diagonal(sd_arr_z, 0)
-        sd_arr_r = np.tanh(sd_arr_z)
-
-        # Apply exclusions AFTER final plot space
-        sd_arr_r[exclude_indices_reordered, :] = np.nan
-        sd_arr_r[:, exclude_indices_reordered] = np.nan
-
-        # --- Plot SD matrix ---
-        vmax1 = 0.6
-        fig, ax = plt.subplots(figsize=(10, 10))
-        ax.set_facecolor("white")
-        cmap_sd = mpl.cm.get_cmap("Reds").copy()
-        cmap_sd.set_bad(color="none")  # Transparent for NaN
-        img = ax.imshow(sd_arr_r, cmap=cmap_sd, vmin=0, vmax=vmax1)
-        for idx in break_idx[1:-1]:
-            ax.axvline(idx, color="black")
-            ax.axhline(idx, color="black")
-        ax.set_yticks(label_idx)
-        ax.set_xticks(label_idx)
-        ax.set_yticklabels(unique_labels)
-        ax.set_xticklabels(unique_labels, rotation=90)
-        fig.tight_layout()
-        fig.savefig(f"/cbica/projects/executive_function/EF_dataset_figures/figures/fmriprep_figures/XCPD_task-{task}_StandardDeviation.pdf")
-        plt.close()
-
-        # --- Compute Coefficient of Variation (CV) ---
-        denom = np.abs(mean_arr_r)
-        cv_arr_r = np.divide(sd_arr_r, np.abs(mean_arr_r),
-            out=np.full_like(sd_arr_r, np.nan, dtype=float),
-            where=~np.isclose(mean_arr_r, 0))
-        np.fill_diagonal(cv_arr_r, 0)
-
-        # Apply exclusions AFTER final plot space
-        cv_arr_r[exclude_indices_reordered, :] = np.nan
-        cv_arr_r[:, exclude_indices_reordered] = np.nan
-        
-        # Print min and max CV values (ignoring NaNs)
-        print(f"CV min: {np.nanmin(cv_arr_r):.4f}, CV max: {np.nanmax(cv_arr_r):.4f}")
-
-        # --- Adaptive upper bound for CV ---
-        vmax_cv = float(np.nanpercentile(cv_arr_r, 99))  # 99th percentile
-        vmax_cv = min(vmax_cv, 3.0)  # optional hard cap
-        norm_cv = mpl.colors.Normalize(vmin=0, vmax=vmax_cv)
-
-        # --- Plot CV matrix ---
-        fig, ax = plt.subplots(figsize=(10, 10))
-        ax.set_facecolor("white")
-        cmap_cv = mpl.cm.get_cmap("Reds").copy()
-        cmap_cv.set_bad(color="none")
-        img = ax.imshow(cv_arr_r, cmap=cmap_cv, norm=norm_cv)
-        for idx in break_idx[1:-1]:
-            ax.axvline(idx, color="black")
-            ax.axhline(idx, color="black")
-        ax.set_yticks(label_idx)
-        ax.set_xticks(label_idx)
-        ax.set_yticklabels(unique_labels)
-        ax.set_xticklabels(unique_labels, rotation=90)
-        fig.tight_layout()
-        fig.savefig(f"/cbica/projects/executive_function/EF_dataset_figures/figures/fmriprep_figures/XCPD_task-{task}_CoefficientOfVariation.pdf")
-        plt.close()
 
         # --- Plot colorbars ---
-        fig, axs = plt.subplots(3, 1, figsize=(15, 2))
+        fig, axs = plt.subplots(1, 1, figsize=(15, 2))
         # Mean
         norm_mean = mpl.colors.Normalize(vmin=-1, vmax=1)
         fig.colorbar(
             mpl.cm.ScalarMappable(norm=norm_mean, cmap="seismic"),
-            cax=axs[0], orientation="horizontal"
+            cax=axs, orientation="horizontal"
         ).set_ticks([-1, 0, 1])
-        # SD
-        norm_sd = mpl.colors.Normalize(vmin=0, vmax=vmax1)
-        fig.colorbar(
-            mpl.cm.ScalarMappable(norm=norm_sd, cmap="Reds"),
-            cax=axs[1], orientation="horizontal"
-        ).set_ticks([0, np.mean([0, vmax1]), vmax1])
-        # CV (adaptive)
-        fig.colorbar(
-            mpl.cm.ScalarMappable(norm=norm_cv, cmap=cmap_cv),
-            cax=axs[2], orientation="horizontal"
-        ).set_ticks([0, vmax_cv/2, vmax_cv])
         fig.tight_layout()
         fig.savefig(
             f"/cbica/projects/executive_function/EF_dataset_figures/figures/fmriprep_figures/XCPD_task-{task}_colorbar.pdf",
