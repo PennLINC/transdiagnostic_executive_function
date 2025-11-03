@@ -18,7 +18,7 @@ library(stringr)
 
 ```{r load cubids summary, include=TRUE}
 # Read cubids summary tsv file
-cubids_summary <- read.delim('/Users/bsevchik/Documents/GitHub/transdiagnostic_executive_function/curation/03_cubids_curation/final_cubids_docs/v48_summary.tsv', header = TRUE, stringsAsFactors = FALSE) # local path - replace
+cubids_summary <- read.delim('/Users/bsevchik/Documents/GitHub/transdiagnostic_executive_function/curation/03_cubids_curation/final_cubids_docs/v50_summary.tsv', header = TRUE, stringsAsFactors = FALSE) # local path - replace
 
 cubids_summary
 ```
@@ -78,7 +78,7 @@ categories <- list(
   list(pattern = "rest", extra_pattern = "run-02", image_type = "resting state fMRI run 02"),
   list(pattern = "rest", extra_pattern = "run-03", image_type = "resting state fMRI run 03"),
   list(pattern = "nback", extra_pattern = "run-01", image_type = "task fMRI run 01"),
-  list(pattern = "nback", extra_pattern = "run-02", image_type = "task fMRI run 02"),
+  #list(pattern = "nback", extra_pattern = "run-02", image_type = "task fMRI run 02"),
   list(pattern = "asl", image_type = "ASL"),
   list(pattern = "m0scan", image_type = "m0 scan"),
   list(pattern = "T2w", extra_pattern = "norm", image_type = "T2w normalized"),  # Ensure only T2w with "norm"
