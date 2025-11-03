@@ -7,6 +7,7 @@ The Python scripts here are used to update, edit, or correct metadata in the Dat
 
 Note about repeated runs in the dataset:
 + There are some scans with an extra run in the dataset, if it was re-done at the scanner. While T1 scans should have 1 run, T2 scans should have 1 run, DWI scans should have 1 run, fMRI rest scans should have 2 runs, fMRI n-back scans should have 1 run, fmaps should each have 1 run, and ASL/M0 scans should have 1 run each, there are instances where a session has an extra second and/or third run.
+  + Based on notes taken at the scanner on the day of the scan, we manually deleted extraneous n-back runs in the case of a repeated n-back run.
 + During the curation process, during the `cubids apply` stage, runs with low volumes were automatically deleted. Other repeated runs were manually investigated and discussed with the study team, then manually deleted if it was determined that one of the runs was of poor quality.
 + The repeated runs that were manually deleted were re-named in sequential order such that the remaining runs were either 'run 1' or 'run 1' and 'run 2'. However, repeated runs automatically deleted as part of the `cubids apply` stage were not always re-named in sequential order, such that there can exist a sole 'run 2' or 'run 2' and 'run 3'.
 + Some repeated runs were intentionally kept in the dataset if none of the scans were determined to be of poor quality. Hence, there can remain extra repeated runs in the dataset.
