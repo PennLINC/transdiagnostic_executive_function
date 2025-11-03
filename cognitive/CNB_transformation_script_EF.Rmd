@@ -1,0 +1,261 @@
+---
+title: "CNB transformation script"
+author: "Brooke Sevchik"
+date: "2025-10-16"
+output: html_document
+---
+
+``` {r mapping}
+
+# -------------------------------
+# Inputs
+# -------------------------------
+mapping_csv <- "/Volumes/Coordinators/Protocols/TED_PROTOCOLS/EXECUTIVE_829744/CNB_data_10:9:25/EF_CNB_mapping.csv"   # columns: ndar_ElementName, cnb_raw_data_variable
+data_csv    <- "/Volumes/Coordinators/Protocols/TED_PROTOCOLS/EXECUTIVE_829744/CNB_data_10:9:25/final_combined_cnb_clean_0.csv"
+drop_csv    <- "/Volumes/Coordinators/Protocols/TED_PROTOCOLS/EXECUTIVE_829744/CNB_data_10:9:25/EF_no_NDA_mapping.csv"
+out_csv     <- "/Volumes/Coordinators/Protocols/TED_PROTOCOLS/EXECUTIVE_829744/CNB_data_10:9:25/cnb_data_bids.csv"
+
+# NOTE that mapping for TRAIL_A will be initially incorrect until further edits below
+# -------------------------------
+# Libraries
+# -------------------------------
+library(tidyverse)
+
+
+# -------------------------------
+# Read files
+# -------------------------------
+mapping <- read.csv(mapping_csv, stringsAsFactors = FALSE, check.names = FALSE, strip.white = TRUE)
+dat     <- read.csv(data_csv,    stringsAsFactors = FALSE, check.names = FALSE, strip.white = TRUE)
+dropdf  <- read.csv(drop_csv,    stringsAsFactors = FALSE, check.names = FALSE, strip.white = TRUE)
+
+
+# -------------------------------
+# Clean mapping, build rename vector
+# -------------------------------
+stopifnot(all(c("ndar_ElementName","cnb_raw_data_variable") %in% names(mapping)))
+
+mapping <- mapping %>%
+  mutate(
+    ndar_ElementName      = trimws(ndar_ElementName),
+    cnb_raw_data_variable = trimws(cnb_raw_data_variable)
+  ) %>%
+  filter(!is.na(ndar_ElementName),
+         !is.na(cnb_raw_data_variable),
+         cnb_raw_data_variable != "") %>%
+  distinct(cnb_raw_data_variable, .keep_all = TRUE)
+
+# ---- Clean mapping & drop rows with no NDAR target ----
+mapping <- mapping %>%
+  mutate(
+    ndar_ElementName      = trimws(ndar_ElementName),
+    cnb_raw_data_variable = trimws(cnb_raw_data_variable)
+  ) %>%
+  filter(!is.na(ndar_ElementName), ndar_ElementName != "",    # drop empties
+         !is.na(cnb_raw_data_variable), cnb_raw_data_variable != "") %>%
+  distinct(cnb_raw_data_variable, .keep_all = TRUE)
+
+# names = CNB (current), values = NDAR (target)
+rename_vec <- setNames(mapping$ndar_ElementName, mapping$cnb_raw_data_variable)
+
+# -------------------------------
+# 1) Drop from CSV + "platform"
+# -------------------------------
+names(dat) <- trimws(names(dat))
+drop_list  <- trimws(dropdf[[1]])                 # assumes a single-column list
+to_remove  <- unique(c("platform", drop_list))
+dat <- dat[, !(names(dat) %in% to_remove), drop = FALSE]
+
+# -------------------------------
+# 2) Keep ONLY mapped columns (plus any you explicitly protect)
+# -------------------------------
+protected <- c("participant_id")  # add more if needed
+keep_set  <- intersect(names(dat), c(mapping$cnb_raw_data_variable, protected))
+dat <- dat[, keep_set, drop = FALSE]
+
+# -------------------------------
+# 3) Rename CNB -> NDAR
+# -------------------------------
+m <- match(names(dat), names(rename_vec))
+needs <- !is.na(m)
+names(dat)[needs] <- rename_vec[m[needs]]
+
+# -------------------------------
+# Save
+# -------------------------------
+write.csv(dat, out_csv, row.names = FALSE)
+
+# -------------------------------
+# (Optional) Quick diagnostics
+# -------------------------------
+orig_names <- names(read.csv(data_csv, check.names = FALSE, stringsAsFactors = FALSE))
+unmapped_leftovers <- setdiff(setdiff(orig_names, mapping$cnb_raw_data_variable),
+                              c(protected, drop_list, "platform"))
+if (length(unmapped_leftovers)) {
+  message("These columns were removed because they are not in the mapping: ",
+          paste(unmapped_leftovers, collapse = ", "))
+}
+
+
+```
+
+
+Once mapping is finished, break up csv file into separate csv/tsv files for each task.
+``` {r separate tsv files per task pt 2}
+library(dplyr)
+library(readr)
+library(fs)      # for dir_create (optional but nice)
+
+# ========= EDIT THESE PATHS =========
+input_csv  <- "/Volumes/Coordinators/Protocols/TED_PROTOCOLS/EXECUTIVE_829744/CNB_data_10:9:25/cnb_data_bids.csv"
+output_dir_csv <- "/Volumes/Coordinators/Protocols/TED_PROTOCOLS/EXECUTIVE_829744/CNB_data_10:9:25/task_csv_bids"
+output_dir_tsv <- "/Volumes/Coordinators/Protocols/TED_PROTOCOLS/EXECUTIVE_829744/CNB_data_10:9:25/task_tsv_bids"
+# ===================================
+
+# ---- Load the single, combined file ----
+combined_CNB_clean <- read_csv(input_csv, show_col_types = FALSE)
+
+# ---- Define prefix map (same as your code) ----
+prefix_map <- c(
+  "cnb_adt"   = "age_differentiation_test",
+  "cnb_adt_valid_code" = "age_differentiation_test",
+  "cnb_cpf"   = "penn_face_memory_test",
+  "cnb_cpf_valid_code"   = "penn_face_memory_test",
+  "cnb_ctap" = "short_computerized_finger_tapping_task",
+  "cnb_ctap_valid_code" = "short_computerized_finger_tapping_task",
+  "cnb_er40"  = "penn_emotion_recognition_task",
+  "enb_er40_valid_code" = "penn_emotion_recognition_task",
+  "cnb_cpw"   = "penn_word_memory_test", # was KCPW
+  "cpw_valid_code" = "penn_word_memory_test",
+  "cnb_pvrt"  = "penn_logical_reasoning_test", # was KSPVRT
+  "cnb_pvrt_valid_code"  = "penn_logical_reasoning_test",
+  "cnb_medf"  = "measured_emotion_differentiation_test",
+  "cnb_medf_valid_code"  = "measured_emotion_differentiation_test",
+  "cnb_mpract"= "motor_praxis",
+  "cnb_mpract_valid_code"= "motor_praxis",
+  "cnb_pcet"  = "penn_conditional_exclusion_task",
+  "cnb_pcet_valid_code"  = "penn_conditional_exclusion_task",
+  "cnb_pmat"  = "penn_matrix_reasoning_test",
+  "cnb_pmat_valid_code" = "penn_matrix_reasoning_test",
+  "cnb_lnb"   = "short_letter_2back",
+  "cnb_lnb_valid_code"   = "short_letter_2back",
+  "cnb_cptnl" = "short_penn_continuous_performance_test",
+  "cnb_cptnl_valid_code" = "short_penn_continuous_performance_test",
+  "cnb_volt"  = "visual_object_learning_test",
+  "cnb_volt_valid_code"  = "visual_object_learning_test",
+  "cnb_plot"  = "variable_short_penn_line_orientation_test",
+  "cnb_plot_valid_code"  = "variable_short_penn_line_orientation_test",
+  "cnb_ddisc" = "delay_discounting_task",
+  "cnb_ddisc_valid_code" = "delay_discounting_task",
+  "cnb_rdisc" = "risk_discounting_task",
+  "cnb_rdisc_valid_code" = "risk_discounting_task",
+  "cnb_edisc" = "effort_discounting_task",
+  "cnb_edisc_valid_code" = "effort_discounting_task",
+  "cnb_digsym"= "digit_symbol",
+  "cnb_digsym_valid_code"= "digit_symbol",
+  "cnb_aim"   = "penn_abstraction_inhibition_working_memory_task",
+  "cnb_aim_valid_code"   = "penn_abstraction_inhibition_working_memory_task",
+  "cnb_b_trails"= "trailmaking_test_b", # corresponds to TRAIL_B
+  "cnb_trails_b_valid_code"= "trailmaking_test_b",
+  "cnb_a_trails" = "trailmaking_test_a",
+  "cnb_trails_a_valid_code" = "trailmaking_test_a"
+)
+
+# ---- Ensure output directories exist ----
+dir_create(output_dir_csv, recurse = TRUE)
+dir_create(output_dir_tsv, recurse = TRUE)
+
+# ---- Figure out common (non-prefixed) columns ----
+all_cols <- names(combined_CNB_clean)
+is_prefixed_by_any <- Reduce(`|`, lapply(names(prefix_map), function(p) startsWith(all_cols, p)))
+# If none matched, is_prefixed_by_any might be NULL; guard it:
+if (is.null(is_prefixed_by_any)) is_prefixed_by_any <- rep(FALSE, length(all_cols))
+common_cols <- all_cols[!is_prefixed_by_any]
+
+# (Optional) Always-keep columns—append here if desired:
+always_keep <- c()  # e.g., c("participant_id", "session_id")
+common_cols <- unique(c(common_cols, intersect(always_keep, all_cols)))
+
+# ---- Split & save per prefix ----
+saved <- list()
+
+for (i in seq_along(prefix_map)) {
+  prefix   <- names(prefix_map)[i]
+  df_name  <- unname(prefix_map[i])
+
+  cols_for_prefix <- all_cols[startsWith(all_cols, prefix)]
+
+  # Skip if no columns for this prefix
+  if (length(cols_for_prefix) == 0) next
+
+  df_split <- combined_CNB_clean %>%
+    select(any_of(c(common_cols, cols_for_prefix)))
+
+  # Assign object in the global env (optional)
+  assign(df_name, df_split, envir = .GlobalEnv)
+
+  # Save CSV
+  csv_path <- file.path(output_dir_csv, paste0(df_name, ".csv"))
+  write_csv(df_split, csv_path)
+
+  # Save TSV
+  tsv_path <- file.path(output_dir_tsv, paste0(df_name, ".tsv"))
+  write_tsv(df_split, tsv_path)
+
+  saved[[prefix]] <- list(csv = csv_path, tsv = tsv_path)
+}
+
+# Quick summary in console
+message("Wrote ", length(saved), " prefix files.")
+invisible(saved)
+
+
+```
+
+Edit TRAILS mapping here further so it is accurate.
+``` {r edit TRAILS}
+library(readr)
+
+# feed in TRAILS A and TRAILS B spreadsheet
+trails_a <- read_tsv("/Volumes/Coordinators/Protocols/TED_PROTOCOLS/EXECUTIVE_829744/CNB_data_10:9:25/task_tsv_bids/trailmaking_test_a.tsv")
+trails_b <- read_tsv("/Volumes/Coordinators/Protocols/TED_PROTOCOLS/EXECUTIVE_829744/CNB_data_10:9:25/task_tsv_bids/trailmaking_test_b.tsv")
+
+
+# edit TRAILS A such that it does not have the 'a' in column names
+names(trails_a) <- gsub("_a_", "_", names(trails_a))
+head(trails_a)
+names(trails_a)
+
+# edit TRAILS B such that it does not have the 'a' in column names
+names(trails_b) <- gsub("_b_", "_", names(trails_b))
+head(trails_b)
+names(trails_b)
+
+### for both TRAILS A and TRAILS B, add in form version
+#trails_a$cnb_trails_form <- "TRAILS A"
+#trails_a <- trails_a[, c(1, 2, ncol(trails_a), 3:(ncol(df)-1))] # third column from left
+#trails_b$cnb_trails_form <- "TRAILS B"
+#trails_b <- trails_b[, c(1, 2, ncol(trails_b), 3:(ncol(df)-1))] # third column from left
+trails_a <- trails_a %>%
+  mutate(cnb_trails_form = "TRAILS A") %>%
+  relocate(cnb_trails_form, .after = 2)
+
+trails_b <- trails_b %>%
+  mutate(cnb_trails_form = "TRAILS B") %>%
+  relocate(cnb_trails_form, .after = 2)
+
+
+# Write as TSV
+write.table(trails_a, "/Volumes/Coordinators/Protocols/TED_PROTOCOLS/EXECUTIVE_829744/CNB_data_10:9:25/task_tsv_bids/trailmaking_test_a.tsv",
+            sep = "\t", row.names = FALSE, quote = FALSE)
+write.table(trails_b, "/Volumes/Coordinators/Protocols/TED_PROTOCOLS/EXECUTIVE_829744/CNB_data_10:9:25/task_tsv_bids/trailmaking_test_b.tsv",
+            sep = "\t", row.names = FALSE, quote = FALSE)
+
+# Write as CSV
+write.csv(trails_a, "/Volumes/Coordinators/Protocols/TED_PROTOCOLS/EXECUTIVE_829744/CNB_data_10:9:25/task_csv_bids/trailmaking_test_a.csv",
+          row.names = FALSE)
+write.csv(trails_b, "/Volumes/Coordinators/Protocols/TED_PROTOCOLS/EXECUTIVE_829744/CNB_data_10:9:25/task_csv_bids/trailmaking_test_b.csv",
+          row.names = FALSE)
+
+```
+Upload the tsv files to OpenNeuro with the raw dataset.
