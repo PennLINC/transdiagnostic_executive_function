@@ -120,73 +120,6 @@ age_mean <- mean(UPDATED_demographic_data_scanned$age)
 print(age_range)
 print(age_mean)
 ```
-```{r look at age and sex distribution across study groups}
-# Age summary by study group
-age_summary <- UPDATED_demographic_data_scanned %>%
-  group_by(study_group) %>%
-  summarise(
-    age_min = min(age, na.rm = TRUE),
-    age_max = max(age, na.rm = TRUE),
-    age_mean = round(mean(age, na.rm = TRUE), 2),
-    age_sd = sd(age, na.rm = TRUE),
-    n = n()
-  ) %>%
-  arrange(study_group)
-
-age_summary
-
-# Sex summary by study group
-sex_summary <- UPDATED_demographic_data_scanned %>%
-  mutate(sex = if_else(is.na(sex), "N/A", sex)) %>%
-  group_by(study_group, sex) %>%
-  summarise(n = n(), .groups = "drop") %>%
-  arrange(study_group, sex)
-sex_summary
-
-# One-way ANOVA
-anova_age <- aov(age ~ study_group, data = UPDATED_demographic_data_scanned)
-summary(anova_age)
-
-# Create a clinical vs. control flag
-clinical_df <- UPDATED_demographic_data_scanned %>%
-  mutate(
-    clinical_status = case_when(
-      study_group %in% c("ADHD", "PRO/CHR") ~ "Clinical",
-      study_group == "TD/NC"                 ~ "Control",
-      TRUE                                   ~ NA_character_
-    )
-  ) %>%
-  filter(!is.na(clinical_status), !is.na(age))
-
-# clinical summary
-clinical_summary <- clinical_df %>%
-  group_by(clinical_status) %>%
-  summarise(
-    n       = n(),
-    age_mean= mean(age),
-    age_sd  = sd(age),
-    .groups = "drop"
-  )
-clinical_summary
-
-
-# 2-sample t test for age
-# Welch two-sample t-test (default, robust to unequal variances)
-clinical_ttest <- t.test(age ~ clinical_status, data = clinical_df)
-
-clinical_ttest
-
-
-
-
-# Contingency table of sex by group
-sex_table <- table(UPDATED_demographic_data_scanned$study_group,
-                   UPDATED_demographic_data_scanned$sex)
-#Chi-square test
-chisq.test(sex_table)
-
-
-```
 
 
 
@@ -233,50 +166,6 @@ ggplot(sex_table, aes(x = sex, y = percent, fill = sex)) +
 dev.off()
 
 
-# Ethnicity Bar Chart
-png(filename = "/Users/bsevchik/projects/EF_clinical/demographics/ethnicity_bar_chart.png", 
-    width = 2000, height = 2000, res = 300) # local path
-
-ggplot(ethnicity_table, aes(x = ethnicity, y = percent, fill = ethnicity)) +
-  geom_col() +
-  geom_text(aes(label = paste0(percent, "%")), vjust = -0.3, size = 5) +
-  labs(title = "Ethnicity Distribution", x = "Ethnicity", y = "Percent", fill = "Ethnicity") +
-  theme_minimal(base_size = 20) +
-  scale_fill_manual(values = c("Hispanic" = "#B6A6E9", "N/A" = "#4394E5", "Non - Hispanic" = "#AFDC8F")) +
-  theme(
-    plot.title = element_text(hjust = 0.5),
-    axis.text.x = element_blank(),
-    axis.ticks.x = element_blank()
-    )
-
-dev.off()
-
-
-# Race Bar Chart
-png(filename = "/Users/bsevchik/projects/EF_clinical/demographics/race_bar_chart.png", # local path
-    width = 3000, height = 2000, res = 300) # local path
-
-ggplot(race_table, aes(x = reorder(race, -percent), y = percent, fill = race)) +
-  geom_col() +
-  geom_text(aes(label = paste0(percent, "%")), vjust = -0.3, size = 5) +
-  labs(title = "Race Distribution", x = "Race", y = "Percent", fill = "Race") +
-  theme_minimal(base_size = 20) +
-  scale_fill_manual(values = c(
-    "Asian" = "#B6A6E9", 
-    "Black or African American" = "#4394E5", 
-    "More than one race" = "#AFDC8F", 
-    "Unknown or not reported" = "#F8AE54", 
-    "White" = "#92C5F9"
-  )) +
-  theme(
-    plot.title = element_text(hjust = 0.5),
-    axis.text.x = element_blank(),
-    axis.ticks.x = element_blank()
-    )
-
-dev.off()
-
-
 
 ```
 
@@ -303,28 +192,9 @@ print(age_histogram)
 dev.off()
 ```
 
+
+
 ```{r stacked bar plot - age & sex}
-png(filename = "/Users/bsevchik/Documents/GitHub/transdiagnostic_executive_function/demographics/demographic_figures/age_sex_stacked_bar_chart.png", 
-    width = 2500, height = 2000, res = 300)
-
-ggplot(UPDATED_demographic_data_scanned, aes(x = age, fill = sex)) +
-  geom_bar(position = "stack") +
-  labs(title = "Age by Sex Distribution",
-       x = "Age (Years)",
-       y = "Count",
-       fill = "Sex") +
-  theme_minimal(base_size = 20) +
-  theme(
-    plot.title = element_text(hjust = 0.5)
-  ) +
-  scale_fill_manual(values = c("M" = "#B6A6E9", "F" = "#4394E5"))
-
-dev.off()
-
-```
-
-
-```{r stacked bar plot as PDF}
 # Define the plot as an object so we can reuse it
 age_sex_plot <- ggplot(UPDATED_demographic_data_scanned, aes(x = age, fill = sex)) +
   geom_bar(position = "stack") +
