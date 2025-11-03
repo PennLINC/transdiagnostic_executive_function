@@ -101,7 +101,6 @@ print(summary_df)
 
 ```
 ```{r distribution}
-# Assuming `summary_df` is your 3-row summary table with counts
 # Convert wide to long format
 summary_long <- summary_df %>%
   pivot_longer(cols = starts_with("dx_"),
