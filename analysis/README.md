@@ -17,5 +17,5 @@ The scripts in this folder include:
     + `plot_corrmat_nback.py` is used to create the n-back task correlation matrix for figure 6 in the manuscript
     + `plot_corrmat_rest_run.py` is used to create the resting-state correlation matrix for figure 6 in the manuscript
     + `plot_qsi_scalar_maps_1.py`, `plot_qsi_scalar_maps_2.py`, `plot_qsi_scalar_maps_3.py`, and `plot_qsi_scalar_maps_4.py` are used to create the scalar maps for DWI data for figure 7 in the manuscript
-    + `plot_surfaces.ipynb` is used to plot ALFF and ReHO for figure 6 in the manuscript
+    + `plot_surfaces.ipynb` is used to plot ALFF and ReHO for figure 6 in the manuscript, and to plot the atlases in figure 5 of the manuscript
     + `visualize_afq_bundles.py` is used to plot the individual white matter tracts for a few example subjects
