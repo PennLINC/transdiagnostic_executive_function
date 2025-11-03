@@ -14,3 +14,4 @@ The order in which the scripts in this folder should be run is below:
      + It is important to `datalad save -m "..."` with a commit message after editing the metadata with CuBIDS.
 5. Anonymize the scans before preprocessing (reface T1s & deface T2s) with `04_reface_anathomicals.sh`
 
+`image_counts_longitudinal.py` summarizes the number of participants with each image modality, the number of scans with each image modality, and the percent of each image modality that had longitudinal data.
