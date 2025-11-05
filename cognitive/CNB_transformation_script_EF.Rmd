@@ -127,7 +127,7 @@ prefix_map <- c(
   "enb_er40_valid_code" = "penn_emotion_recognition_task",
   "cnb_cpw"   = "penn_word_memory_test", # was KCPW
   "cpw_valid_code" = "penn_word_memory_test",
-  "cnb_pvrt"  = "penn_logical_reasoning_test", # was KSPVRT
+  "cnb_pvrt"  = "penn_verbal_reasoning_test", # was KSPVRT
   "cnb_pvrt_valid_code"  = "penn_logical_reasoning_test",
   "cnb_medf"  = "measured_emotion_differentiation_test",
   "cnb_medf_valid_code"  = "measured_emotion_differentiation_test",
