@@ -61,7 +61,7 @@ def find_sessions(sub_dir: Path) -> List[Path]:
 def summarize_pipeline(print_name: str, inner_root: Path) -> None:
     if not inner_root.exists() or not inner_root.is_dir():
         print(f"\n[{print_name}]")
-        print(f"  b Expected inner root does not exist: {inner_root}")
+        print(f"  Expected inner root does not exist: {inner_root}")
         return
 
     subs = find_subjects(inner_root)
@@ -126,7 +126,7 @@ def main():
         ("fmriprep_unnzipped", "fmriprep_unnzipped", ["fmriprep_func", "fmriprep"]),  # typo-tolerant
         ("qsiprep_unzipped", "qsiprep_unzipped", ["qsiprep"]),
         ("qsirecon_unzipped", "qsirecon_unzipped", ["qsirecon/derivatives/qsirecon-DSIStudio"]),
-        ("xcpd_unzipped", "xcpd_unzipped", ["xcpd"]),
+        ("xcpd_unzipped", "xcpd_unzipped", ["xcpd_unzipped/xcpd"]),
     ]
 
     seen_fmriprep = False  # avoid double-printing if both spellings exist
