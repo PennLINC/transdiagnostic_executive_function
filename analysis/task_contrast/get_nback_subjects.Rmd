@@ -1,0 +1,34 @@
+---
+title: "subjects_task_contrast"
+author: "Brooke Sevchik"
+date: "2025-11-19"
+output: html_document
+---
+Basically, we just want to include subjects with nback data in array.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r load packages, include=FALSE}
+library(tidyverse)
+library(dplyr)
+library(readr)
+```
+
+
+```{r filter}
+fmri_data<- read.csv("/Users/bsevchik/Documents/GitHub/transdiagnostic_executive_function/QC/qc_csvs/final_QC_csvs/EF_desc-fMRI_qc.csv")
+
+fmri_data_nback <- fmri_data %>%
+  filter(task == 'nback' & qc_determination == 'pass')
+
+fmri_data_nback
+
+print(unique(fmri_data_nback$participant_id))
+
+```
+
+
+
+
