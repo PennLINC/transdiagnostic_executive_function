@@ -118,47 +118,26 @@ combined_CNB_clean <- read_csv(input_csv, show_col_types = FALSE)
 # ---- Define prefix map (same as your code) ----
 prefix_map <- c(
   "cnb_adt"   = "age_differentiation_test",
-  "cnb_adt_valid_code" = "age_differentiation_test",
   "cnb_cpf"   = "penn_face_memory_test",
-  "cnb_cpf_valid_code"   = "penn_face_memory_test",
   "cnb_ctap" = "short_computerized_finger_tapping_task",
-  "cnb_ctap_valid_code" = "short_computerized_finger_tapping_task",
   "cnb_er40"  = "penn_emotion_recognition_task",
-  "cnb_er40_valid_code" = "penn_emotion_recognition_task",
   "cnb_cpw"   = "penn_word_memory_test", # was KCPW
-  "cpw_valid_code" = "penn_word_memory_test",
   "cnb_pvrt"  = "penn_verbal_reasoning_test", # was KSPVRT
-  "cnb_pvrt_valid_code"  = "penn_logical_reasoning_test",
   "cnb_medf"  = "measured_emotion_differentiation_test",
-  "cnb_medf_valid_code"  = "measured_emotion_differentiation_test",
   "cnb_mpract"= "motor_praxis",
-  "cnb_mpract_valid_code"= "motor_praxis",
   "cnb_pcet"  = "penn_conditional_exclusion_task",
-  "cnb_pcet_valid_code"  = "penn_conditional_exclusion_task",
   "cnb_pmat"  = "penn_matrix_reasoning_test",
-  "cnb_pmat_valid_code" = "penn_matrix_reasoning_test",
   "cnb_lnb"   = "short_letter_2back",
-  "cnb_lnb_valid_code"   = "short_letter_2back",
   "cnb_cptnl" = "short_penn_continuous_performance_test",
-  "cnb_cptnl_valid_code" = "short_penn_continuous_performance_test",
   "cnb_volt"  = "visual_object_learning_test",
-  "cnb_volt_valid_code"  = "visual_object_learning_test",
   "cnb_plot"  = "variable_short_penn_line_orientation_test",
-  "cnb_plot_valid_code"  = "variable_short_penn_line_orientation_test",
   "cnb_ddisc" = "delay_discounting_task",
-  "cnb_ddisc_valid_code" = "delay_discounting_task",
   "cnb_rdisc" = "risk_discounting_task",
-  "cnb_rdisc_valid_code" = "risk_discounting_task",
   "cnb_edisc" = "effort_discounting_task",
-  "cnb_edisc_valid_code" = "effort_discounting_task",
   "cnb_digsym"= "digit_symbol",
-  "cnb_digsym_valid_code"= "digit_symbol",
   "cnb_aim"   = "penn_abstraction_inhibition_working_memory_task",
-  "cnb_aim_valid_code"   = "penn_abstraction_inhibition_working_memory_task",
   "cnb_b_trails"= "trailmaking_test_b", # corresponds to TRAIL_B
-  "cnb_trails_b_valid_code"= "trailmaking_test_b",
-  "cnb_a_trails" = "trailmaking_test_a",
-  "cnb_trails_a_valid_code" = "trailmaking_test_a"
+  "cnb_a_trails" = "trailmaking_test_a"
 )
 
 # ---- Ensure output directories exist ----
@@ -211,6 +190,10 @@ invisible(saved)
 
 
 ```
+
+
+
+
 
 Edit TRAILS mapping here further so it is accurate.
 ``` {r edit TRAILS}
