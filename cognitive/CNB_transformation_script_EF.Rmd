@@ -124,7 +124,7 @@ prefix_map <- c(
   "cnb_ctap" = "short_computerized_finger_tapping_task",
   "cnb_ctap_valid_code" = "short_computerized_finger_tapping_task",
   "cnb_er40"  = "penn_emotion_recognition_task",
-  "enb_er40_valid_code" = "penn_emotion_recognition_task",
+  "cnb_er40_valid_code" = "penn_emotion_recognition_task",
   "cnb_cpw"   = "penn_word_memory_test", # was KCPW
   "cpw_valid_code" = "penn_word_memory_test",
   "cnb_pvrt"  = "penn_verbal_reasoning_test", # was KSPVRT
