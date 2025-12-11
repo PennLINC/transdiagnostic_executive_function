@@ -1,119 +1,97 @@
 #!/usr/bin/env python
+"""Run second-level GLM for n-back task across all subjects."""
 
 from pathlib import Path
+
+import numpy as np
 import pandas as pd
-from scipy.stats import norm
-
 from nilearn.glm.second_level import SecondLevelModel
-from nilearn.interfaces.bids import save_glm_to_bids
 from nilearn.image import load_img
+from nilearn.interfaces.bids import save_glm_to_bids
 
 
-# ----------------------------------------------------------
-# CONFIG
-# ----------------------------------------------------------
-
-task_label = "nback"
-space_label = "MNI152NLin6Asym"
-contrast_label = "twoBackMinusZeroBack"
-
-# First-level output root
-firstlevel_dir = Path(
-    "/cbica/projects/executive_function/code/task_contrast/"
-    "results/plot_bids_features/derivatives/nilearn_glm"
-)
-
-# Where to write second-level outputs
-group_out_dir = firstlevel_dir / "group_level_bids"
-group_out_dir.mkdir(exist_ok=True)
-
-
-# ----------------------------------------------------------
-# TEMPLATEFLOW MASK + BACKGROUND (same bg as first level)
-# ----------------------------------------------------------
-
-# Brain mask for analysis (binary mask)
+CONTRAST_LABELS = ["twoback", "zeroback", "twoBackMinusZeroBack"]
+MODEL_TYPES = ["rtdur", "nortdur"]
 group_mask_img = load_img(
-    "/cbica/projects/executive_function/.cache/templateflow/tpl-MNI152NLin6Asym/tpl-MNI152NLin6Asym_res-02_desc-brain_mask.nii.gz"
+    "/cbica/projects/executive_function/.cache/templateflow/"
+    "tpl-MNI152NLin6Asym/tpl-MNI152NLin6Asym_res-02_desc-brain_mask.nii.gz"
 )
-
-# Background image for report visualization (underlay)
 bg_img = load_img(
-    "/cbica/projects/executive_function/.cache/templateflow/tpl-MNI152NLin6Asym/tpl-MNI152NLin6Asym_res-02_desc-brain_T1w.nii.gz"
+    "/cbica/projects/executive_function/.cache/templateflow/"
+    "tpl-MNI152NLin6Asym/tpl-MNI152NLin6Asym_res-02_desc-brain_T1w.nii.gz"
 )
 
+for model_type in MODEL_TYPES:
+    firstlevel_dir = Path(f"/cbica/projects/executive_function/EF_dataset/derivatives/nback-{model_type}")
+    for contrast_label in CONTRAST_LABELS:
+        print("\n====================================================")
+        print(f"Running group model for contrast: {contrast_label}")
+        print("====================================================\n")
 
-# ----------------------------------------------------------
-# COLLECT FIRST-LEVEL EFFECT SIZE MAPS
-# ----------------------------------------------------------
-# e.g. sub-20188/sub-20188_task-nback_space-MNI152NLin6Asym_contrast-twoBackMinusZeroBack_stat-effect_statmap.nii.gz
+        group_out_dir = firstlevel_dir / f"group-{contrast_label}"
+        group_out_dir.mkdir(exist_ok=True, parents=True)
 
-pattern = (
-    f"sub-*/sub-*_task-{task_label}_space-{space_label}_"
-    f"contrast-{contrast_label}_stat-effect_statmap.nii.gz"
-)
+        pattern = (
+            "sub-*/sub-*_task-nback_space-MNI152NLin6Asym_"
+            f"contrast-{contrast_label}_stat-effect_statmap.nii.gz"
+        )
 
-effect_maps = sorted(firstlevel_dir.glob(pattern))
+        effect_maps = sorted(firstlevel_dir.glob(pattern))
+        if len(effect_maps) == 0:
+            raise RuntimeError(
+                f"No first-level maps found for contrast '{contrast_label}' with pattern:\n  {pattern}"
+            )
 
-if len(effect_maps) == 0:
-    raise RuntimeError(f"No first-level maps found with pattern:\n  {pattern}")
+        print(f"Found {len(effect_maps)} maps before QC.")
 
-print(f"Found {len(effect_maps)} first-level effect-size maps:\n")
-for p in effect_maps:
-    print("  ", p)
+        # ----- QC: drop maps that are all-nan or constant -----
+        good_maps = []
+        good_subs = []
+        for p in effect_maps:
+            img = load_img(p)
+            data = img.get_fdata()
+            if not np.isfinite(data).any():
+                print(f"[DROP] {p} is all non-finite.")
+                continue
+            if np.nanstd(data) == 0:
+                print(f"[DROP] {p} is constant/zero.")
+                continue
+            good_maps.append(p)
+            good_subs.append(p.name.split("_")[0].replace("sub-", ""))
 
-subject_labels = [p.name.split("_")[0].replace("sub-", "") for p in effect_maps]
+        effect_maps = good_maps
+        subject_labels = good_subs
 
+        print(f"Kept {len(effect_maps)} maps after QC.")
 
-# ----------------------------------------------------------
-# DESIGN MATRIX: ONE-SAMPLE T-TEST
-# ----------------------------------------------------------
+        if len(effect_maps) < 2:
+            raise RuntimeError(
+                f"Need at least 2 valid subjects for group model of {contrast_label} "
+                f"(found {len(effect_maps)})."
+            )
 
-design_matrix = pd.DataFrame(
-    {"intercept": [1.0] * len(effect_maps)},
-    index=subject_labels,
-)
+        # Design matrix
+        design_matrix = pd.DataFrame(
+            {"intercept": [1.0] * len(effect_maps)},
+            index=subject_labels,
+        )
 
-print("\nSecond-level design matrix:")
-print(design_matrix.head())
-print(f"\nTotal subjects: {len(design_matrix)}\n")
-print("Subjects included:")
-print(sorted(subject_labels))
+        # Fit second-level
+        model = SecondLevelModel(mask_img=group_mask_img, minimize_memory=False)
+        model = model.fit(effect_maps, design_matrix=design_matrix)
 
+        # Save results
+        contrasts = {contrast_label: "intercept"}
 
-# ----------------------------------------------------------
-# FIT SECOND-LEVEL MODEL
-# ----------------------------------------------------------
+        save_glm_to_bids(
+            model=model,
+            contrasts=contrasts,
+            out_dir=group_out_dir,
+            threshold=0.001,          # <-- p-value threshold
+            height_control="fpr",     # <-- interpret threshold as p
+            cluster_threshold=10,
+            bg_img=bg_img,
+            two_sided=True,
+        )
 
-model = SecondLevelModel(
-    mask_img=group_mask_img,   # <-- TemplateFlow mask for analysis
-    minimize_memory=False
-)
-
-model = model.fit(
-    second_level_input=effect_maps,
-    design_matrix=design_matrix,
-)
-
-
-# ----------------------------------------------------------
-# SAVE OUTPUTS IN BIDS-LIKE FORMAT
-# ----------------------------------------------------------
-
-group_contrast_name = "group_twoBackMinusZeroBack"
-contrasts = {group_contrast_name: "intercept"}
-
-save_glm_to_bids(
-    model=model,
-    contrasts=contrasts,
-    out_dir=group_out_dir,
-    threshold=norm.isf(0.001),  # Z ~ 3.09
-    height_control=None,        # treat threshold as Z, not p
-    cluster_threshold=10,
-    bg_img=bg_img,              # <-- same bg as first level
-    two_sided=True,             # <-- forward to generate_report(two_sided=True)
-)
-
-print(f"\nSaved second-level BIDS-like outputs to:\n  {group_out_dir}\n")
-
-
+        print(f"\nSaved second-level outputs to:\n  {group_out_dir}\n")
