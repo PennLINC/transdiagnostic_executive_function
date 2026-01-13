@@ -1,0 +1,400 @@
+---
+title: "diagnostic_distribution.Rmd"
+output: html_document
+date: "2025-07-10"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r load packages, include=FALSE}
+library(tidyverse)
+library(dplyr)
+library(networkD3)
+library(webshot2)
+library(webshot)
+```
+
+```{r load in csvs}
+# Load in final clinical diagnosis df (cleaned up from clinical_verification.Rmd script)
+clinical_diagnosis_df <- read.csv('/Users/bsevchik/projects/EF_clinical/final_clinical_CNB/clinical/UPDATED_clinical_scanned_clean.csv')
+
+```
+
+
+```{r separate out csvs}
+ADHD_df <- clinical_diagnosis_df %>% filter(study_group == "ADHD")
+TDNC_df <- clinical_diagnosis_df %>% filter(study_group == "TD/NC")
+PROCHR_df <- clinical_diagnosis_df %>% filter(study_group == "PRO/CHR")
+
+# Calculate counts and percentages
+study_group_summary <- clinical_diagnosis_df %>%
+  group_by(study_group) %>%
+  summarise(
+    count = n()
+  ) %>%
+  mutate(
+    percentage = round(100 * count / sum(count), 1)
+  )
+
+# Print the result
+print(study_group_summary)
+```
+
+NOTE: dx_sum is inaccurate for healthy controls: counts dx_none as a diagnosis in the csv file!
+
+```{r number of diagnoses by group}
+# Calculate average dxsum (number of diagnoses) per study_group
+dxsum_avg_summary <- clinical_diagnosis_df %>%
+  filter(study_group %in% c("ADHD", "TD/NC", "PRO/CHR")) %>%  # Optional: ensure group validity
+  mutate(dxsum = as.numeric(dxsum)) %>%  # Ensure dxsum is numeric
+  group_by(study_group) %>%
+  summarise(avg_dxsum = mean(dxsum, na.rm = TRUE)) %>%
+  ungroup()
+
+
+dxsum_avg_summary
+
+```
+TD/NC will be wrong bc dx_none counts as 1, but should count as 0 - can fix later
+
+
+```{r summarize diagnoses}
+
+# Identify dx_ columns
+dx_cols <- grep("^dx_", names(clinical_diagnosis_df), value = TRUE)
+dx_cols <- setdiff(dx_cols, "dx_pscat")  # Exclude dx_pscat
+
+# Function to summarize dx_ counts for each group
+summarize_dx <- function(df, group_name) {
+  # Ensure dx_ columns are numeric
+  dx_data <- df %>%
+    select(all_of(dx_cols)) %>%
+    mutate(across(everything(), ~ as.numeric(as.character(.))))
+  
+  # Sum across columns
+  dx_sums <- colSums(dx_data, na.rm = TRUE)
+  
+  # Return as a row in a data frame
+  data.frame(study_group = group_name, t(dx_sums), check.names = FALSE)
+}
+
+# Apply the function to each study group
+ADHD_summary <- summarize_dx(ADHD_df, "ADHD")
+TDNC_summary <- summarize_dx(TDNC_df, "TD/NC")
+PROCHR_summary <- summarize_dx(PROCHR_df, "PRO/CHR")
+
+# Combine into one summary data frame
+summary_df <- bind_rows(ADHD_summary, TDNC_summary, PROCHR_summary)
+
+# Exclude remitted ones from summary_df
+summary_df <- summary_df %>%
+  select(-dx_prodromal_remit, -dx_psychosis_remit, -dx_scz_remit, -dx_moodnos_remit, -dx_mdd_remit, -dx_bp_remit, -dx_adhd_remit, -dx_ptsd_remit, -dx_other_remit)
+
+
+# View or export the result
+print(summary_df)
+#write.csv(summary_df, file = #"/Users/bsevchik/projects/EF_clinical/final_clinical_CNB/clinical/diagnoses_wideform.csv", row.names = FALSE)
+
+```
+
+
+
+```{r figure of distribution}
+#NOTE: this plot might not be accurate since many people have multiple diagnoses
+
+
+# Assuming `summary_df` is your 3-row summary table with counts
+# Convert wide to long format
+summary_long <- summary_df %>%
+  pivot_longer(cols = starts_with("dx_"),
+               names_to = "diagnosis",
+               values_to = "count")
+
+# Normalize to proportions within each study_group
+summary_long <- summary_long %>%
+  group_by(study_group) %>%
+  mutate(prop = count / sum(count))
+
+# Define labels for ggplot key (change this once you figure out what exact labels mean)
+diagnosis_labels <- c(
+  dx_adhd = "ADHD",
+  dx_adhd_remit = "ADHD (Remitted)",
+  dx_bp = "BPD",
+  dx_bp_remit = "BPD (Remitted)",
+  dx_mdd = "MDD",
+  dx_mdd_remit = "MDD (Remitted)",
+  dx_moodnos = "Mood Disorder NOS",
+  dx_moodnos_remit = "Mood Disorder NOS (Remitted)",
+  dx_none = "No Diagnosis",
+  dx_other = "Other",
+  dx_other_remit = "Other (Remitted)",
+  dx_prodromal = "CHR/Prodromal Psychosis",
+  dx_prodromal_remit = "CHR/Prodromal Psychosis (Remitted)",
+  dx_psychosis = "Psychosis",
+  dx_psychosis_remit = "Psychosis (Remitted)",
+  dx_scz = "Schizophrenia",
+  dx_scz_remit = "Schizophrenia (Remitted)",
+  dx_ptsd = "PTSD",
+  dx_ptsd_remit = "PTSD (Remitted)"
+)
+#Replace diagnosis values using new names
+summary_long <- summary_long %>%
+  mutate(diagnosis = recode(diagnosis, !!!diagnosis_labels))
+summary_long #use this if you want to include in graph key/figure label label where count might = 0 (longer figure key/legend)
+summary_long_no0 <- summary_long %>%
+  filter(count != 0)
+summary_long_no0 #use this if you only want graph to show labels where count does not = 0
+write.csv(summary_long_no0, file = "/Users/bsevchik/projects/EF_clinical/final_clinical_CNB/clinical/summary_long_no0.csv", row.names = FALSE)
+
+
+# Plot: stacked bar of proportions
+ggplot(summary_long_no0, aes(x = study_group, y = prop, fill = diagnosis)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Proportion of Diagnoses by Study Group",
+       x = "Study Group", y = "Proportion") +
+  scale_y_continuous(labels = scales::percent_format()) +
+  theme_minimal()
+
+#Save out plot
+#ggsave("/Users/bsevchik/projects/EF_clinical/clinical_diagnosis/diagnosis_plot.png", width = 8, height = 6, #dpi = 300)
+
+```
+
+
+
+
+
+```{r sankey plot without percentages}
+# Disambiguate labels (some have repeat names)
+summary_long_no0 <- summary_long_no0 %>%
+  mutate(
+    source_label = paste(study_group, "Group"),
+    target_label = diagnosis  # or paste("Dx:", diagnosis) to be extra safe
+  )
+
+# Create nodes
+nodes <- data.frame(name = unique(c(summary_long_no0$source_label, summary_long_no0$target_label)))
+
+# Map node names to indices
+summary_long_no0 <- summary_long_no0 %>%
+  mutate(source = match(source_label, nodes$name) - 1,
+         target = match(target_label, nodes$name) - 1)
+
+# Create links
+links <- summary_long_no0 %>%
+  select(source, target, value = count)
+
+# Plot
+sankeyNetwork(Links = links,
+              Nodes = nodes,
+              Source = "source",
+              Target = "target",
+              Value = "value",
+              NodeID = "name",
+              fontSize = 12,
+              nodeWidth = 30)
+
+
+```
+
+```{r sankey plot with percentages - proportion based on total number of diagnoses out of total diagnoses count (total diagnosis count will be higher than participant count)}
+# Load packages
+library(dplyr)
+library(networkD3)
+library(htmlwidgets)
+
+
+# Step 1: Calculate total count
+total_count <- sum(summary_long_no0$count)
+
+# Step 2: Create clean source/target labels
+summary_long_no0 <- summary_long_no0 %>%
+  mutate(
+    source_label = study_group,
+    target_label = diagnosis
+  )
+
+# Step 3: Compute total flow per source and target
+source_flows <- summary_long_no0 %>%
+  group_by(source_label) %>%
+  summarise(source_total = sum(count), .groups = "drop") %>%
+  mutate(
+    source_pct = round(100 * source_total / total_count, 1),
+    source_label_pct = paste0(source_label, " (", source_pct, "%)")
+  )
+
+target_flows <- summary_long_no0 %>%
+  group_by(target_label) %>%
+  summarise(target_total = sum(count), .groups = "drop") %>%
+  mutate(
+    target_pct = round(100 * target_total / total_count, 1),
+    target_label_pct = paste0(target_label, " (", target_pct, "%)")
+  )
+
+# Step 4: Join percent labels back to main dataframe
+summary_long_labeled <- summary_long_no0 %>%
+  left_join(source_flows, by = "source_label") %>%
+  left_join(target_flows, by = "target_label")
+
+# Step 5: Create nodes and links
+nodes <- data.frame(name = unique(c(summary_long_labeled$source_label_pct,
+                                    summary_long_labeled$target_label_pct)))
+
+links <- summary_long_labeled %>%
+  mutate(
+    source = match(source_label_pct, nodes$name) - 1,
+    target = match(target_label_pct, nodes$name) - 1
+  ) %>%
+  select(source, target, value = count)
+
+# Step 6: Plot Sankey
+sankey_plot <- sankeyNetwork(Links = links,
+              Nodes = nodes,
+              Source = "source",
+              Target = "target",
+              Value = "value",
+              NodeID = "name",
+              fontSize = 12,
+              nodeWidth = 30)
+
+
+saveWidget(sankey_plot,
+           file = "/Users/bsevchik/projects/EF_clinical/final_clinical_CNB/clinical/diagnosis_sankey_plot_1.html",
+           selfcontained = TRUE)
+
+
+webshot2::webshot(
+  url = "/Users/bsevchik/projects/EF_clinical/final_clinical_CNB/clinical/diagnosis_sankey_plot_1.html",
+  file = "/Users/bsevchik/projects/EF_clinical/final_clinical_CNB/clinical/diagnosis_sankey_plot_1.png",
+  vwidth = 800,   # Try 600–1000 for a less wide plot
+  vheight = 500   # Tweak height to match
+)
+
+```
+
+
+```{r sankey plot with percentages - proportion based on percentage of unique participants in dataset who have that diagnosis out of total participants, and left side is based on percentage of unique participants with that study_group }
+
+# Load packages
+library(dplyr)
+library(tidyr)
+library(networkD3)
+library(htmlwidgets)
+
+# Ensure all TD/NC participants have dx_none == 1 - note that you need to do this manually bc some of them don't have dx_none == 1, likely bc they had a 1 for something not surveyed as part of EF!!
+clinical_diagnosis_df <- clinical_diagnosis_df %>%
+  mutate(dx_none = ifelse(study_group == "TD/NC", 1, dx_none))
+
+# Step 1: Create clean source/target labels
+summary_long_no0 <- summary_long_no0 %>%
+  mutate(
+    source_label = study_group,
+    target_label = diagnosis
+  )
+
+# Step 2: Get total number of unique participants
+total_participants <- clinical_diagnosis_df %>%
+  distinct(bblid) %>%
+  nrow()
+
+# Step 3: Compute % of participants per study group (left side of Sankey)
+source_flows <- clinical_diagnosis_df %>%
+  group_by(source_label = study_group) %>%
+  summarise(unique_participants = n_distinct(bblid), .groups = "drop") %>%
+  mutate(
+    source_pct = round(100 * unique_participants / total_participants, 1),
+    source_label_pct = paste0(source_label, " (", source_pct, "%)")
+  )
+
+# Step 4: Compute % of participants per diagnosis (right side of Sankey)
+dx_cols <- grep("^dx_", names(clinical_diagnosis_df), value = TRUE)
+dx_cols <- setdiff(dx_cols, "dx_pscat")  # Exclude if necessary
+
+long_dx <- clinical_diagnosis_df %>%
+  select(bblid, all_of(dx_cols)) %>%
+  pivot_longer(cols = all_of(dx_cols), names_to = "diagnosis", values_to = "has_dx") %>%
+  filter(has_dx == 1)
+
+target_flows <- long_dx %>%
+  group_by(target_label = diagnosis) %>%
+  summarise(unique_participants = n_distinct(bblid), .groups = "drop") %>%
+  mutate(
+    target_pct = round(100 * unique_participants / total_participants, 1)
+  )
+
+# Step 5: Apply readable labels to diagnosis names
+diagnosis_labels <- c(
+  dx_adhd = "ADHD",
+  dx_adhd_remit = "ADHD (Remitted)",
+  dx_bp = "BPD",
+  dx_bp_remit = "BPD (Remitted)",
+  dx_mdd = "MDD",
+  dx_mdd_remit = "MDD (Remitted)",
+  dx_moodnos = "Mood Disorder NOS",
+  dx_moodnos_remit = "Mood Disorder NOS (Remitted)",
+  dx_none = "No Diagnosis",
+  dx_other = "Other",
+  dx_other_remit = "Other (Remitted)",
+  dx_prodromal = "CHR/Prodromal Psychosis",
+  dx_prodromal_remit = "CHR/Prodromal Psychosis (Remitted)",
+  dx_psychosis = "Psychosis",
+  dx_psychosis_remit = "Psychosis (Remitted)",
+  dx_scz = "Schizophrenia",
+  dx_scz_remit = "Schizophrenia (Remitted)",
+  dx_ptsd = "PTSD",
+  dx_ptsd_remit = "PTSD (Remitted)"
+)
+
+target_flows <- target_flows %>%
+  mutate(target_label = recode(target_label, !!!diagnosis_labels)) %>%
+  mutate(target_label_pct = paste0(target_label, " (", target_pct, "%)"))
+
+# Step 6: Join percent labels back to main summary
+summary_long_labeled <- summary_long_no0 %>%
+  left_join(source_flows, by = "source_label") %>%
+  left_join(target_flows, by = "target_label")
+
+# Step 7: Create nodes and links
+nodes <- data.frame(name = unique(c(summary_long_labeled$source_label_pct,
+                                    summary_long_labeled$target_label_pct)))
+
+links <- summary_long_labeled %>%
+  mutate(
+    source = match(source_label_pct, nodes$name) - 1,
+    target = match(target_label_pct, nodes$name) - 1
+  ) %>%
+  select(source, target, value = count)
+
+# Step 8: Plot Sankey
+sankey_plot <- sankeyNetwork(Links = links,
+              Nodes = nodes,
+              Source = "source",
+              Target = "target",
+              Value = "value",
+              NodeID = "name",
+              fontSize = 12,
+              nodeWidth = 30)
+
+# Step 9: Save HTML and PNG
+saveWidget(sankey_plot,
+           file = "/Users/bsevchik/projects/EF_clinical/final_clinical_CNB/clinical/diagnosis_sankey_plot_2.html",
+           selfcontained = TRUE)
+
+webshot2::webshot(
+  url = "/Users/bsevchik/projects/EF_clinical/final_clinical_CNB/clinical/diagnosis_sankey_plot_2.html",
+  file = "/Users/bsevchik/projects/EF_clinical/final_clinical_CNB/clinical/diagnosis_sankey_plot_2.png",
+  vwidth = 1000,
+  vheight = 500,
+  zoom = 3.83
+)
+
+
+```
+
+
+
+
+
+
