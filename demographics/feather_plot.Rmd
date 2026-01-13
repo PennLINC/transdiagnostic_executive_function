@@ -218,8 +218,14 @@ df <- df %>%
 
 updated_input <- df
 
+# Save out age information for later use
+EF_age_info <- updated_input %>%
+  select(participant_id, session_id, age_months, age)
+EF_age_info
+write.csv(EF_age_info, "/Users/bsevchik/projects/EF_code/EF_self_report/EF_age_info.csv", row.names = FALSE)
 
-# Get average age across essions
+
+# Get average age across sessions
 mean_age <- mean(updated_input$age)
 print(mean_age)
 
