@@ -1,0 +1,41 @@
+---
+title: "tanner_girl_score"
+output: html_document
+date: "2026-01-28"
+---
+
+```{r score tanner girl}
+# Code script to score the Tanner Scale (Female)  - Marshall & Tanner (1970)
+# https://doi.org/10.1136/adc.44.235.291
+# Scoring instructions: Sum individual item responses to get the raw total score. Note that for each individual question, 4 refers to the highest developmental stage, while a response of 5 indicates "I don't know."
+
+
+# Load required packages
+library(dplyr)
+library (readr)
+
+# Load data
+tanner_girl <- read_tsv("/Users/bsevchik/projects/EF_clinical/self-report/scale_csvs_Jan/separate_tsvs/tanner_girl.tsv")
+
+# Compute total scores for each individual participant
+tanner_girl <- tanner_girl %>%
+  mutate(
+  tanner_girl_total_score = if_else(
+    if_all(tanner_girl_1:tanner_girl_8, is.na),
+    NA_real_,
+    rowSums(across(tanner_girl_1:tanner_girl_8), na.rm = TRUE) # if all the values are NA, then final score is NA
+  )
+)
+write_tsv(tanner_girl,"/Users/bsevchik/projects/EF_clinical/self-report/scale_csvs_Jan/final_scored_tsvs/tanner_girl.tsv", na = "n/a")
+```
+``` {r tanner girl distribution}
+library(ggplot2)
+library(dplyr)
+
+tanner_girl %>%
+  ggplot(aes(x = tanner_girl_total_score)) +
+  geom_histogram(bins = 20) +
+  labs(x = "Tanner (Female) total score (sum items 1–8)", y = "Number of sessions",
+       title = "Distribution of Tanner (Female) total scores")
+
+```

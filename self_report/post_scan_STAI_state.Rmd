@@ -1,0 +1,50 @@
+---
+title: "post_scan_STAI_state_score"
+output: html_document
+date: "2026-01-21"
+---
+
+```{r score post_scan_STAI_state_score}
+# Code script to score the State-Trait Anxiety Inventory (State Only) - Spielberger et al. (1977)
+# https://www.researchgate.net/publication/235361542_Manual_for_the_State-Trait_Anxiety_Inventory_Form_Y1_-_Y2
+# Scoring instructions: Questions 1-20 refer to state anxiety. Higher scores indicate greater anxiety. Reverse code the items necessary, then calculate a sum of all individual item responses for state and trait scores and full STAI total.
+
+# Load required packages
+library(dplyr)
+library (readr)
+
+# Load data
+post_scan_STAI <- read.csv("/Users/bsevchik/projects/EF_clinical/self-report/scale_csvs_Jan/ef_selfreport_post-scan_state.csv")
+
+# Edit csv file
+post_scan_STAI <- post_scan_STAI %>%
+  select(-redcapid, -protocol, -protocol_number, -admin_timestamp, -date, -assessor, -location)
+post_scan_STAI
+
+# Compute total scores for each individual participant
+rev_items <- c(
+  "stai_q_01", "stai_q_02", "stai_q_05", "stai_q_08", "stai_q_10", "stai_q_11", "stai_q_15", "stai_q_16", "stai_q_19", "stai_q_20"
+)
+keep_items <- c("stai_q_03", "stai_q_04", "stai_q_06", "stai_q_07", "stai_q_09", "stai_q_12", "stai_q_13", "stai_q_14", "stai_q_17", "stai_q_18", rev_items)
+
+post_scan_STAI <- post_scan_STAI %>%
+  mutate(across(all_of(keep_items), as.numeric)) %>%
+  mutate(across(all_of(rev_items), ~ ifelse(is.na(.x), NA_real_, 5 - .x))) %>%
+  mutate(
+    post_scan_STAI_state_total_score = rowSums(across(all_of(keep_items)), na.rm = TRUE),
+  )
+
+write_tsv(post_scan_STAI,"/Users/bsevchik/projects/EF_clinical/self-report/scale_csvs_Jan/final_scored_tsvs/post_scan_stai_state.tsv", na = "n/a")
+```
+
+``` {r post_scan_STAI distribution}
+library(ggplot2)
+library(dplyr)
+
+post_scan_STAI %>%
+  ggplot(aes(x = post_scan_STAI_state_total_score)) +
+  geom_histogram(bins = 20) +
+  labs(x = "STAI State total score (post-scan)", y = "Number of sessions",
+       title = "Distribution of post-scan STAI State scores")
+
+```

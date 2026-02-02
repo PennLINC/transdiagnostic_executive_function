@@ -1,0 +1,79 @@
+---
+title: "E-SWAN DMDD"
+author: "Brooke Sevchik"
+date: "2026-01-21"
+output: html_document
+---
+
+```{r}
+# Code script to score the Extended Strengths and Weaknesses Assessment of DMDD Symptoms and Normal Behavior - Alexander et al. (2020)
+# https://pubmed.ncbi.nlm.nih.gov/31423596/
+
+# Load required packages
+library(dplyr)
+library (readr)
+
+# Load data
+ESWAN_DMDD <- read_tsv("/Users/bsevchik/projects/EF_clinical/self-report/scale_csvs_Jan/separate_tsvs/eswan_dmdd.tsv")
+
+# View the first few rows
+head(ESWAN_DMDD)
+
+# Define item groups 
+home <- c("eswan_dmdd_01a", "eswan_dmdd_02a", "eswan_dmdd_03a", "eswan_dmdd_04a", "eswan_dmdd_05a", "eswan_dmdd_06a", "eswan_dmdd_07a", "eswan_dmdd_08a", "eswan_dmdd_09a", "eswan_dmdd_10a")
+friends <- c("eswan_dmdd_01b", "eswan_dmdd_02b", "eswan_dmdd_03b", "eswan_dmdd_04b", "eswan_dmdd_05b", "eswan_dmdd_06b", "eswan_dmdd_07b", "eswan_dmdd_08b", "eswan_dmdd_09b", "eswan_dmdd_10b")
+school <- c("eswan_dmdd_01c", "eswan_dmdd_02c", "eswan_dmdd_03c", "eswan_dmdd_04c", "eswan_dmdd_05c", "eswan_dmdd_06c", "eswan_dmdd_07c", "eswan_dmdd_08c", "eswan_dmdd_09c", "eswan_dmdd_10c")
+
+# Convert to numeric (in case they were read as text)
+ESWAN_DMDD[home] <- lapply(ESWAN_DMDD[home], as.numeric)
+ESWAN_DMDD[friends] <- lapply(ESWAN_DMDD[friends], as.numeric)
+ESWAN_DMDD[school] <- lapply(ESWAN_DMDD[school], as.numeric)
+
+# Compute subscale and total scores 
+ESWAN_DMDD <- ESWAN_DMDD %>%
+  mutate(
+    ESWAN_DMDD_home_total = rowSums(select(., all_of(home)), na.rm = TRUE),
+    
+    ESWAN_DMDD_friends_total = rowSums(select(., all_of(friends)), na.rm = TRUE),
+    
+    ESWAN_DMDD_school_total = rowSums(select(., all_of(school)), na.rm = TRUE),
+    
+    ESWAN_DMDD_total_score    = ESWAN_DMDD_home_total + ESWAN_DMDD_friends_total +  ESWAN_DMDD_school_total
+  )%>%
+  rename_with(tolower)  
+
+write_tsv(ESWAN_DMDD, "/Users/bsevchik/projects/EF_clinical/self-report/scale_csvs_Jan/final_scored_tsvs/eswan_dmdd.tsv", na = "n/a")
+
+    
+
+```
+``` {r E-SWAN DMDD distribution}
+library(ggplot2)
+library(dplyr)
+
+ESWAN_DMDD %>%
+  ggplot(aes(x = eswan_dmdd_home_total)) +
+  geom_histogram(bins = 20) +
+  labs(x = "ESWAN-DMDD Home total", y = "Number of sessions",
+       title = "Distribution of ESWAN-DMDD Home total scores")
+
+ESWAN_DMDD %>%
+  ggplot(aes(x = eswan_dmdd_friends_total)) +
+  geom_histogram(bins = 20) +
+  labs(x = "ESWAN-DMDD Friends total", y = "Number of sessions",
+       title = "Distribution of ESWAN-DMDD Friends total scores")
+
+ESWAN_DMDD %>%
+  ggplot(aes(x = eswan_dmdd_school_total)) +
+  geom_histogram(bins = 20) +
+  labs(x = "ESWAN-DMDD School total", y = "Number of sessions",
+       title = "Distribution of ESWAN-DMDD School total scores")
+
+ESWAN_DMDD %>%
+  ggplot(aes(x = eswan_dmdd_total_score)) +
+  geom_histogram(bins = 20) +
+  labs(x = "ESWAN-DMDD Total score", y = "Number of sessions",
+       title = "Distribution of ESWAN-DMDD Total scores")
+
+```
+

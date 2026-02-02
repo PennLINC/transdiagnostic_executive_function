@@ -1,0 +1,69 @@
+---
+title: "MAPSR_score"
+output: html_document
+date: "2026-01-21"
+---
+
+```{r score MAP-SR}
+# Code script to score the Motivation and Pleasure Scale - Self-Report (MAP-SR) - Llerena et al. (2013)
+# https://doi.org/10.1016/j.comppsych.2012.12.001
+# Scoring instructions: The raw scores of all the 15 items are summed to obtain a total raw score that ranges from 0 to 60. Higher scores reflect lower pathology. Subscores are also calculated as follows:
+  #social pleasure subscore: sum items 1-3
+  #recreational/work pleasure subscore: sum items 4-6
+  #feelings and motivations about close, caring relationships subscore: sum items 7-9
+  #motivation and effort to engage in activities subscore: sum items 10-15
+
+# Load required packages 
+library(dplyr)
+library (readr)
+
+# Load data
+MAPSSR <- read_tsv("/Users/bsevchik/projects/EF_clinical/self-report/scale_csvs_Jan/separate_tsvs/mapssr.tsv")
+
+# Compute total scores for each individual participant
+MAPSSR <- MAPSSR %>%
+  mutate(
+    mapssr_social_total = rowSums(select(., mapssr_1, mapssr_2, mapssr_3), na.rm = TRUE),
+    mapssr_recvoc_total = rowSums(select(., mapssr_4, mapssr_5, mapssr_6), na.rm = TRUE),
+    mapssr_motrelation_total = rowSums(select(., mapssr_7, mapssr_8, mapssr_9), na.rm = TRUE),
+    mapssr_engage_total = rowSums(select(., mapssr_10, mapssr_11, mapssr_12, mapssr_13, mapssr_14, mapssr_15), na.rm = TRUE),
+    mapssr_total_score  = rowSums(select(., mapssr_1, mapssr_2, mapssr_3, mapssr_4, mapssr_5, mapssr_6, mapssr_7, mapssr_8, mapssr_9, mapssr_10, mapssr_11, mapssr_12, mapssr_13, mapssr_14, mapssr_15), na.rm = TRUE)
+  )%>%
+  rename_with(tolower) # lowercase 
+write_tsv(MAPSSR,"/Users/bsevchik/projects/EF_clinical/self-report/scale_csvs_Jan/final_scored_tsvs/mapssr.tsv", na = "n/a")
+```
+``` {r MAP-SR distribution}
+library(ggplot2)
+library(dplyr)
+
+MAPSSR %>%
+  ggplot(aes(x = mapssr_social_total)) +
+  geom_histogram(bins = 20) +
+  labs(x = "MAP-SR Social pleasure total", y = "Number of sessions",
+       title = "Distribution of MAP-SR Social pleasure scores")
+
+MAPSSR %>%
+  ggplot(aes(x = mapssr_recvoc_total)) +
+  geom_histogram(bins = 20) +
+  labs(x = "MAP-SR Recreational/Work pleasure total", y = "Number of sessions",
+       title = "Distribution of MAP-SR Recreational/Work pleasure scores")
+
+MAPSSR %>%
+  ggplot(aes(x = mapssr_motrelation_total)) +
+  geom_histogram(bins = 20) +
+  labs(x = "MAP-SR Motivation/Relationships total", y = "Number of sessions",
+       title = "Distribution of MAP-SR Motivation/Relationships scores")
+
+MAPSSR %>%
+  ggplot(aes(x = mapssr_engage_total)) +
+  geom_histogram(bins = 20) +
+  labs(x = "MAP-SR Engage (motivation/effort) total", y = "Number of sessions",
+       title = "Distribution of MAP-SR Engage scores")
+
+MAPSSR %>%
+  ggplot(aes(x = mapssr_total_score)) +
+  geom_histogram(bins = 20) +
+  labs(x = "MAP-SR Total score (0–60)", y = "Number of sessions",
+       title = "Distribution of MAP-SR Total scores")
+
+```

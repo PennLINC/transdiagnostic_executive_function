@@ -1,0 +1,70 @@
+---
+title: "ESWAN_ADHD_score"
+output: html_document
+date: "2026-01-21"
+---
+
+```{r ESWAN-ADHD}
+# Code script to score the Extended Strengths and Weaknesses Assessment of ADHD Symptoms and Normal Behavior - Alexander et al. (2020)
+# https://doi.org/10.1111/jcpp.13104
+# Scoring instructions: Each item is rated on a 7-point scale (-3 to 3), ranging from Far Below Average (3, reflecting a difficulty) to Far Above Average (-3, reflecting a strength). Higher scores on the SWAN reflect greater difficulties, while lower scores reflect greater strengths. Two subscales: Inattention (Items 1-9 and Hyperactivity/Impulsivity (Items 10-18)
+
+# Load required packages
+library(dplyr)
+library (readr)
+
+# Load data
+ESWAN_ADHD <- read_tsv("/Users/bsevchik/projects/EF_clinical/self-report/scale_csvs_Jan/separate_tsvs/eswan_adhd.tsv")
+
+
+# Define item groups 
+inattention <- c("eswan_adhd_01", "eswan_adhd_02", "eswan_adhd_03", "eswan_adhd_04", "eswan_adhd_05", "eswan_adhd_06", "eswan_adhd_07", "eswan_adhd_08", "eswan_adhd_09")
+hyperactivity_impulsivity <- c("eswan_adhd_10", "eswan_adhd_11", "eswan_adhd_12", "eswan_adhd_13", "eswan_adhd_14", "eswan_adhd_15", "eswan_adhd_16", "eswan_adhd_17", "eswan_adhd_18")
+
+all_items <- c(inattention, hyperactivity_impulsivity)
+
+# Convert to numeric (in case they were read as text)
+ESWAN_ADHD[all_items] <- lapply(ESWAN_ADHD[all_items], as.numeric)
+
+# Recode 1-7 to -3 to 3 (subtract 4)
+ESWAN_ADHD[all_items] <- lapply(ESWAN_ADHD[all_items], function(x) ifelse(is.na(x), NA, x - 4))
+
+# Compute subscale and total scores 
+ESWAN_ADHD <- ESWAN_ADHD %>%
+  mutate(
+    ESWAN_ADHD_inattention_total = rowSums(select(., all_of(inattention)), na.rm = TRUE),
+    
+    ESWAN_ADHD_hyperactivity_impulsivity_total = rowSums(select(., all_of(hyperactivity_impulsivity)), na.rm = TRUE),
+    
+    ESWAN_ADHD_total_score    = ESWAN_ADHD_inattention_total + ESWAN_ADHD_hyperactivity_impulsivity_total 
+  )%>%
+  rename_with(tolower)  
+
+write_tsv(ESWAN_ADHD, "/Users/bsevchik/projects/EF_clinical/self-report/scale_csvs_Jan/final_scored_tsvs/eswan_adhd.tsv", na = "n/a")
+```
+``` {r E-SWAN ADHD distribution}
+library(ggplot2)
+library(dplyr)
+
+ESWAN_ADHD %>%
+  ggplot(aes(x = eswan_adhd_inattention_total)) +
+  geom_histogram(bins = 20) +
+  labs(x = "ESWAN-ADHD Inattention total", y = "Number of sessions",
+       title = "Distribution of ESWAN-ADHD Inattention total scores")
+
+ESWAN_ADHD %>%
+  ggplot(aes(x = eswan_adhd_hyperactivity_impulsivity_total)) +
+  geom_histogram(bins = 20) +
+  labs(x = "ESWAN-ADHD Hyperactivity/Impulsivity total", y = "Number of sessions",
+       title = "Distribution of ESWAN-ADHD Hyperactivity/Impulsivity total scores")
+
+ESWAN_ADHD %>%
+  ggplot(aes(x = eswan_adhd_total_score)) +
+  geom_histogram(bins = 20) +
+  labs(x = "ESWAN-ADHD Total score", y = "Number of sessions",
+       title = "Distribution of ESWAN-ADHD Total scores")
+
+```
+
+
+

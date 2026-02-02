@@ -1,0 +1,39 @@
+---
+title: "BDI_score"
+output: html_document
+date: "2026-01-21"
+---
+
+```{r score BDI}
+# Code script to score the Beck Depression Inventory - Beck et al. (1961)
+# https://pubmed.ncbi.nlm.nih.gov/13688369/
+# Scoring instructions: For the full BDI, the raw scores from each of the 21 items are summed to get a total score ranging from 0-63. This study uses a version of the BDI modified to exclude an item pertaining to suicide (item 9) and interest in sex (item 21), so the total scores range from 0-57. Higher scores indicate a greater severity of depression symptoms.
+
+
+# Load required packages (optional, for tidy syntax)
+library(dplyr)
+library (readr)
+
+# Load data
+BDI <- read_tsv("/Users/bsevchik/projects/EF_clinical/self-report/scale_csvs_Jan/separate_tsvs/bdi_1a_ms_child.tsv")
+
+# Compute total scores for each individual participant
+BDI <- BDI %>%
+  mutate(
+    BDI_1a_ms_child_total_score    = rowSums(select(., bdi_ms_child_1, bdi_ms_child_2, bdi_ms_child_3, bdi_ms_child_4, bdi_ms_child_5, bdi_ms_child_6, bdi_ms_child_7, bdi_ms_child_8, bdi_ms_child_10, bdi_ms_child_11, bdi_ms_child_12, bdi_ms_child_13, bdi_ms_child_14, bdi_ms_child_15, bdi_ms_child_16, bdi_ms_child_17, bdi_ms_child_18, bdi_ms_child_19, bdi_ms_child_20), na.rm = TRUE)
+  )%>%
+  rename_with(tolower) # lowercase 
+write_tsv(BDI,"/Users/bsevchik/projects/EF_clinical/self-report/scale_csvs_Jan/final_scored_tsvs/bdi_1a_ms_child.tsv", na = "n/a")
+```
+
+``` {r BDI distribution}
+library(ggplot2)
+library(dplyr)
+
+BDI %>%
+  ggplot(aes(x = bdi_1a_ms_child_total_score)) +
+  geom_histogram(bins = 20) +
+  labs(x = "BDI total score (modified; range 0–57)", y = "Number of sessions",
+       title = "Distribution of BDI total scores (modified)")
+
+```

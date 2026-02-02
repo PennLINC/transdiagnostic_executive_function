@@ -1,0 +1,75 @@
+---
+title: "pre-scan_STAI_score"
+output: html_document
+date: "2026-01-21"
+---
+
+```{r score pre-scan_STAI}
+# Code script to score the State-Trait Anxiety Inventory - Spielberger et al. (1977)
+# https://www.researchgate.net/publication/235361542_Manual_for_the_State-Trait_Anxiety_Inventory_Form_Y1_-_Y2
+# Scoring instructions: Questions 1-20 refer to state anxiety, and questions 21-40 refer to trait anxiety. Higher scores indicate greater anxiety. Reverse code the items necessary, then calculate a sum of all individual item responses for state and trait scores and full STAI total.
+
+# Load required packages
+library(dplyr)
+library (readr)
+
+# Load data
+pre_scan_STAI <- read.csv("/Users/bsevchik/projects/EF_clinical/self-report/scale_csvs_Jan/ef_selfreport_pre-scan_stai.csv")
+
+# Edit csv file
+pre_scan_STAI <- pre_scan_STAI %>%
+  select(-redcapid, -protocol, -protocol_number, -admin_timestamp, -date, -assessor, -location)
+pre_scan_STAI
+
+# Compute total scores for each individual participant
+rev_items <- c(
+  "stai_q_01", "stai_q_02", "stai_q_05", "stai_q_08", "stai_q_10", "stai_q_11", "stai_q_15", "stai_q_16", "stai_q_19", "stai_q_20", "stai_q_21", "stai_q_23", "stai_q_26", "stai_q_27", "stai_q_30", "stai_q_33", "stai_q_34", "stai_q_36", "stai_q_39"
+)
+keep_items <- c("stai_q_03", "stai_q_04", "stai_q_06", "stai_q_07", "stai_q_09", "stai_q_12", "stai_q_13", "stai_q_14", "stai_q_17", "stai_q_18", "stai_q_22", "stai_q_24", "stai_q_25", "stai_q_28", "stai_q_29", "stai_q_31", "stai_q_32", "stai_q_35", "stai_q_37", "stai_q_38", "stai_q_40", rev_items)
+
+pre_scan_STAI <- pre_scan_STAI %>%
+  mutate(across(all_of(keep_items), as.numeric)) %>%
+  mutate(across(all_of(rev_items), ~ ifelse(is.na(.x), NA_real_, 5 - .x))) %>%
+  mutate(
+    pre_scan_STAI_total_score = rowSums(across(all_of(keep_items)), na.rm = TRUE),
+    
+    pre_scan_STAI_trait_total_score = rowSums(across(c(
+  stai_q_21, stai_q_22, stai_q_23, stai_q_24, stai_q_25, stai_q_26, stai_q_27, stai_q_28, stai_q_29, stai_q_30, stai_q_31, stai_q_32, stai_q_33, stai_q_34, stai_q_35, stai_q_36, stai_q_37, stai_q_38, stai_q_39, stai_q_40
+)), na.rm = TRUE),
+    
+    pre_scan_STAI_state_total_score = rowSums(across(c(
+  stai_q_01, stai_q_02, stai_q_03, stai_q_04, stai_q_05,
+  stai_q_06, stai_q_07, stai_q_08, stai_q_09, stai_q_10,
+  stai_q_11, stai_q_12, stai_q_13, stai_q_14, stai_q_15,
+  stai_q_16, stai_q_17, stai_q_18, stai_q_19, stai_q_20
+)), na.rm = TRUE)
+  )
+
+write_tsv(pre_scan_STAI,"/Users/bsevchik/projects/EF_clinical/self-report/scale_csvs_Jan/final_scored_tsvs/pre_scan_stai.tsv", na = "n/a")
+```
+
+
+
+``` {r pre_scan_STAI distribution}
+library(ggplot2)
+library(dplyr)
+
+pre_scan_STAI %>%
+  ggplot(aes(x = pre_scan_STAI_total_score)) +
+  geom_histogram(bins = 20) +
+  labs(x = "STAI total score (pre-scan)", y = "Number of sessions",
+       title = "Distribution of pre-scan STAI total scores")
+
+pre_scan_STAI %>%
+  ggplot(aes(x = pre_scan_STAI_state_total_score)) +
+  geom_histogram(bins = 20) +
+  labs(x = "STAI State total score (pre-scan)", y = "Number of sessions",
+       title = "Distribution of pre-scan STAI State scores")
+
+pre_scan_STAI %>%
+  ggplot(aes(x = pre_scan_STAI_trait_total_score)) +
+  geom_histogram(bins = 20) +
+  labs(x = "STAI Trait total score (pre-scan)", y = "Number of sessions",
+       title = "Distribution of pre-scan STAI Trait scores")
+
+```

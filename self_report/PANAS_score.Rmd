@@ -1,0 +1,44 @@
+---
+title: "PANAS_score"
+output: html_document
+date: "2026-01-27"
+---
+
+```{r score PANAS}
+# Code script to score the Positive and Negative Affect  - Watson et al. (1988)
+#  https://doi.org/10.1037/0022-3514.54.6.1063
+# Scoring instructions: The even items correspond to negative affect and the odd items correspond to positive affect. The raw scores on the negative items are summed to obtain a total raw score that ranges from 5 to 25. The raw scores on the positive items are summed to obtain a total raw score that ranges from 5 to 25. 
+
+# Load required packages
+library(dplyr)
+library (readr)
+
+# Load data
+PANAS <- read_tsv("/Users/bsevchik/projects/EF_clinical/self-report/scale_csvs_Jan/separate_tsvs/panas.tsv")
+
+# Compute total scores for each individual participant
+PANAS <- PANAS %>%
+  mutate(
+    panas_sum_pos = rowSums(select(., panas_1, panas_3, panas_5, panas_7, panas_9), na.rm = TRUE),
+    panas_sum_neg = rowSums(select(., panas_2, panas_4, panas_6, panas_8, panas_10), na.rm = TRUE),
+  )%>%
+  rename_with(tolower) # lowercase 
+write_tsv(PANAS,"/Users/bsevchik/projects/EF_clinical/self-report/scale_csvs_Jan/final_scored_tsvs/panas.tsv", na = "n/a")
+```
+``` {r PANAS distribution}
+library(ggplot2)
+library(dplyr)
+
+PANAS %>%
+  ggplot(aes(x = panas_sum_pos)) +
+  geom_histogram(bins = 20) +
+  labs(x = "PANAS Positive Affect total (5–25)", y = "Number of sessions",
+       title = "Distribution of PANAS Positive Affect scores")
+
+PANAS %>%
+  ggplot(aes(x = panas_sum_neg)) +
+  geom_histogram(bins = 20) +
+  labs(x = "PANAS Negative Affect total (5–25)", y = "Number of sessions",
+       title = "Distribution of PANAS Negative Affect scores")
+
+```

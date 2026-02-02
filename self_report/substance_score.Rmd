@@ -1,0 +1,108 @@
+---
+title: "substance_score"
+output: html_document
+date: "2026-01-28"
+---
+
+```{r score Substance}
+# Code script to score the Substance Use Questionnaire - modified from Han et al. (1999)
+# https://pubmed.ncbi.nlm.nih.gov/10707437/
+# Scoring instructions: Summary scores specifically for tobacco, alcohol, and marijuana are created by adding up responses for frequency of use. We also create a separate summary score that is the sum total of individual responses for other substances, adding up individual responses as to whether these substances were used in the last 12 months, in the lifetime, or never. Two of the other substances used were fake drugs, and used to create validity columns.
+
+# Load required packages 
+library(dplyr)
+library (readr)
+
+# Load data
+substance <- read_tsv("/Users/bsevchik/projects/EF_clinical/self-report/scale_csvs_Jan/separate_tsvs/substance.tsv")
+
+### Compute total scores for each individual participant
+
+# mutate summary scores for alcohol, tobacco, and marijuana
+substance <- substance %>%
+  mutate(
+    substance_tob_summary = case_when(
+      substance_tob_010 %in% c(1, 2) ~ 0L,
+      substance_tob_010 == 3         ~ 1L,
+      substance_tob_010 == 4         ~ 2L,
+      substance_tob_010 == 5         ~ 3L,
+      TRUE                           ~ NA   # or keep as-is, see below
+    )
+  ) %>%
+  mutate(
+    substance_alc_summary = case_when(
+      substance_alc_010 %in% c(1, 2) ~ 0L,
+      substance_alc_010 == 3         ~ 1L,
+      substance_alc_010 == 4         ~ 2L,
+      substance_alc_010 == 5         ~ 3L,
+      TRUE                           ~ NA   
+    )
+  ) %>%
+  mutate(
+    substance_mar_summary = case_when(
+      substance_mar_010 %in% c(1, 2) ~ 0L,
+      substance_mar_010 == 3         ~ 1L,
+      substance_mar_010 == 4         ~ 2L,
+      substance_mar_010 == 5         ~ 3L,
+      TRUE                           ~ NA_integer_ 
+    )
+  )
+
+# mutate substance_othr columns
+cols <- c("substance_othr_010", "substance_othr_020", "substance_othr_030", "substance_othr_060", "substance_othr_070", "substance_othr_080", "substance_othr_090", "substance_othr_100", "substance_othr_110","substance_othr_120", "substance_othr_130", "substance_othr_140", "substance_othr_150", "substance_othr_160", "substance_othr_170")
+
+substance <- substance %>%
+  mutate(across(all_of(cols), ~ case_when(
+    .x == 1 ~ 2L,
+    .x == 2 ~ 1L,
+    .x == 3 ~ 0L,
+    TRUE    ~ NA_integer_
+  )))
+
+# sum substance_othr columns for summary
+substance <- substance %>%
+  mutate(
+    substance_other_summary = rowSums(across(all_of(cols)), na.rm = TRUE)
+  )
+
+
+# create validity columns based on affirmative responses to fake drugs
+substance <- substance %>%
+  mutate(
+    validity_fake_drugs = if_else(
+      substance_othr_040 != 3 | substance_othr_050 != 3,
+      1L, 0L
+    )
+  )
+
+write_tsv(substance,"/Users/bsevchik/projects/EF_clinical/self-report/scale_csvs_Jan/final_scored_tsvs/substance.tsv", na = "n/a")
+```
+``` {r substance distritbution}
+library(ggplot2)
+library(dplyr)
+
+substance %>%
+  ggplot(aes(x = substance_tob_summary)) +
+  geom_histogram(bins = 20) +
+  labs(x = "Tobacco frequency summary (0–3)", y = "Number of sessions",
+       title = "Distribution of tobacco use summary scores")
+
+substance %>%
+  ggplot(aes(x = substance_alc_summary)) +
+  geom_histogram(bins = 20) +
+  labs(x = "Alcohol frequency summary (0–3)", y = "Number of sessions",
+       title = "Distribution of alcohol use summary scores")
+
+substance %>%
+  ggplot(aes(x = substance_mar_summary)) +
+  geom_histogram(bins = 20) +
+  labs(x = "Marijuana frequency summary (0–3)", y = "Number of sessions",
+       title = "Distribution of marijuana use summary scores")
+
+substance %>%
+  ggplot(aes(x = substance_other_summary)) +
+  geom_histogram(bins = 20) +
+  labs(x = "Other substances summary (sum)", y = "Number of sessions",
+       title = "Distribution of other-substances summary scores")
+
+```

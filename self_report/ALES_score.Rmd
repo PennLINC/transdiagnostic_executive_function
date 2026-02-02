@@ -1,0 +1,50 @@
+---
+title: "ALES_score"
+output: html_document
+date: "2026-01-21"
+---
+
+```{r score ALES}
+# Code script to score the Adverse Life Experiences Scale - Ferguson et al. (2010)
+#  https://doi.org/10.1348/135910799168506Digital Object Identifier (DOI)
+# Scoring instructions: We created three summary scores: one based on the frequency of events affirmed, one based on the sum of good versus bad experiences, and one based on the sum of scores pertaining to how much the event affected the individual.
+
+# Load required packages 
+library(dplyr)
+library (readr)
+
+# Load data
+ALES <- read_tsv("/Users/bsevchik/projects/EF_clinical/self-report/scale_csvs_Jan/separate_tsvs/ales.tsv")
+
+# Compute total scores for each individual participant
+ALES <- ALES %>%
+  mutate(
+    ales_frequency  = rowSums(select(., ales_1:ales_25), na.rm = TRUE),
+    ales_good_bad = rowSums(select(., ales_12_1, ales_13_1, ales_14_1, ales_15_1, ales_16_1, ales_17_1, ales_18_1, ales_19_1, ales_20_1, ales_21_1, ales_22_1, ales_23_1, ales_24_1, ales_25_1), na.rm = TRUE),
+    ales_effect  = rowSums(select(., ales_1_1, ales_2_1, ales_3_1, ales_4_1, ales_5_1, ales_6_1, ales_7_1, ales_8_1, ales_9_1, ales_10_1, ales_11_1, ales_12_2, ales_14_2, ales_15_2, ales_16_2, ales_17_2, ales_18_2, ales_19_2, ales_20_2, ales_21_2, ales_22_2, ales_23_2, ales_24_2, ales_25_2), na.rm = TRUE),
+  )
+write_tsv(ALES,"/Users/bsevchik/projects/EF_clinical/self-report/scale_csvs_Jan/final_scored_tsvs/ales.tsv", na = "n/a")
+```
+``` {r ALES distribution}
+library(ggplot2)
+library(dplyr)
+
+ALES %>%
+  ggplot(aes(x = ales_frequency)) +
+  geom_histogram(bins = 20) +
+  labs(x = "ALES frequency (sum of affirmed events)", y = "Number of sessions",
+       title = "Distribution of ALES frequency scores")
+
+ALES %>%
+  ggplot(aes(x = ales_good_bad)) +
+  geom_histogram(bins = 20) +
+  labs(x = "ALES good vs bad (sum)", y = "Number of sessions",
+       title = "Distribution of ALES good/bad scores")
+
+ALES %>%
+  ggplot(aes(x = ales_effect)) +
+  geom_histogram(bins = 20) +
+  labs(x = "ALES effect (sum)", y = "Number of sessions",
+       title = "Distribution of ALES effect scores")
+
+```

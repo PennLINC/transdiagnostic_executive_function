@@ -1,0 +1,43 @@
+---
+title: "ALS-18_score"
+output: html_document
+date: "2026-01-21"
+---
+
+```{r score ALS}
+# Code script to score the Affective Lability Scale - Contardi et al. (2018)
+# https://doi.org/10.3389/fpsyg.2018.00427
+# Scoring instructions: Create sum and average from each of the items.
+
+# Load required packages 
+library(dplyr)
+library (readr)
+
+# Load data
+ALS <- read_tsv("/Users/bsevchik/projects/EF_clinical/self-report/scale_csvs_Jan/separate_tsvs/als_18.tsv")
+
+# Compute total scores for each individual participant
+ALS <- ALS %>%
+  mutate(
+    als_total_score    = rowSums(select(., als_1:als_18), na.rm = TRUE),
+    als_avg_score   = rowMeans(select(., als_1:als_18), na.rm = TRUE)
+  )
+write_tsv(ALS,"/Users/bsevchik/projects/EF_clinical/self-report/scale_csvs_Jan/final_scored_tsvs/als-18.tsv", na = "n/a")
+```
+``` {r ALS distribution}
+library(ggplot2)
+library(dplyr)
+
+ALS %>%
+  ggplot(aes(x = als_total_score)) +
+  geom_histogram(bins = 20) +
+  labs(x = "ALS total score (sum of 18 items)", y = "Number of sessions",
+       title = "Distribution of ALS total scores")
+
+ALS %>%
+  ggplot(aes(x = als_avg_score)) +
+  geom_histogram(bins = 20) +
+  labs(x = "ALS average score", y = "Number of sessions",
+       title = "Distribution of ALS average scores")
+
+```

@@ -1,0 +1,45 @@
+---
+title: "ARI_score"
+output: html_document
+date: "2026-01-21"
+---
+
+```{r score ARI}
+# Code script to score the Affective Reactivity Index - Stringaris et al. (2012)
+# https://doi.org/10.1111/j.1469-7610.2012.02561.x
+# Scoring instructions: The raw scores on the first six items are summed to obtain a total raw score that ranges from 0 to 12. Higher scores indicate greater severity of irritability. In addition, the clinician is asked to calculate and use the average total score. The average total score reduces the overall score to a 3-point scale, which allows the clinician to think of the child’s irritability in terms of none (0), mild-moderate (1), or moderate-severe (2). The use of the average total score was found to be reliable, easy to use, and clinically useful to the clinicians in the DSM-5 Field Trials. The average total score is calculated by dividing the raw total score by 6 (i.e., the first 6 items on the measure).
+
+# Load required packages (optional, for tidy syntax)
+library(dplyr)
+library (readr)
+
+# Load data
+ARI <- read_tsv("/Users/bsevchik/projects/EF_clinical/self-report/scale_csvs_Jan/separate_tsvs/ari.tsv")
+
+# Compute total scores for each individual participant
+ARI <- ARI %>%
+  mutate(
+    ARI_total_score    = rowSums(select(., ari_1, ari_2, ari_3, ari_4, ari_5, ari_6), na.rm = TRUE),
+    ARI_avg   = rowMeans(select(., ari_1, ari_2, ari_3, ari_4, ari_5, ari_6), na.rm = TRUE)
+  )%>%
+  rename_with(tolower) # lowercase 
+write_tsv(ARI,"/Users/bsevchik/projects/EF_clinical/self-report/scale_csvs_Jan/final_scored_tsvs/ari.tsv", na = "n/a")
+```
+``` {r ARI distribution}
+library(ggplot2)
+library(dplyr)
+
+ARI %>%
+  ggplot(aes(x = ari_total_score)) +
+  geom_histogram(bins = 13) +
+  labs(x = "ARI total score (0–12)", y = "Number of sessions",
+       title = "Distribution of ARI total scores")
+
+ARI %>%
+  ggplot(aes(x = ari_avg)) +
+  geom_histogram(bins = 20) +
+  labs(x = "ARI average score", y = "Number of sessions",
+       title = "Distribution of ARI average scores")
+
+```
+

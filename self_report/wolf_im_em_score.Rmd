@@ -1,0 +1,69 @@
+---
+title: "wolf_im_em_score"
+output: html_document
+date: "2026-01-28"
+---
+
+```{r score Wolf IM/EM}
+# Code script to score the Wolf Intrinsic Motivation/Extrinsic Motivation Scale - Didier et al. (2023)
+# https://doi.org/10.1016/j.comppsych.2023.152413
+# Scoring instructions: Items 1, 3, 5, 7, 10, 12, and 14 correspond to intrinsic motivation (IM). Items 2, 4, 6, 9, 11, and 13 correspond to extrinsic motivation (EM). Item 8 is a validity check. Calculate summary scores of average_im (average of all the IM items); average_em (average of all the EM items); avg_of_im_em_averages (Average of the average_im and average_em scores) - this accounts for the different number of IM and EM items; and difference_of_im_em_averages (Difference of im_average and em_average). A new column validity_never_sleepy column is a check for if the data for that session is valid. Here, 1 means invalid (a subject answered 1 or 7 for this question), and 0 means valid.
+
+# Load required packages 
+library(dplyr)
+library (readr)
+
+# Load data
+wolf_im_em <- read_tsv("/Users/bsevchik/projects/EF_clinical/self-report/scale_csvs_Jan/separate_tsvs/wolf_im_em.tsv")
+
+# Compute total scores for each individual participant
+wolf_im_em <- wolf_im_em %>%
+  mutate(
+    im_average = rowMeans(across(c(
+      wolf_im_em_1, wolf_im_em_3, wolf_im_em_5, wolf_im_em_7,
+      wolf_im_em_10, wolf_im_em_12, wolf_im_em_14
+    )), na.rm = TRUE),
+
+    em_average = rowMeans(across(c(
+      wolf_im_em_2, wolf_im_em_4, wolf_im_em_6,
+      wolf_im_em_9, wolf_im_em_11, wolf_im_em_13
+    )), na.rm = TRUE),
+
+    validity_never_sleepy = if_else(wolf_im_em_8 %in% c(1, 7), 1L, 0L)
+  ) %>%
+  mutate(
+    avg_of_im_em_averages = rowMeans(across(c(im_average, em_average)), na.rm = FALSE),
+    difference_of_im_em_averages = im_average - em_average
+  )
+
+write_tsv(wolf_im_em,"/Users/bsevchik/projects/EF_clinical/self-report/scale_csvs_Jan/final_scored_tsvs/wolf_im_em.tsv", na = "n/a")
+```
+``` {r Wolf IM/EM distribution}
+library(ggplot2)
+library(dplyr)
+
+wolf_im_em %>%
+  ggplot(aes(x = im_average)) +
+  geom_histogram(bins = 20) +
+  labs(x = "Wolf Intrinsic Motivation (IM) average", y = "Number of sessions",
+       title = "Distribution of Wolf IM average scores")
+
+wolf_im_em %>%
+  ggplot(aes(x = em_average)) +
+  geom_histogram(bins = 20) +
+  labs(x = "Wolf Extrinsic Motivation (EM) average", y = "Number of sessions",
+       title = "Distribution of Wolf EM average scores")
+
+wolf_im_em %>%
+  ggplot(aes(x = avg_of_im_em_averages)) +
+  geom_histogram(bins = 20) +
+  labs(x = "Average of IM and EM averages", y = "Number of sessions",
+       title = "Distribution of average(IM, EM) scores")
+
+wolf_im_em %>%
+  ggplot(aes(x = difference_of_im_em_averages)) +
+  geom_histogram(bins = 20) +
+  labs(x = "IM average − EM average", y = "Number of sessions",
+       title = "Distribution of (IM − EM) difference scores")
+
+```

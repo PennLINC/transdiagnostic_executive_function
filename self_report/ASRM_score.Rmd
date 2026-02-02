@@ -1,0 +1,37 @@
+---
+title: "ASRM_score"
+output: html_document
+date: "2026-01-21"
+---
+
+```{r score ASRM}
+# Code script to score the Altman Self-Rating Mania Scale - Altman et al. (1997)
+# https://doi.org/10.1016/S0006-3223(96)00548-3
+# Scoring instructions: The raw scores on the five items are summed to obtain a total raw score. A higher score indicates greater suymptoms of mania.
+
+# Load required packages (optional, for tidy syntax)
+library(dplyr)
+library (readr)
+
+# Load data
+ASRM <- read_tsv("/Users/bsevchik/projects/EF_clinical/self-report/scale_csvs_Jan/separate_tsvs/asrm.tsv")
+
+# Compute total scores for each individual participant
+ASRM <- ASRM %>%
+  mutate(
+    ASRM_total_score    = rowSums(select(., asrm_1, asrm_2, asrm_3, asrm_4, asrm_5), na.rm = TRUE)
+  )%>%
+  rename_with(tolower) # lowercase 
+write_tsv(ASRM,"/Users/bsevchik/projects/EF_clinical/self-report/scale_csvs_Jan/final_scored_tsvs/asrm.tsv", na = "n/a")
+```
+``` {r ASRM distribution}
+library(ggplot2)
+library(dplyr)
+
+ASRM %>%
+  ggplot(aes(x = asrm_total_score)) +
+  geom_histogram(bins = 20) +
+  labs(x = "ASRM total score (sum of 5 items)", y = "Number of sessions",
+       title = "Distribution of ASRM total scores")
+
+```

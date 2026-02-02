@@ -1,0 +1,75 @@
+---
+title: "BDI_score"
+output: html_document
+date: "2026-01-21"
+---
+
+```{r score BIS BAS}
+# Code script to score the Behavioral Inhibtion/Behavioral Activation Scale - Carver & White (1994)
+# https://doi.org/10.1037/0022-3514.67.2.319
+# Scoring instructions: Sum the raw scores from each of the items corresponding to each subscale:
+  #items 1-7 = BIS, where lower score = more inhibition;
+  #items 8-12 = BAS reward responsiveness, where lower score = more reward responsiveness
+  #items 13-16 = BAS Drive, where lower score = more driven
+  #items 17-20 = BAS Fun Seeking, where lower score = more fun-seeking
+  #items 8-20 = BAS total
+
+
+# Load required packages (optional, for tidy syntax)
+library(dplyr)
+library (readr)
+
+# Load data
+BIS_BAS <- read_tsv("/Users/bsevchik/projects/EF_clinical/self-report/scale_csvs_Jan/separate_tsvs/bisbias_child.tsv") #typo, fix if you fix the typo in earlier script
+
+# Compute total scores for each individual participant
+BIS_BAS <- BIS_BAS %>%
+  mutate(
+    bisbas_child_5_r = (5-bisbas_child_5) #reverse-score item 5 in BIS scale
+  ) %>%
+  mutate(
+    bissc_total = rowSums(select(., bisbas_child_1, bisbas_child_2, bisbas_child_3, bisbas_child_4, bisbas_child_5_r, bisbas_child_6, bisbas_child_7), na.rm = TRUE),
+    bas_drive = rowSums(select(., bisbas_child_13, bisbas_child_14, bisbas_child_15, bisbas_child_16), na.rm = TRUE),
+    bas_fs = rowSums(select(., bisbas_child_17, bisbas_child_18, bisbas_child_19, bisbas_child_20), na.rm = TRUE),
+    bas_rr = rowSums(select(., bisbas_child_8, bisbas_child_9, bisbas_child_10, bisbas_child_11, bisbas_child_12), na.rm = TRUE),
+    bas_total = rowSums(select(., bisbas_child_8, bisbas_child_9, bisbas_child_10, bisbas_child_11, bisbas_child_12, bisbas_child_13, bisbas_child_14, bisbas_child_15, bisbas_child_16, bisbas_child_17, bisbas_child_18, bisbas_child_19, bisbas_child_20), na.rm = TRUE)
+  ) %>%
+  select(-bisbas_child_5_r) #drop temporary reverse-scored column from final df/tsv
+write_tsv(BIS_BAS,"/Users/bsevchik/projects/EF_clinical/self-report/scale_csvs_Jan/final_scored_tsvs/bisbas_child.tsv", na = "n/a")
+```
+``` {r BIS BAS distribution}
+library(ggplot2)
+library(dplyr)
+
+BIS_BAS %>%
+  ggplot(aes(x = bissc_total)) +
+  geom_histogram(bins = 20) +
+  labs(x = "BIS total score", y = "Number of sessions",
+       title = "Distribution of BIS total scores")
+
+BIS_BAS %>%
+  ggplot(aes(x = bas_rr)) +
+  geom_histogram(bins = 20) +
+  labs(x = "BAS Reward Responsiveness", y = "Number of sessions",
+       title = "Distribution of BAS Reward Responsiveness scores")
+
+BIS_BAS %>%
+  ggplot(aes(x = bas_drive)) +
+  geom_histogram(bins = 20) +
+  labs(x = "BAS Drive", y = "Number of sessions",
+       title = "Distribution of BAS Drive scores")
+
+BIS_BAS %>%
+  ggplot(aes(x = bas_fs)) +
+  geom_histogram(bins = 20) +
+  labs(x = "BAS Fun Seeking", y = "Number of sessions",
+       title = "Distribution of BAS Fun Seeking scores")
+
+BIS_BAS %>%
+  ggplot(aes(x = bas_total)) +
+  geom_histogram(bins = 20) +
+  labs(x = "BAS total score", y = "Number of sessions",
+       title = "Distribution of BAS total scores")
+
+
+```

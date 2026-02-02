@@ -1,0 +1,45 @@
+---
+title: "PPA_score"
+output: html_document
+date: "2026-01-21"
+---
+
+```{r score PPA}
+# Code script to score the PROMIS Pediatric Anxiety scale - Irwin et al. (2012)
+# publication: https://link.springer.com/article/10.1186/1477-7525-10-22
+# scoring guideline: https://www.healthmeasures.net/images/PROMIS/manuals/Scoring_Manual_Only/PROMIS_Anxiety_Scoring_Manual_03June2022.pdf
+# Scoring instructions: The raw sum scores are created by adding all the responses to individual items. The total raw sum score ranges from 8 to 40, where a higher score indicates greater anxiety symptoms. 
+#The raw sum scores can then also be converted to a T-score according to pre-defined table in the manual.
+
+# Load required packages (optional, for tidy syntax)
+library(dplyr)
+library (readr)
+
+# Load data
+PPA <- read_tsv("/Users/bsevchik/projects/EF_clinical/self-report/scale_csvs_Jan/separate_tsvs/ppa.tsv")
+
+# Compute total scores for each individual participant
+PPA <- PPA %>%
+  mutate(
+    ppa_qc = ifelse(rowSums(!is.na(select(., ppa_1:ppa_8))) < 4, "invalid (minimum 4 resposes required)","pass")
+  ) %>% # invalid raw total sum score if < 4 responses
+  mutate(
+    ppa_total_score = rowSums(select(., ppa_1, ppa_2, ppa_3, ppa_4, ppa_5, ppa_6, ppa_7, ppa_8), na.rm = TRUE)
+  )%>%
+  mutate(
+    ppa_total_score = ifelse(ppa_qc == "pass", ppa_total_score, NA) # if invalid/<4 responses, summary score is NA
+  ) %>%
+  select(-ppa_qc) # don't want helper qc column in final tsv file
+write_tsv(PPA,"/Users/bsevchik/projects/EF_clinical/self-report/scale_csvs_Jan/final_scored_tsvs/ppa.tsv", na = "n/a")
+```
+``` {r PPA distribution}
+library(ggplot2)
+library(dplyr)
+
+PPA %>%
+  ggplot(aes(x = ppa_total_score)) +
+  geom_histogram(bins = 20) +
+  labs(x = "PROMIS Pediatric Anxiety total score (8–40)", y = "Number of sessions",
+       title = "Distribution of PROMIS Pediatric Anxiety total scores")
+
+```
