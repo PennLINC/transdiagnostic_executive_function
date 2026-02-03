@@ -5,7 +5,7 @@ date: "2026-01-21"
 ---
 
 ```{r score pre-scan_STAI}
-# Code script to score the State-Trait Anxiety Inventory - Spielberger et al. (1977)
+# Code script to score the State-Trait Anxiety Inventory - Spielberger et al. (1983)
 # https://www.researchgate.net/publication/235361542_Manual_for_the_State-Trait_Anxiety_Inventory_Form_Y1_-_Y2
 # Scoring instructions: Questions 1-20 refer to state anxiety, and questions 21-40 refer to trait anxiety. Higher scores indicate greater anxiety. Reverse code the items necessary, then calculate a sum of all individual item responses for state and trait scores and full STAI total.
 

@@ -6,7 +6,7 @@ date: "2025-07-01"
 
 ```{r}
 # PRIME Screen
-# https://doi.org/10.1016/j.schres.2008.08.018
+# https://doi.org/10.1016/j.schres.2008.08.018 - Kobayashi et al. (2008)
 # Scoring instructions: Sum of the 12 items. 
 
 # Load required packages 

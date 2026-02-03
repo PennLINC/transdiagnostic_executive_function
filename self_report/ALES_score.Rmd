@@ -5,8 +5,8 @@ date: "2026-01-21"
 ---
 
 ```{r score ALES}
-# Code script to score the Adverse Life Experiences Scale - Ferguson et al. (2010)
-#  https://doi.org/10.1348/135910799168506Digital Object Identifier (DOI)
+# Code script to score the Adverse Life Experiences Scale - Hawes et al. (2021)
+# https://doi.org/10.1037/amp0000760
 # Scoring instructions: We created three summary scores: one based on the frequency of events affirmed, one based on the sum of good versus bad experiences, and one based on the sum of scores pertaining to how much the event affected the individual.
 
 # Load required packages 
