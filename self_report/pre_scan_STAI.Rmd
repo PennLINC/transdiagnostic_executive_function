@@ -27,23 +27,39 @@ rev_items <- c(
 )
 keep_items <- c("stai_q_03", "stai_q_04", "stai_q_06", "stai_q_07", "stai_q_09", "stai_q_12", "stai_q_13", "stai_q_14", "stai_q_17", "stai_q_18", "stai_q_22", "stai_q_24", "stai_q_25", "stai_q_28", "stai_q_29", "stai_q_31", "stai_q_32", "stai_q_35", "stai_q_37", "stai_q_38", "stai_q_40", rev_items)
 
+
+# Define state and trait item sets
+state_items <- c(
+  "stai_q_01","stai_q_02","stai_q_03","stai_q_04","stai_q_05",
+  "stai_q_06","stai_q_07","stai_q_08","stai_q_09","stai_q_10",
+  "stai_q_11","stai_q_12","stai_q_13","stai_q_14","stai_q_15",
+  "stai_q_16","stai_q_17","stai_q_18","stai_q_19","stai_q_20"
+)
+trait_items <- c(
+  "stai_q_21","stai_q_22","stai_q_23","stai_q_24","stai_q_25",
+  "stai_q_26","stai_q_27","stai_q_28","stai_q_29","stai_q_30",
+  "stai_q_31","stai_q_32","stai_q_33","stai_q_34","stai_q_35",
+  "stai_q_36","stai_q_37","stai_q_38","stai_q_39","stai_q_40"
+)
+
+# Temp reverse-coded column names
+tmp_rev <- paste0(rev_items, "_rc")
+
+# Helper: for any set of items, swap rev_items -> their _rc versions
+score_cols <- function(items) {
+  c(setdiff(items, rev_items), paste0(intersect(items, rev_items), "_rc"))
+}
+
 pre_scan_STAI <- pre_scan_STAI %>%
   mutate(across(all_of(keep_items), as.numeric)) %>%
-  mutate(across(all_of(rev_items), ~ ifelse(is.na(.x), NA_real_, 5 - .x))) %>%
+  # Create temp reverse-coded columns (preserve NA)
+  mutate(across(all_of(rev_items), ~ ifelse(is.na(.x), NA_real_, 5 - .x), .names = "{.col}_rc")) %>%
   mutate(
-    pre_scan_STAI_total_score = rowSums(across(all_of(keep_items)), na.rm = TRUE),
-    
-    pre_scan_STAI_trait_total_score = rowSums(across(c(
-  stai_q_21, stai_q_22, stai_q_23, stai_q_24, stai_q_25, stai_q_26, stai_q_27, stai_q_28, stai_q_29, stai_q_30, stai_q_31, stai_q_32, stai_q_33, stai_q_34, stai_q_35, stai_q_36, stai_q_37, stai_q_38, stai_q_39, stai_q_40
-)), na.rm = TRUE),
-    
-    pre_scan_STAI_state_total_score = rowSums(across(c(
-  stai_q_01, stai_q_02, stai_q_03, stai_q_04, stai_q_05,
-  stai_q_06, stai_q_07, stai_q_08, stai_q_09, stai_q_10,
-  stai_q_11, stai_q_12, stai_q_13, stai_q_14, stai_q_15,
-  stai_q_16, stai_q_17, stai_q_18, stai_q_19, stai_q_20
-)), na.rm = TRUE)
-  )
+    pre_scan_STAI_total_score       = rowSums(across(all_of(score_cols(keep_items))),  na.rm = TRUE),
+    pre_scan_STAI_state_total_score = rowSums(across(all_of(score_cols(state_items))), na.rm = TRUE),
+    pre_scan_STAI_trait_total_score = rowSums(across(all_of(score_cols(trait_items))), na.rm = TRUE)
+  ) %>%
+  select(-all_of(tmp_rev))  # drop temp columns so item-level responses remain original
 
 write_tsv(pre_scan_STAI,"/Users/bsevchik/projects/EF_clinical/self-report/scale_csvs_Jan/final_scored_tsvs/pre_scan_stai.tsv", na = "n/a")
 ```

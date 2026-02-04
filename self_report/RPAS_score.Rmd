@@ -23,15 +23,21 @@ rev_items <- c(
   "phys_anhed_13","phys_anhed_14","phys_anhed_15"
 )
 keep_items <- c("phys_anhed_5","phys_anhed_6","phys_anhed_8","phys_anhed_10", rev_items)
+
+tmp_rev <- paste0(rev_items, "_rc")  # temp reverse-coded column names
+
 RPAS <- RPAS %>%
   mutate(across(all_of(keep_items), as.numeric)) %>%
-  mutate(across(all_of(rev_items), ~ 1 - .x)) %>%
+  mutate(across(all_of(rev_items), ~ 1 - .x, .names = "{.col}_rc")) %>%
   mutate(
-    rpas_total_score = rowSums(across(all_of(keep_items)), na.rm = TRUE),
-    rpas_average_score = rowMeans(across(all_of(keep_items)), na.rm = TRUE)
-  )
+    rpas_total_score = rowSums(across(all_of(c(setdiff(keep_items, rev_items), tmp_rev))), na.rm = TRUE),
+    rpas_average_score = rowMeans(across(all_of(c(setdiff(keep_items, rev_items), tmp_rev))), na.rm = TRUE)
+  ) %>%
+  select(-all_of(tmp_rev))  # drop temp columns
+
 write_tsv(RPAS,"/Users/bsevchik/projects/EF_clinical/self-report/scale_csvs_Jan/final_scored_tsvs/rpas.tsv", na = "n/a")
 ```
+
 ``` {r RPAS distribution}
 library(ggplot2)
 library(dplyr)

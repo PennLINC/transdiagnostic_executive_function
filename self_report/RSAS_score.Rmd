@@ -22,15 +22,24 @@ rev_items <- c(
 )
 keep_items <- c("soc_anhed_1", "soc_anhed_2", "soc_anhed_3", "soc_anhed_5", "soc_anhed_6", "soc_anhed_7", "soc_anhed_8", "soc_anhed_10", "soc_anhed_15", rev_items)
 
+# Temporary reverse-coded column names
+tmp_rev <- paste0(rev_items, "_rc")
+
+# Final set of columns used for scoring (non-reversed originals + reversed temps)
+score_cols <- c(setdiff(keep_items, rev_items), tmp_rev)
+
 RSAS <- RSAS %>%
   mutate(across(all_of(keep_items), as.numeric)) %>%
-  mutate(across(all_of(rev_items), ~ 1 - .x)) %>%
+  mutate(across(all_of(rev_items), ~ 1 - .x, .names = "{.col}_rc")) %>%
   mutate(
-    rsas_total_score = rowSums(across(all_of(keep_items)), na.rm = TRUE),
-    rsas_average_score = rowMeans(across(all_of(keep_items)), na.rm = TRUE)
-  )
+    rsas_total_score   = rowSums(across(all_of(score_cols)), na.rm = TRUE),
+    rsas_average_score = rowMeans(across(all_of(score_cols)), na.rm = TRUE)
+  ) %>%
+  select(-all_of(tmp_rev))  # drop temp columns so item-level responses remain original
+
 write_tsv(RSAS,"/Users/bsevchik/projects/EF_clinical/self-report/scale_csvs_Jan/final_scored_tsvs/rsas.tsv", na = "n/a")
 ```
+
 ``` {r RSAS distribution}
 library(ggplot2)
 library(dplyr)

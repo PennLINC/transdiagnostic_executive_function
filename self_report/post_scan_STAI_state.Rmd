@@ -22,17 +22,34 @@ post_scan_STAI <- post_scan_STAI %>%
 post_scan_STAI
 
 # Compute total scores for each individual participant
+
 rev_items <- c(
   "stai_q_01", "stai_q_02", "stai_q_05", "stai_q_08", "stai_q_10", "stai_q_11", "stai_q_15", "stai_q_16", "stai_q_19", "stai_q_20"
 )
-keep_items <- c("stai_q_03", "stai_q_04", "stai_q_06", "stai_q_07", "stai_q_09", "stai_q_12", "stai_q_13", "stai_q_14", "stai_q_17", "stai_q_18", rev_items)
+
+state_items <- c(
+  "stai_q_01","stai_q_02","stai_q_03","stai_q_04","stai_q_05",
+  "stai_q_06","stai_q_07","stai_q_08","stai_q_09","stai_q_10",
+  "stai_q_11","stai_q_12","stai_q_13","stai_q_14","stai_q_15",
+  "stai_q_16","stai_q_17","stai_q_18","stai_q_19","stai_q_20"
+)
+
+# Temp reverse-coded column names
+tmp_rev <- paste0(rev_items, "_rc")
+
+# Helper: swap reverse-keyed items for their _rc versions
+score_cols <- function(items) {
+  c(setdiff(items, rev_items), paste0(intersect(items, rev_items), "_rc"))
+}
 
 post_scan_STAI <- post_scan_STAI %>%
-  mutate(across(all_of(keep_items), as.numeric)) %>%
-  mutate(across(all_of(rev_items), ~ ifelse(is.na(.x), NA_real_, 5 - .x))) %>%
+  mutate(across(all_of(state_items), as.numeric)) %>%
+  # Create temp reverse-coded columns (preserve NA)
+  mutate(across(all_of(rev_items), ~ ifelse(is.na(.x), NA_real_, 5 - .x), .names = "{.col}_rc")) %>%
   mutate(
-    post_scan_STAI_state_total_score = rowSums(across(all_of(keep_items)), na.rm = TRUE),
-  )
+    post_scan_STAI_state_total_score = rowSums(across(all_of(score_cols(state_items))), na.rm = TRUE)
+  ) %>%
+  select(-all_of(tmp_rev))  # drop temp columns so item-level responses remain original
 
 write_tsv(post_scan_STAI,"/Users/bsevchik/projects/EF_clinical/self-report/scale_csvs_Jan/final_scored_tsvs/post_scan_stai_state.tsv", na = "n/a")
 ```

@@ -13,59 +13,6 @@ date: "2026-01-28"
 library(dplyr)
 library (readr)
 
-# Load data
-substance <- read_tsv("/Users/bsevchik/projects/EF_clinical/self-report/scale_csvs_Jan/separate_tsvs/substance.tsv")
-
-### Compute total scores for each individual participant
-
-# mutate summary scores for alcohol, tobacco, and marijuana
-substance <- substance %>%
-  mutate(
-    substance_tob_summary = case_when(
-      substance_tob_010 %in% c(1, 2) ~ 0L,
-      substance_tob_010 == 3         ~ 1L,
-      substance_tob_010 == 4         ~ 2L,
-      substance_tob_010 == 5         ~ 3L,
-      TRUE                           ~ NA   # or keep as-is, see below
-    )
-  ) %>%
-  mutate(
-    substance_alc_summary = case_when(
-      substance_alc_010 %in% c(1, 2) ~ 0L,
-      substance_alc_010 == 3         ~ 1L,
-      substance_alc_010 == 4         ~ 2L,
-      substance_alc_010 == 5         ~ 3L,
-      TRUE                           ~ NA   
-    )
-  ) %>%
-  mutate(
-    substance_mar_summary = case_when(
-      substance_mar_010 %in% c(1, 2) ~ 0L,
-      substance_mar_010 == 3         ~ 1L,
-      substance_mar_010 == 4         ~ 2L,
-      substance_mar_010 == 5         ~ 3L,
-      TRUE                           ~ NA_integer_ 
-    )
-  )
-
-# mutate substance_othr columns
-cols <- c("substance_othr_010", "substance_othr_020", "substance_othr_030", "substance_othr_060", "substance_othr_070", "substance_othr_080", "substance_othr_090", "substance_othr_100", "substance_othr_110","substance_othr_120", "substance_othr_130", "substance_othr_140", "substance_othr_150", "substance_othr_160", "substance_othr_170")
-
-substance <- substance %>%
-  mutate(across(all_of(cols), ~ case_when(
-    .x == 1 ~ 2L,
-    .x == 2 ~ 1L,
-    .x == 3 ~ 0L,
-    TRUE    ~ NA_integer_
-  )))
-
-# sum substance_othr columns for summary
-substance <- substance %>%
-  mutate(
-    substance_other_summary = rowSums(across(all_of(cols)), na.rm = TRUE)
-  )
-
-
 # create validity columns based on affirmative responses to fake drugs
 substance <- substance %>%
   mutate(
@@ -77,6 +24,7 @@ substance <- substance %>%
 
 write_tsv(substance,"/Users/bsevchik/projects/EF_clinical/self-report/scale_csvs_Jan/final_scored_tsvs/substance.tsv", na = "n/a")
 ```
+
 ``` {r substance distritbution}
 library(ggplot2)
 library(dplyr)
