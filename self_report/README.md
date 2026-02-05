@@ -39,11 +39,11 @@ See below for missingness on each of the main, pre-scan, and post-scan batteries
   + sub-22617, ses-2
  
 There are a few scales with missing data due to protocol changes:
-  + sub-22618, ses-2
-  + sub-22653, ses-1
-  + sub-22670, ses-1
-  + sub-23113, ses-1
-  + sub-23582, ses-1
++ sub-22618, ses-2
++ sub-22653, ses-1
++ sub-22670, ses-1
++ sub-23113, ses-1
++ sub-23582, ses-1
     
 + For the Altman Self-Rating Mania Scale, at the beginning of the study, most participants completed the scale only at the first session and third session, but not at the second session. As the study went on, almost all of the participants at later enrollments completed this scale at the second session as well.
 + For the Positive and Negative Affect Schedule, at the beginning of the study, most participants completed the scale only at the third session. As the study progressed, many of the participants at later enrollments completed this scale at session 1 and session 2 as well.
