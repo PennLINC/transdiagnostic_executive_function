@@ -43,3 +43,7 @@ See below for missingness on each of the main, pre-scan, and post-scan batteries
   + sub-23113, ses-1
   + sub-23582, ses-1
 
+There are a few scales with missing data due to protocol changes: 
++ For the Altman Self-Rating Mania Scale, at the beginning of the study, most participants completed the scale only at the first session and third session, but not at the second session. As the study went on, almost all of the participants at later enrollments completed this scale at the second session as well.
++ For the Positive and Negative Affect Schedule, at the beginning of the study, most participants completed the scale only at the third session. As the study progressed, many of the participants at later enrollments completed this scale at session 1 and session 2 as well.
++ For the Revised Physical Anhedonia Scale and the Revised Social Anhedonia Scale, at the beginning of the study, most participants completed the scale only at the first session and third session, but not at the second session. As the study went on, almost all of the participants at later enrollments completed this scale at the second session as well.
