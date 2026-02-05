@@ -4,6 +4,8 @@ Each script in this folder is used to score each self-report scale. The correspo
 
 The main battery administered contained most of the self-report scales. There was also a pre-scan battery, consisting of the full State-Trait Anxiety Inventory (STAI) before the scan, and a post-scan battery, consisting of just the state items on the State-Trait Anxiety Inventory.
 
+Due to complexities in how puberty is staged, we do not include summary scores and only include item-level data for the Tanner Developmental Stages scales (Girl and Boy). Due to the lack of participants that endorsed drug use, and the complexity of substance use, we also do not include summary scores and only include item-level data for the Substance Use Questionnaire.
+
 See below for missingness on each of the main, pre-scan, and post-scan batteries. Here, "missing completely" means it was omitted from the data entirely, and "incomplete" means this session was referenced in the data, but some or all of the data is 'NA' and marked as incomplete.
 + Subjects missing completely:
   + Pre-scan STAI: sub-20410
@@ -40,3 +42,8 @@ See below for missingness on each of the main, pre-scan, and post-scan batteries
   + sub-22670, ses-1
   + sub-23113, ses-1
   + sub-23582, ses-1
+
+There are a few scales with missing data due to protocol changes: 
++ For the Altman Self-Rating Mania Scale, at the beginning of the study, most participants completed the scale only at the first session and third session, but not at the second session. As the study went on, almost all of the participants at later enrollments completed this scale at the second session as well.
++ For the Positive and Negative Affect Schedule, at the beginning of the study, most participants completed the scale only at the third session. As the study progressed, many of the participants at later enrollments completed this scale at session 1 and session 2 as well.
++ For the Revised Physical Anhedonia Scale and the Revised Social Anhedonia Scale, at the beginning of the study, most participants completed the scale only at the first session and third session, but not at the second session. As the study went on, almost all of the participants at later enrollments completed this scale at the second session as well.
