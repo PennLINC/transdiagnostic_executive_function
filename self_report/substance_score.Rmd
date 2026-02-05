@@ -54,3 +54,21 @@ substance %>%
        title = "Distribution of other-substances summary scores")
 
 ```
+
+``` {r substance check endorsement}
+cols_to_check <- c("substance_tob_010", "substance_alc_010", "substance_mar_010")
+
+counts_gt2 <- substance %>%   # <- change to your data frame name if different
+  summarise(across(
+    all_of(cols_to_check),
+    ~ sum(.x > 2, na.rm = TRUE),
+    .names = "{.col}_gt2_n"
+  ))
+
+counts_gt2
+```
+
+
+
+
+
