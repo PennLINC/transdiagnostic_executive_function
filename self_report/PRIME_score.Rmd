@@ -7,7 +7,11 @@ date: "2025-07-01"
 ```{r}
 # PRIME Screen
 # https://doi.org/10.1016/j.schres.2008.08.018 - Kobayashi et al. (2008)
-# Scoring instructions: Sum of the 12 items. 
+# https://doi.org/10.1093/schbul/sbae224 Calkins et al (2025)
+# Scoring instructions: Sum of the 12 items. Clinical significance is determined by the following criteria:
+  # ≥1 item rated 6 (definitely agree)
+  # ≥3 items rated 5 (somewhat agree)
+  # total items 1-12 ≥ 2 SD away from mean by age (see Table 1 in Calkins et al.).
 
 # Load required packages 
 library(dplyr)
