@@ -7,11 +7,14 @@ date: "2026-01-28"
 ```{r score Substance}
 # Code script to score the Substance Use Questionnaire - modified from Han et al. (1999)
 # https://pubmed.ncbi.nlm.nih.gov/10707437/
-# Scoring instructions: Summary scores specifically for tobacco, alcohol, and marijuana are created by adding up responses for frequency of use. We also create a separate summary score that is the sum total of individual responses for other substances, adding up individual responses as to whether these substances were used in the last 12 months, in the lifetime, or never. Two of the other substances used were fake drugs, and used to create validity columns.
+# Scoring instructions: We do not provide summary scores for this data due to the complexity of substance use. Two of the substances used were fake drugs, and used to create validity columns.
 
 # Load required packages 
 library(dplyr)
 library (readr)
+
+# Load data
+substance <- read_tsv("/Users/bsevchik/projects/EF_clinical/self-report/scale_csvs_Jan/separate_tsvs/substance.tsv")
 
 # create validity columns based on affirmative responses to fake drugs
 substance <- substance %>%

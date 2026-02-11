@@ -19,11 +19,13 @@ ALS <- read_tsv("/Users/bsevchik/projects/EF_clinical/self-report/scale_csvs_Jan
 # Compute total scores for each individual participant
 ALS <- ALS %>%
   mutate(
-    als_total_score    = rowSums(select(., als_1:als_18), na.rm = TRUE),
-    als_avg_score   = rowMeans(select(., als_1:als_18), na.rm = TRUE)
+    als_total_score    = rowSums(select(., als_1:als_18), na.rm = FALSE),
+    als_avg_score   = rowMeans(select(., als_1:als_18), na.rm = FALSE)
   )
+
 write_tsv(ALS,"/Users/bsevchik/projects/EF_clinical/self-report/scale_csvs_Jan/final_scored_tsvs/als-18.tsv", na = "n/a")
 ```
+
 ``` {r ALS distribution}
 library(ggplot2)
 library(dplyr)

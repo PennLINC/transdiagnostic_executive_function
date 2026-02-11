@@ -32,11 +32,11 @@ ESWAN_DMDD[school] <- lapply(ESWAN_DMDD[school], as.numeric)
 # Compute subscale and total scores 
 ESWAN_DMDD <- ESWAN_DMDD %>%
   mutate(
-    ESWAN_DMDD_home_total = rowSums(select(., all_of(home)), na.rm = TRUE),
+    ESWAN_DMDD_home_total = rowSums(select(., all_of(home)), na.rm = FALSE),
     
-    ESWAN_DMDD_friends_total = rowSums(select(., all_of(friends)), na.rm = TRUE),
+    ESWAN_DMDD_friends_total = rowSums(select(., all_of(friends)), na.rm = FALSE),
     
-    ESWAN_DMDD_school_total = rowSums(select(., all_of(school)), na.rm = TRUE),
+    ESWAN_DMDD_school_total = rowSums(select(., all_of(school)), na.rm = FALSE),
     
     ESWAN_DMDD_total_score    = ESWAN_DMDD_home_total + ESWAN_DMDD_friends_total +  ESWAN_DMDD_school_total
   )%>%

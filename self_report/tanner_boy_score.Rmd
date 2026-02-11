@@ -7,6 +7,7 @@ date: "2026-01-28"
 ```{r score tanner boy}
 # Tanner Scale (Male)  - Marshall & Tanner (1970)
 # https://adc.bmj.com/content/45/239/13
+# We do not provide summary scores for this scale due to the complexities of pubertal staging.
 
 
 # Load required packages

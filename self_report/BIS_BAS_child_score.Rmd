@@ -29,11 +29,11 @@ BIS_BAS <- BIS_BAS %>%
     bisbas_child_5_r = (5-bisbas_child_5) #reverse-score item 5 in BIS scale
   ) %>%
   mutate(
-    bissc_total = rowSums(select(., bisbas_child_1, bisbas_child_2, bisbas_child_3, bisbas_child_4, bisbas_child_5_r, bisbas_child_6, bisbas_child_7), na.rm = TRUE),
-    bas_drive = rowSums(select(., bisbas_child_13, bisbas_child_14, bisbas_child_15, bisbas_child_16), na.rm = TRUE),
-    bas_fs = rowSums(select(., bisbas_child_17, bisbas_child_18, bisbas_child_19, bisbas_child_20), na.rm = TRUE),
-    bas_rr = rowSums(select(., bisbas_child_8, bisbas_child_9, bisbas_child_10, bisbas_child_11, bisbas_child_12), na.rm = TRUE),
-    bas_total = rowSums(select(., bisbas_child_8, bisbas_child_9, bisbas_child_10, bisbas_child_11, bisbas_child_12, bisbas_child_13, bisbas_child_14, bisbas_child_15, bisbas_child_16, bisbas_child_17, bisbas_child_18, bisbas_child_19, bisbas_child_20), na.rm = TRUE)
+    bissc_total = rowSums(select(., bisbas_child_1, bisbas_child_2, bisbas_child_3, bisbas_child_4, bisbas_child_5_r, bisbas_child_6, bisbas_child_7), na.rm = FALSE),
+    bas_drive = rowSums(select(., bisbas_child_13, bisbas_child_14, bisbas_child_15, bisbas_child_16), na.rm = FALSE),
+    bas_fs = rowSums(select(., bisbas_child_17, bisbas_child_18, bisbas_child_19, bisbas_child_20), na.rm = FALSE),
+    bas_rr = rowSums(select(., bisbas_child_8, bisbas_child_9, bisbas_child_10, bisbas_child_11, bisbas_child_12), na.rm = FALSE),
+    bas_total = rowSums(select(., bisbas_child_8, bisbas_child_9, bisbas_child_10, bisbas_child_11, bisbas_child_12, bisbas_child_13, bisbas_child_14, bisbas_child_15, bisbas_child_16, bisbas_child_17, bisbas_child_18, bisbas_child_19, bisbas_child_20), na.rm = FALSE)
   ) %>%
   select(-bisbas_child_5_r) #drop temporary reverse-scored column from final df/tsv
 write_tsv(BIS_BAS,"/Users/bsevchik/projects/EF_clinical/self-report/scale_csvs_Jan/final_scored_tsvs/bisbas_child.tsv", na = "n/a")

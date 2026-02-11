@@ -23,11 +23,11 @@ MAPSSR <- read_tsv("/Users/bsevchik/projects/EF_clinical/self-report/scale_csvs_
 # Compute total scores for each individual participant
 MAPSSR <- MAPSSR %>%
   mutate(
-    mapssr_social_total = rowSums(select(., mapssr_1, mapssr_2, mapssr_3), na.rm = TRUE),
-    mapssr_recvoc_total = rowSums(select(., mapssr_4, mapssr_5, mapssr_6), na.rm = TRUE),
-    mapssr_motrelation_total = rowSums(select(., mapssr_7, mapssr_8, mapssr_9), na.rm = TRUE),
-    mapssr_engage_total = rowSums(select(., mapssr_10, mapssr_11, mapssr_12, mapssr_13, mapssr_14, mapssr_15), na.rm = TRUE),
-    mapssr_total_score  = rowSums(select(., mapssr_1, mapssr_2, mapssr_3, mapssr_4, mapssr_5, mapssr_6, mapssr_7, mapssr_8, mapssr_9, mapssr_10, mapssr_11, mapssr_12, mapssr_13, mapssr_14, mapssr_15), na.rm = TRUE)
+    mapssr_social_total = rowSums(select(., mapssr_1, mapssr_2, mapssr_3), na.rm = FALSE),
+    mapssr_recvoc_total = rowSums(select(., mapssr_4, mapssr_5, mapssr_6), na.rm = FALSE),
+    mapssr_motrelation_total = rowSums(select(., mapssr_7, mapssr_8, mapssr_9), na.rm = FALSE),
+    mapssr_engage_total = rowSums(select(., mapssr_10, mapssr_11, mapssr_12, mapssr_13, mapssr_14, mapssr_15), na.rm = FALSE),
+    mapssr_total_score  = rowSums(select(., mapssr_1, mapssr_2, mapssr_3, mapssr_4, mapssr_5, mapssr_6, mapssr_7, mapssr_8, mapssr_9, mapssr_10, mapssr_11, mapssr_12, mapssr_13, mapssr_14, mapssr_15), na.rm = FALSE)
   )%>%
   rename_with(tolower) # lowercase 
 write_tsv(MAPSSR,"/Users/bsevchik/projects/EF_clinical/self-report/scale_csvs_Jan/final_scored_tsvs/mapssr.tsv", na = "n/a")

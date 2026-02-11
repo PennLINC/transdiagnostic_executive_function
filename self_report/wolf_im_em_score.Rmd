@@ -22,12 +22,12 @@ wolf_im_em <- wolf_im_em %>%
     im_average = rowMeans(across(c(
       wolf_im_em_1, wolf_im_em_3, wolf_im_em_5, wolf_im_em_7,
       wolf_im_em_10, wolf_im_em_12, wolf_im_em_14
-    )), na.rm = TRUE),
+    )), na.rm = FALSE),
 
     em_average = rowMeans(across(c(
       wolf_im_em_2, wolf_im_em_4, wolf_im_em_6,
       wolf_im_em_9, wolf_im_em_11, wolf_im_em_13
-    )), na.rm = TRUE),
+    )), na.rm = FALSE),
 
     validity_never_sleepy = if_else(wolf_im_em_8 %in% c(1, 7), 1L, 0L)
   ) %>%

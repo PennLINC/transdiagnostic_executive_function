@@ -19,8 +19,8 @@ PANAS <- read_tsv("/Users/bsevchik/projects/EF_clinical/self-report/scale_csvs_J
 # Compute total scores for each individual participant
 PANAS <- PANAS %>%
   mutate(
-    panas_sum_pos = rowSums(select(., panas_1, panas_3, panas_5, panas_7, panas_9), na.rm = TRUE),
-    panas_sum_neg = rowSums(select(., panas_2, panas_4, panas_6, panas_8, panas_10), na.rm = TRUE),
+    panas_sum_pos = rowSums(select(., panas_1, panas_3, panas_5, panas_7, panas_9), na.rm = FALSE),
+    panas_sum_neg = rowSums(select(., panas_2, panas_4, panas_6, panas_8, panas_10), na.rm = FALSE),
   )%>%
   rename_with(tolower) # lowercase 
 write_tsv(PANAS,"/Users/bsevchik/projects/EF_clinical/self-report/scale_csvs_Jan/final_scored_tsvs/panas.tsv", na = "n/a")

@@ -55,9 +55,9 @@ pre_scan_STAI <- pre_scan_STAI %>%
   # Create temp reverse-coded columns (preserve NA)
   mutate(across(all_of(rev_items), ~ ifelse(is.na(.x), NA_real_, 5 - .x), .names = "{.col}_rc")) %>%
   mutate(
-    pre_scan_STAI_total_score       = rowSums(across(all_of(score_cols(keep_items))),  na.rm = TRUE),
-    pre_scan_STAI_state_total_score = rowSums(across(all_of(score_cols(state_items))), na.rm = TRUE),
-    pre_scan_STAI_trait_total_score = rowSums(across(all_of(score_cols(trait_items))), na.rm = TRUE)
+    pre_scan_STAI_total_score       = rowSums(across(all_of(score_cols(keep_items))),  na.rm = FALSE),
+    pre_scan_STAI_state_total_score = rowSums(across(all_of(score_cols(state_items))), na.rm = FALSE),
+    pre_scan_STAI_trait_total_score = rowSums(across(all_of(score_cols(trait_items))), na.rm = FALSE)
   ) %>%
   select(-all_of(tmp_rev))  # drop temp columns so item-level responses remain original
 

@@ -19,7 +19,7 @@ ASRM <- read_tsv("/Users/bsevchik/projects/EF_clinical/self-report/scale_csvs_Ja
 # Compute total scores for each individual participant
 ASRM <- ASRM %>%
   mutate(
-    ASRM_total_score    = rowSums(select(., asrm_1, asrm_2, asrm_3, asrm_4, asrm_5), na.rm = TRUE)
+    ASRM_total_score    = rowSums(select(., asrm_1, asrm_2, asrm_3, asrm_4, asrm_5), na.rm = FALSE)
   )%>%
   rename_with(tolower) # lowercase 
 write_tsv(ASRM,"/Users/bsevchik/projects/EF_clinical/self-report/scale_csvs_Jan/final_scored_tsvs/asrm.tsv", na = "n/a")

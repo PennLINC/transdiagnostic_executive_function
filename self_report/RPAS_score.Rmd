@@ -30,8 +30,8 @@ RPAS <- RPAS %>%
   mutate(across(all_of(keep_items), as.numeric)) %>%
   mutate(across(all_of(rev_items), ~ 1 - .x, .names = "{.col}_rc")) %>%
   mutate(
-    rpas_total_score = rowSums(across(all_of(c(setdiff(keep_items, rev_items), tmp_rev))), na.rm = TRUE),
-    rpas_average_score = rowMeans(across(all_of(c(setdiff(keep_items, rev_items), tmp_rev))), na.rm = TRUE)
+    rpas_total_score = rowSums(across(all_of(c(setdiff(keep_items, rev_items), tmp_rev))), na.rm = FALSE),
+    rpas_average_score = rowMeans(across(all_of(c(setdiff(keep_items, rev_items), tmp_rev))), na.rm = FALSE)
   ) %>%
   select(-all_of(tmp_rev))  # drop temp columns
 

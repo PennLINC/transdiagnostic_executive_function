@@ -19,8 +19,8 @@ ARI <- read_tsv("/Users/bsevchik/projects/EF_clinical/self-report/scale_csvs_Jan
 # Compute total scores for each individual participant
 ARI <- ARI %>%
   mutate(
-    ARI_total_score    = rowSums(select(., ari_1, ari_2, ari_3, ari_4, ari_5, ari_6), na.rm = TRUE),
-    ARI_avg   = rowMeans(select(., ari_1, ari_2, ari_3, ari_4, ari_5, ari_6), na.rm = TRUE)
+    ARI_total_score    = rowSums(select(., ari_1, ari_2, ari_3, ari_4, ari_5, ari_6), na.rm = FALSE),
+    ARI_avg   = rowMeans(select(., ari_1, ari_2, ari_3, ari_4, ari_5, ari_6), na.rm = FALSE)
   )%>%
   rename_with(tolower) # lowercase 
 write_tsv(ARI,"/Users/bsevchik/projects/EF_clinical/self-report/scale_csvs_Jan/final_scored_tsvs/ari.tsv", na = "n/a")

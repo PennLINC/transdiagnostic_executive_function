@@ -32,9 +32,9 @@ ESWAN_ADHD[all_items] <- lapply(ESWAN_ADHD[all_items], function(x) ifelse(is.na(
 # Compute subscale and total scores 
 ESWAN_ADHD <- ESWAN_ADHD %>%
   mutate(
-    ESWAN_ADHD_inattention_total = rowSums(select(., all_of(inattention)), na.rm = TRUE),
+    ESWAN_ADHD_inattention_total = rowSums(select(., all_of(inattention)), na.rm = FALSE),
     
-    ESWAN_ADHD_hyperactivity_impulsivity_total = rowSums(select(., all_of(hyperactivity_impulsivity)), na.rm = TRUE),
+    ESWAN_ADHD_hyperactivity_impulsivity_total = rowSums(select(., all_of(hyperactivity_impulsivity)), na.rm = FALSE),
     
     ESWAN_ADHD_total_score    = ESWAN_ADHD_inattention_total + ESWAN_ADHD_hyperactivity_impulsivity_total 
   )%>%

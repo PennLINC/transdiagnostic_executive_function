@@ -20,7 +20,7 @@ BDI <- read_tsv("/Users/bsevchik/projects/EF_clinical/self-report/scale_csvs_Jan
 # Compute total scores for each individual participant
 BDI <- BDI %>%
   mutate(
-    BDI_1a_ms_child_total_score    = rowSums(select(., bdi_ms_child_1, bdi_ms_child_2, bdi_ms_child_3, bdi_ms_child_4, bdi_ms_child_5, bdi_ms_child_6, bdi_ms_child_7, bdi_ms_child_8, bdi_ms_child_10, bdi_ms_child_11, bdi_ms_child_12, bdi_ms_child_13, bdi_ms_child_14, bdi_ms_child_15, bdi_ms_child_16, bdi_ms_child_17, bdi_ms_child_18, bdi_ms_child_19, bdi_ms_child_20), na.rm = TRUE)
+    BDI_1a_ms_child_total_score    = rowSums(select(., bdi_ms_child_1, bdi_ms_child_2, bdi_ms_child_3, bdi_ms_child_4, bdi_ms_child_5, bdi_ms_child_6, bdi_ms_child_7, bdi_ms_child_8, bdi_ms_child_10, bdi_ms_child_11, bdi_ms_child_12, bdi_ms_child_13, bdi_ms_child_14, bdi_ms_child_15, bdi_ms_child_16, bdi_ms_child_17, bdi_ms_child_18, bdi_ms_child_19, bdi_ms_child_20), na.rm = FALSE)
   )%>%
   rename_with(tolower) # lowercase 
 write_tsv(BDI,"/Users/bsevchik/projects/EF_clinical/self-report/scale_csvs_Jan/final_scored_tsvs/bdi_1a_ms_child.tsv", na = "n/a")

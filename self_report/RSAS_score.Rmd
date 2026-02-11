@@ -32,8 +32,8 @@ RSAS <- RSAS %>%
   mutate(across(all_of(keep_items), as.numeric)) %>%
   mutate(across(all_of(rev_items), ~ 1 - .x, .names = "{.col}_rc")) %>%
   mutate(
-    rsas_total_score   = rowSums(across(all_of(score_cols)), na.rm = TRUE),
-    rsas_average_score = rowMeans(across(all_of(score_cols)), na.rm = TRUE)
+    rsas_total_score   = rowSums(across(all_of(score_cols)), na.rm = FALSE),
+    rsas_average_score = rowMeans(across(all_of(score_cols)), na.rm = FALSE)
   ) %>%
   select(-all_of(tmp_rev))  # drop temp columns so item-level responses remain original
 

@@ -7,7 +7,7 @@ date: "2026-01-28"
 ```{r score tanner girl}
 # Tanner Scale (Female)  - Marshall & Tanner (1970)
 # https://doi.org/10.1136/adc.44.235.291
-# Scoring instructions: Sum individual item responses to get the raw total score. Note that for each individual question, 4 refers to the highest developmental stage, while a response of 5 indicates "I don't know."
+# # We do not provide summary scores for this scale due to the complexities of pubertal staging.
 
 
 # Load required packages
