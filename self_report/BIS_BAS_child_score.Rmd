@@ -5,8 +5,9 @@ date: "2026-01-21"
 ---
 
 ```{r score BIS BAS}
-# Code script to score the Behavioral Inhibtion/Behavioral Activation Scale - Carver & White (1994)
+# Code script to score the Behavioral Inhibtion/Behavioral Activation Scale - Carver & White (1994) and Muris et al. (2005)
 # https://doi.org/10.1037/0022-3514.67.2.319
+# https://doi-org.proxy.library.upenn.edu/10.1016/j.paid.2004.06.007
 # Scoring instructions: Sum the raw scores from each of the items corresponding to each subscale:
   #items 1-7 = BIS, where lower score = more inhibition;
   #items 8-12 = BAS reward responsiveness, where lower score = more reward responsiveness
