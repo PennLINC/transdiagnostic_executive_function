@@ -7,7 +7,13 @@ date: "2026-01-21"
 ```{r score ALES}
 # Code script to score the Adverse Life Experiences Scale - Hawes et al. (2021)
 # https://doi.org/10.1037/amp0000760
-# Scoring instructions: We created three summary scores: one based on the frequency of events affirmed, one based on the sum of good versus bad experiences, and one based on the sum of scores pertaining to how much the event affected the individual.
+# Adapted from ABCD scoring functions: https://github.com/nbdc-datahub/ABCDscores/blob/main/R/scores_mh.R
+# Scoring instructions: We created five summary scores, adapted from scoring from the ABCD study of this scale. Details can be found in the description of each of these summary variables in the corresponding JSON file.
+  # ales_frequency corresponds to the sum of 'yes' responses to whether an event occured in item-level responses
+  # ales_severity_sum corresponds to the sum of responses to items asking how much the event affected the participant
+  # ales_severity_mean corresponds to the mean of responses to items asking how much the event affected the participant
+  # ales_good_count corresponds to the sum of 'mostly good' responses to items asking whether the event was a good or bad experience
+  # ales_bad_count corresponds to the sum of 'mostly bad' responses to items asking whether the event was a good or bad experience
 
 # Load required packages 
 library(dplyr)
@@ -16,15 +22,87 @@ library (readr)
 # Load data
 ALES <- read_tsv("/Users/bsevchik/projects/EF_clinical/self-report/scale_csvs_Jan/separate_tsvs/ales.tsv")
 
-# Compute total scores for each individual participant
-ALES <- ALES %>%
+
+
+
+event_vars <- paste0("ales_", 1:25)
+
+sev_event_vars <- c(paste0("ales_", 1:11),  paste0("ales_", 12:25))
+sev_vars       <- c(paste0("ales_", 1:11, "_1"), paste0("ales_", 12:25, "_2"))
+
+exp_event_vars <- paste0("ales_", 12:25)
+exp_vars       <- paste0("ales_", 12:25, "_1")  # 1=good, 2=bad
+
+ALES_scored <- ALES %>%
+  rowwise() %>%
   mutate(
-    ales_frequency  = rowSums(select(., ales_1:ales_25), na.rm = TRUE),
-    ales_good_bad = rowSums(select(., ales_12_1, ales_13_1, ales_14_1, ales_15_1, ales_16_1, ales_17_1, ales_18_1, ales_19_1, ales_20_1, ales_21_1, ales_22_1, ales_23_1, ales_24_1, ales_25_1), na.rm = TRUE),
-    ales_effect  = rowSums(select(., ales_1_1, ales_2_1, ales_3_1, ales_4_1, ales_5_1, ales_6_1, ales_7_1, ales_8_1, ales_9_1, ales_10_1, ales_11_1, ales_12_2, ales_14_2, ales_15_2, ales_16_2, ales_17_2, ales_18_2, ales_19_2, ales_20_2, ales_21_2, ales_22_2, ales_23_2, ales_24_2, ales_25_2), na.rm = TRUE),
-  )
-write_tsv(ALES,"/Users/bsevchik/projects/EF_clinical/self-report/scale_csvs_Jan/final_scored_tsvs/ales.tsv", na = "n/a")
+    # 1) Total endorsed events; if ANY event item is NA -> NA
+    ales_frequency = if (any(is.na(c_across(all_of(event_vars))))) {
+      NA_real_
+    } else {
+      sum(c_across(all_of(event_vars)))
+    },
+
+    # helper flags for severity validity
+    .sev_missing_when_endorsed = {
+      ev  <- c_across(all_of(sev_event_vars))
+      sev <- c_across(all_of(sev_vars))
+      any((ev == 1) & is.na(sev), na.rm = TRUE)   # <-- KEY FIX
+    },
+    .n_endorsed_for_sev = {
+      ev <- c_across(all_of(sev_event_vars))
+      sum(ev == 1, na.rm = TRUE)
+    },
+
+    # 2) Severity sum; NA if any severity is NA where event==1
+    ales_severity_sum = if (.sev_missing_when_endorsed) {
+      NA_real_
+    } else {
+      ev  <- c_across(all_of(sev_event_vars))
+      sev <- c_across(all_of(sev_vars))
+      sum(sev[ev == 1], na.rm = TRUE)
+    },
+
+    # 3) Severity mean; same NA rule; NA if no endorsed events
+    ales_severity_mean = if (.sev_missing_when_endorsed || .n_endorsed_for_sev == 0) {
+      NA_real_
+    } else {
+      ev  <- c_across(all_of(sev_event_vars))
+      sev <- c_across(all_of(sev_vars))
+      mean(sev[ev == 1], na.rm = TRUE)
+    },
+
+    # helper flag for experience validity
+    .exp_missing_when_endorsed = {
+      ev  <- c_across(all_of(exp_event_vars))
+      exp <- c_across(all_of(exp_vars))
+      any((ev == 1) & is.na(exp), na.rm = TRUE)   # <-- KEY FIX
+    },
+
+    # 4) Count good events; NA if any exp is NA where event==1
+    ales_good_count = if (.exp_missing_when_endorsed) {
+      NA_real_
+    } else {
+      ev  <- c_across(all_of(exp_event_vars))
+      exp <- c_across(all_of(exp_vars))
+      sum(exp[ev == 1] == 1, na.rm = TRUE)
+    },
+
+    # 5) Count bad events; same NA rule
+    ales_bad_count = if (.exp_missing_when_endorsed) {
+      NA_real_
+    } else {
+      ev  <- c_across(all_of(exp_event_vars))
+      exp <- c_across(all_of(exp_vars))
+      sum(exp[ev == 1] == 2, na.rm = TRUE)
+    }
+  ) %>%
+  ungroup() %>%
+  select(-.sev_missing_when_endorsed, -.n_endorsed_for_sev, -.exp_missing_when_endorsed)
+
+write_tsv(ALES_scored,"/Users/bsevchik/projects/EF_clinical/self-report/scale_csvs_Jan/final_scored_tsvs/ales.tsv", na = "n/a")
 ```
+
 ``` {r ALES distribution}
 library(ggplot2)
 library(dplyr)
