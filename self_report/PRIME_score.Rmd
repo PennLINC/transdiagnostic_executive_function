@@ -83,6 +83,8 @@ PRIME_ge11 %>%
        title = "Distribution of PRIME total scores, age >= 11")
 
 ```
+The distributions do not look similar. Hence, we will make the clinical significance column for 8-10 year olds 'n/a', since it is not comparable to the distribution for 11+ year-olds.
+
 ``` {r clinical significance cut-offs}
 # Create a vector from Calkins et al. 2025 Table 1 with cut-off scores. ≥ 2 SD away from mean by age indicates clinically significant psychosis spectrum symptoms.
 
@@ -99,6 +101,7 @@ prime_12_gt2sd
   # - ≥1 item rated 6 (definitely agree)
   # - ≥3 items rated 5 (somewhat agree)
   # - total items 1-12 ≥ 2 SD away from mean by age (see Table 1 Calkins et al. 2025)
+# Note that since we don't have comparison data to use as a >=2 SD cut-off for ages 10 and below, their clinical significance score is n/a.
 
 library(dplyr)
 
@@ -117,11 +120,15 @@ PRIME <- PRIME %>%
   mutate(
     n_ge6 = rowSums(across(all_of(prime_items), ~ .x >= 6), na.rm = TRUE),
     n_ge5 = rowSums(across(all_of(prime_items), ~ .x >= 5), na.rm = TRUE),
-
-    clinically_significant_psychosis_spectrum_symptoms = as.integer(
-      (n_ge6 >= 1) |
-      (n_ge5 >= 3) |
-      (!is.na(`>2SD`) & prime_total_score >= `>2SD`)
+    
+    clinically_significant_psychosis_spectrum_symptoms = if_else(
+      age < 11,
+      NA_integer_,
+      as.integer(
+        (n_ge6 >= 1) |
+        (n_ge5 >= 3) |
+        (!is.na(`>2SD`) & prime_total_score >= `>2SD`)
+      )
     )
   ) %>%
   select(-age_for_cutoff, -`>2SD`, -n_ge6, -n_ge5, -age)
