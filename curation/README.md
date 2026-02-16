@@ -14,5 +14,6 @@ The order in which the scripts in this folder should be run is below:
      + It is important to `datalad save -m "..."` with a commit message after editing the metadata with CuBIDS.
 5. Anonymize the scans before preprocessing (reface T1s & deface T2s) with `04_reface_anathomicals.sh`
 6. Score task data from n-back sequences (`05_nback_scoring`, more details included in README in this subfolder). The resulting `events.json` and `events.tsv` files can be found in the `func/` subfolders for each subject and session with the raw data on OpenNeuro.
+7. Add the age of the participants at each session to the sessions.tsv and sessions.json files with `06_add_age_to_sessions.py`
 
 `image_counts_longitudinal.py` summarizes the number of participants with each image modality, the number of scans with each image modality, and the percent of each image modality that had longitudinal data.
