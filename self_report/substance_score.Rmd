@@ -28,35 +28,6 @@ substance <- substance %>%
 write_tsv(substance,"/Users/bsevchik/projects/EF_clinical/self-report/scale_csvs_Jan/final_scored_tsvs/substance.tsv", na = "n/a")
 ```
 
-``` {r substance distritbution}
-library(ggplot2)
-library(dplyr)
-
-substance %>%
-  ggplot(aes(x = substance_tob_summary)) +
-  geom_histogram(bins = 20) +
-  labs(x = "Tobacco frequency summary (0–3)", y = "Number of sessions",
-       title = "Distribution of tobacco use summary scores")
-
-substance %>%
-  ggplot(aes(x = substance_alc_summary)) +
-  geom_histogram(bins = 20) +
-  labs(x = "Alcohol frequency summary (0–3)", y = "Number of sessions",
-       title = "Distribution of alcohol use summary scores")
-
-substance %>%
-  ggplot(aes(x = substance_mar_summary)) +
-  geom_histogram(bins = 20) +
-  labs(x = "Marijuana frequency summary (0–3)", y = "Number of sessions",
-       title = "Distribution of marijuana use summary scores")
-
-substance %>%
-  ggplot(aes(x = substance_other_summary)) +
-  geom_histogram(bins = 20) +
-  labs(x = "Other substances summary (sum)", y = "Number of sessions",
-       title = "Distribution of other-substances summary scores")
-
-```
 
 ``` {r substance check endorsement}
 cols_to_check <- c("substance_tob_010", "substance_alc_010", "substance_mar_010")

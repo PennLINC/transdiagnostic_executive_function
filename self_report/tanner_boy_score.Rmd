@@ -19,14 +19,4 @@ tanner_boy <- read_tsv("/Users/bsevchik/projects/EF_clinical/self-report/scale_c
 
 write_tsv(tanner_boy,"/Users/bsevchik/projects/EF_clinical/self-report/scale_csvs_Jan/final_scored_tsvs/tanner_boy.tsv", na = "n/a")
 ```
-``` {r tanner boy distribution}
-library(ggplot2)
-library(dplyr)
 
-tanner_boy %>%
-  ggplot(aes(x = tanner_boy_total_score)) +
-  geom_histogram(bins = 20) +
-  labs(x = "Tanner (Male) total score (sum items 1–6)", y = "Number of sessions",
-       title = "Distribution of Tanner (Male) total scores")
-
-```

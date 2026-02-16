@@ -22,9 +22,6 @@ library (readr)
 # Load data
 ALES <- read_tsv("/Users/bsevchik/projects/EF_clinical/self-report/scale_csvs_Jan/separate_tsvs/ales.tsv")
 
-
-
-
 event_vars <- paste0("ales_", 1:25)
 
 sev_event_vars <- c(paste0("ales_", 1:11),  paste0("ales_", 12:25))
@@ -107,22 +104,28 @@ write_tsv(ALES_scored,"/Users/bsevchik/projects/EF_clinical/self-report/scale_cs
 library(ggplot2)
 library(dplyr)
 
-ALES %>%
+ALES_scored %>%
   ggplot(aes(x = ales_frequency)) +
   geom_histogram(bins = 20) +
   labs(x = "ALES frequency (sum of affirmed events)", y = "Number of sessions",
        title = "Distribution of ALES frequency scores")
 
-ALES %>%
-  ggplot(aes(x = ales_good_bad)) +
+ALES_scored %>%
+  ggplot(aes(x = ales_severity_sum)) +
   geom_histogram(bins = 20) +
-  labs(x = "ALES good vs bad (sum)", y = "Number of sessions",
-       title = "Distribution of ALES good/bad scores")
+  labs(x = "ALES Severity Sum", y = "Number of sessions",
+       title = "Distribution of ALES severity scores")
 
-ALES %>%
-  ggplot(aes(x = ales_effect)) +
+ALES_scored %>%
+  ggplot(aes(x = ales_good_count)) +
   geom_histogram(bins = 20) +
-  labs(x = "ALES effect (sum)", y = "Number of sessions",
-       title = "Distribution of ALES effect scores")
+  labs(x = "ALES good ratings count", y = "Number of sessions",
+       title = "Distribution of ALES good ratings count")
+
+ALES_scored %>%
+  ggplot(aes(x = ales_bad_count)) +
+  geom_histogram(bins = 20) +
+  labs(x = "ALES bad ratings count", y = "Number of sessions",
+       title = "Distribution of ALES bad ratings count")
 
 ```
