@@ -3,8 +3,13 @@ title: "PRIME_score"
 output: html_document
 date: "2025-07-01"
 ---
+---
+title: "PRIME_score"
+output: html_document
+date: "2025-07-01"
+---
 
-```{r}
+```{r PRIME scores}
 # PRIME Screen
 # https://doi.org/10.1016/j.schres.2008.08.018 - Kobayashi et al. (2008)
 # https://doi.org/10.1093/schbul/sbae224 Calkins et al (2025)
@@ -31,6 +36,7 @@ PRIME <- PRIME %>%
 write_tsv(PRIME,"/Users/bsevchik/projects/EF_clinical/self-report/scale_csvs_Jan/final_scored_tsvs/prime.tsv", na = "n/a")
 
 ```
+
 ``` {r PRIME distribution}
 library(ggplot2)
 library(dplyr)
@@ -42,3 +48,85 @@ PRIME %>%
        title = "Distribution of PRIME total scores")
 
 ```
+
+Compare distribution of 8-10 year olds to 11+ year olds to see if we can use the same clinical significance cut-off.
+
+``` {r age data}
+# Load in age data (from previous demographics code):
+age_data <- read.csv('/Users/bsevchik/projects/EF_code/EF_self_report/EF_age_info.csv')
+age_data$participant_id <- paste0("sub-", age_data$participant_id) #add sub- prefix
+age_data$session_id     <- paste0("ses-", age_data$session_id) #add ses- prefix
+
+# Left join age data into PRIME
+PRIME <- PRIME %>%
+  left_join(age_data %>% select(participant_id, session_id, age),
+            by = c("participant_id", "session_id")) %>%
+  relocate(age, .after = session_id)  # puts age as 3rd column
+
+```
+
+``` {r plot aged distributions}
+# split PRIME into two data frames
+PRIME_lt11 <- PRIME %>% filter(age < 11)
+PRIME_ge11 <- PRIME %>% filter(age >= 11)
+
+PRIME_lt11 %>%
+  ggplot(aes(x = prime_total_score)) +
+  geom_histogram(bins = 20) +
+  labs(x = "PRIME total score", y = "Number of sessions",
+       title = "Distribution of PRIME total scores, age <11")
+
+PRIME_ge11 %>%
+  ggplot(aes(x = prime_total_score)) +
+  geom_histogram(bins = 20) +
+  labs(x = "PRIME total score", y = "Number of sessions",
+       title = "Distribution of PRIME total scores, age >= 11")
+
+```
+``` {r clinical significance cut-offs}
+# Create a vector from Calkins et al. 2025 Table 1 with cut-off scores. ≥ 2 SD away from mean by age indicates clinically significant psychosis spectrum symptoms.
+
+library(tibble)
+
+prime_12_gt2sd <- tibble(
+  age = 11:21,
+  `>2SD` = c(36, 34, 32, 29, 28, 27, 27, 28, 23, 26, 23)
+)
+prime_12_gt2sd
+```
+``` {r clinically significant psychosis spectrum symptoms}
+# Clinical significance is met if any of the following criteria are met:
+  # - ≥1 item rated 6 (definitely agree)
+  # - ≥3 items rated 5 (somewhat agree)
+  # - total items 1-12 ≥ 2 SD away from mean by age (see Table 1 Calkins et al. 2025)
+
+library(dplyr)
+
+prime_12_gt2sd <- tibble::tibble(
+  age = 11:21,
+  `>2SD` = c(36, 34, 32, 29, 28, 27, 27, 28, 23, 26, 23)
+)
+
+prime_items <- paste0("prime_", 1:12)
+
+PRIME <- PRIME %>%
+  mutate(
+    age_for_cutoff = ifelse(age >= 8 & age <= 11, 11L, as.integer(age))
+  ) %>%
+  left_join(prime_12_gt2sd, by = c("age_for_cutoff" = "age")) %>%
+  mutate(
+    n_ge6 = rowSums(across(all_of(prime_items), ~ .x >= 6), na.rm = TRUE),
+    n_ge5 = rowSums(across(all_of(prime_items), ~ .x >= 5), na.rm = TRUE),
+
+    clinically_significant_psychosis_spectrum_symptoms = as.integer(
+      (n_ge6 >= 1) |
+      (n_ge5 >= 3) |
+      (!is.na(`>2SD`) & prime_total_score >= `>2SD`)
+    )
+  ) %>%
+  select(-age_for_cutoff, -`>2SD`, -n_ge6, -n_ge5, -age)
+
+write_tsv(PRIME,"/Users/bsevchik/projects/EF_clinical/self-report/scale_csvs_Jan/final_scored_tsvs/prime.tsv", na = "n/a")
+
+```
+
