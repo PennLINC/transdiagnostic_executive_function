@@ -5,7 +5,7 @@ date: "2026-01-27"
 ---
 
 ```{r score PANAS}
-# Code script to score the Positive and Negative Affect  - Watson et al. (1988)
+# Code script to score the Positive and Negative Affect Schedule - Watson et al. (1988)
 #  https://doi.org/10.1037/0022-3514.54.6.1063
 # Scoring instructions: The even items correspond to negative affect and the odd items correspond to positive affect. The raw scores on the negative items are summed to obtain a total raw score that ranges from 5 to 25. The raw scores on the positive items are summed to obtain a total raw score that ranges from 5 to 25. 
 
