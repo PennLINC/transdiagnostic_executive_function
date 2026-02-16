@@ -6,6 +6,8 @@ The main battery administered contained most of the self-report scales. There wa
 
 Due to complexities in how puberty is staged, we do not include summary scores and only include item-level data for the Tanner Developmental Stages scales (Girl and Boy). Due to the lack of participants that endorsed drug use, and the complexity of substance use, we also do not include summary scores and only include item-level data for the Substance Use Questionnaire.
 
+Given lack of comparison data for determining clinical significance for psychosis symptoms in children under 11 years old, for the PRIME scale, participants under age 11 have 'n/a' in the 'clinically_significant_psychosis_spectrum_symptoms' column.
+
 See below for missingness on each of the main, pre-scan, and post-scan batteries. Here, "missing completely" means it was omitted from the data entirely, and "incomplete" means this session was referenced in the data, but some or all of the data is 'NA' and marked as incomplete.
 + Subjects missing completely:
   + Pre-scan STAI: sub-20410
