@@ -5,7 +5,7 @@ date: "2026-01-28"
 ---
 
 ```{r score tanner girl}
-# Tanner Scale (Female)  - Marshall & Tanner (1970)
+# Tanner Scale (Female)  - Marshall & Tanner (1969)
 # https://doi.org/10.1136/adc.44.235.291
 # # We do not provide summary scores for this scale due to the complexities of pubertal staging.
 
