@@ -33,7 +33,14 @@ def update_tsv(tsv_path: str, age_map: dict, dry_run: bool) -> int:
     """
     subj = os.path.basename(tsv_path).split("_sessions.tsv")[0]  # e.g., sub-20139
 
-    df = pd.read_csv(tsv_path, sep="\t", dtype=str)
+    # Key change: preserve literal strings like "n/a" and don't convert them to NaN
+    df = pd.read_csv(
+        tsv_path,
+        sep="\t",
+        dtype=str,
+        keep_default_na=False,
+        na_filter=False,
+    )
 
     ages = []
     missing = 0
@@ -49,7 +56,14 @@ def update_tsv(tsv_path: str, age_map: dict, dry_run: bool) -> int:
     df.insert(insert_at, "age", ages)
 
     if not dry_run:
-        df.to_csv(tsv_path, sep="\t", index=False, lineterminator="\n")
+        # Key change: write any actual missing values as "n/a" instead of blanks
+        df.to_csv(
+            tsv_path,
+            sep="\t",
+            index=False,
+            lineterminator="\n",
+            na_rep="n/a",
+        )
 
     return missing
 
