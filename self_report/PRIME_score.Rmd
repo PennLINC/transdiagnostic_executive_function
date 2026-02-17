@@ -69,6 +69,7 @@ PRIME <- PRIME %>%
 # split PRIME into two data frames
 PRIME_lt11 <- PRIME %>% filter(age < 11)
 PRIME_ge11 <- PRIME %>% filter(age >= 11)
+PRIME_11 <- PRIME %>% filter(age >= 11 & age < 12)
 
 PRIME_lt11 %>%
   ggplot(aes(x = prime_total_score)) +
@@ -81,6 +82,12 @@ PRIME_ge11 %>%
   geom_histogram(bins = 20) +
   labs(x = "PRIME total score", y = "Number of sessions",
        title = "Distribution of PRIME total scores, age >= 11")
+
+PRIME_11 %>%
+  ggplot(aes(x = prime_total_score)) +
+  geom_histogram(bins = 20) +
+  labs(x = "PRIME total score", y = "Number of sessions",
+       title = "Distribution of PRIME total scores, age = 11")
 
 ```
 The distributions do not look similar. Hence, we will make the clinical significance column for 8-10 year olds 'n/a', since it is not comparable to the distribution for 11+ year-olds.
