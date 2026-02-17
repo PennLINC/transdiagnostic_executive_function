@@ -89,6 +89,23 @@ PRIME_11 %>%
   labs(x = "PRIME total score", y = "Number of sessions",
        title = "Distribution of PRIME total scores, age = 11")
 
+
+
+PRIME_lt11 %>%
+  summarise(
+    n = sum(!is.na(prime_total_score)),
+    mean_prime_total_score = mean(prime_total_score, na.rm = TRUE),
+    sd_prime_total_score = sd(prime_total_score, na.rm = TRUE)
+  ) %>%
+  print()
+
+PRIME_11 %>%
+  summarise(
+    n = sum(!is.na(prime_total_score)),
+    mean_prime_total_score = mean(prime_total_score, na.rm = TRUE),
+    sd_prime_total_score = sd(prime_total_score, na.rm = TRUE)
+  ) %>%
+  print()
 ```
 The distributions do not look similar. Hence, we will make the clinical significance column for 8-10 year olds 'n/a', since it is not comparable to the distribution for 11+ year-olds.
 
