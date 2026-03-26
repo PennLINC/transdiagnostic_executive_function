@@ -10,7 +10,7 @@ from nilearn.image import load_img
 from nilearn.interfaces.bids import save_glm_to_bids
 
 
-CONTRAST_LABELS = ["twoback", "zeroback", "twoBackMinusZeroBack"]
+CONTRAST_LABELS = ["twoBack", "zeroBack", "twoBackMinusZeroBack"]
 MODEL_TYPES = ["rtdur", "nortdur"]
 group_mask_img = load_img(
     "/cbica/projects/executive_function/.cache/templateflow/"
@@ -22,14 +22,20 @@ bg_img = load_img(
 )
 
 for model_type in MODEL_TYPES:
-    firstlevel_dir = Path(f"/cbica/projects/executive_function/EF_dataset/derivatives/nback-{model_type}")
+    firstlevel_dir = Path(f"/cbica/projects/executive_function/code/task_contrast/final/results/first-level/nback-{model_type}")
     for contrast_label in CONTRAST_LABELS:
         print("\n====================================================")
         print(f"Running group model for contrast: {contrast_label}")
         print("====================================================\n")
 
-        group_out_dir = firstlevel_dir / f"group-{contrast_label}"
+        group_out_dir = Path(
+            f"/cbica/projects/executive_function/code/task_contrast/final/results/second-level/nback-{model_type}/group-{contrast_label}"
+        )
         group_out_dir.mkdir(exist_ok=True, parents=True)
+
+        print(f"MODEL TYPE: {model_type}")
+        print(f"Reading first-level maps from: {firstlevel_dir}")
+        print(f"Writing second-level outputs to: {group_out_dir}")
 
         pattern = (
             "sub-*/sub-*_task-nback_space-MNI152NLin6Asym_"
