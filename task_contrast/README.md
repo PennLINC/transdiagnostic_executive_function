@@ -1,13 +1,8 @@
-The environment used for these scripts is the `babs` environment, for which the python requirements can be found in `/python_requirements/babs_requirements`
+The environment used for these scripts is the `nilearn_glm` environment, for which the python requirements can be found in `/python_requirements/nilearn_glm_requirements`
 
-The QC scripts contained here include:
-+ Python scripts that concatenate data from individual preprocessing outputs to create csv files (in the `qc_csvs/full_concatenated_csvs` folder) and distribution figures
-  (in `qc_distribution_figs` folder) that are used to make QC pass/fail decisions after discussion with team members.
-+ `qc_scripts/create_T1_QC_mni_slices.sh` creates the slices used to manually evaluate T1 scans for QC, and `qc_scripts/display_T1_QC_slices.ipynb` visually displays these slices.
-+ `qc_scripts/fmri_coverage.Rmd` is used to investigate more details about the scans that have coverage <50%.
-+ `excluded_csvs/excluded_scans_*.csv` are scans that did NOT pass QC and are later passed into python scripts in the analysis folder to exclude these scans from group average plots.
-+ `qc_csvs/final_QC_csvs` is a folder that contains a summary record of which scans for which modalities are recommended 'passes' versus 'fails' based on our criteria for high quality vs. poor quality scans. There is a separate csv file for each modality, including both the variable used to determine the QC threshold for that modality and the QC determination for each subjects/session. Each csvs file is accompanied by a json file explaining the data it contains.
-  + Note that for fMRI and ASL data, T1 QC recommendations should also be taken into account.
-+ `QC_distributions.Rmd` contains code that summarizes the amount of participants and scans/sessions that passed vs. failed each modality.
+In the `/code` folder:
++ Call `run_nback_glm_single_subject.py` with `run_nback_glm_first_level.slurm` to run the first-level glm analysis.
++ Call `run_nback_second_level.py` with `run_nback_glm_second_level.slurm` to run the second-level glm analysis.
++ Run `create_group_figure.py` to create pdf forms of the second-level results that can be used as input into Indesign for the final figures.
 
-All scans regardless of pass/fail status are included in the raw dataset.
+The `/results` folder contains the pdf forms of second-level results that can be used as input into Indesign for the final figures.
