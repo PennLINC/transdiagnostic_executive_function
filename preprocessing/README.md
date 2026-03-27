@@ -1,4 +1,5 @@
 The environment used to run scripts in the `preprocessing` folder is the `babs` environment, for which the python requirements can be found in `/python_requirements/babs_requirements.txt`
+*Note that instead of the `babs` environment, `babs2` environment (`/python_requirements/babs2_requirements.txt`), which includes an updated version of the BABS software, was used for fmriprep and XCP-D processing, as the processing had to be re-done at a later date. 
 
 Before using BABS software (https://pennlinc-babs.readthedocs.io/en/stable/) as a wrapper around BIDS Apps, we prepared the input BIDS dataset as a DataLad dataset, prepared the containerized BIDS App
 as a DataLad dataset, and prepared a configuration yaml file for the BIDS App.
