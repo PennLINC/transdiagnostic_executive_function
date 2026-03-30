@@ -12,7 +12,7 @@ input_datasets:
         required_files:
             - "*fmriprep_anat*.zip"
         is_zipped: true
-        origin_url: "/cbica/projects/executive_function/EF_dataset/derivatives/fmriprepANAT_BABS_EF_full_project_outputs"
+        origin_url: "ria+file:///cbica/projects/executive_function/EF_dataset/derivatives/fmriprepANAT_BABS_EF_full_project/output_ria#~data"
         path_in_babs: inputs/data/fmriprep_anat
 
 bids_app_args:
@@ -25,8 +25,8 @@ bids_app_args:
     --skip-bids-validation: ""
     -vv: ""
     --cifti-output: "91k"
-    --n_cpus: "4"
-    --mem-mb: "30000"
+    --n_cpus: "8"
+    --mem-mb: "120000"
     --fs-subjects-dir: "${PWD}/inputs/data/fmriprep_anat/fmriprep_anat/sourcedata/freesurfer" #replace with path to your freesurfer results from fmriprep_anat
 
 # Arguments that are passed directly to singularity/apptainer:
@@ -43,24 +43,23 @@ zip_foldernames:
 # How much cluster resources it needs:
 cluster_resources:
     interpreting_shell: "/bin/bash"
-    hard_runtime_limit: "7:00:00"
     temporary_disk_space: 200G
     customized_text: |
         #SBATCH -p all
         #SBATCH --nodes=1
         #SBATCH --ntasks=1
-        #SBATCH --cpus-per-task=4
-        #SBATCH --mem=30G
+        #SBATCH --cpus-per-task=8
+        #SBATCH --mem=120G
         #SBATCH --propagate=NONE
+        #SBATCH --time=24:00:00
 
 # Necessary commands to be run first:
 #   [FIX ME] change or add commands for setting up the virtual environment, for loading necessary modules, etc
 script_preamble: |
-    eval "$(micromamba shell hook --shell bash)"
-    micromamba activate babs
+    source /cbica/projects/executive_function/miniforge3/bin/activate babs2
     
 # Where to run the jobs:
-job_compute_space: "${TMP}" # [FIX ME] replace "/path/to/temporary_compute_space" with yours
+job_compute_space: "/cbica/comp_space/executive_function/fmriprep" # [FIX ME] replace "/path/to/temporary_compute_space" with yours
 
 # Alert messages that might be found in log files of failed jobs:
 #   These messages may be helpful for debugging errors in failed jobs.

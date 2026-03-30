@@ -5,7 +5,7 @@ input_datasets:
         required_files:
             - "*_fmriprep_func*.zip"
         is_zipped: true
-        origin_url: "/cbica/projects/executive_function/EF_dataset/derivatives/fmriprep_BABS_EF_full_project_outputs"
+        origin_url: "ria+file:///cbica/projects/executive_function/EF_dataset/derivatives/fmriprep_BABS_EF_full_project/output_ria#~data"
         unzipped_path_containing_subject_dirs: "fmriprep_func"
         path_in_babs: inputs/data/fmriprep_func
 
@@ -52,15 +52,15 @@ zip_foldernames:
 # How much cluster resources it needs:
 cluster_resources:
     interpreting_shell: "/bin/bash"
-    hard_runtime_limit: "7:00:00"
     temporary_disk_space: 200G
     customized_text: |
         #SBATCH -p all
         #SBATCH --nodes=1
         #SBATCH --ntasks=1
-        #SBATCH --cpus-per-task=8
+        #SBATCH --cpus-per-task=4
         #SBATCH --mem=50G
         #SBATCH --propagate=NONE
+        #SBATCH --time=24:00:00
 
 # Necessary commands to be run first:
 #   [FIX ME] change or add commands for setting up the virtual environment, for loading necessary modules, etc
@@ -69,4 +69,5 @@ script_preamble: |
     micromamba activate babs
 
 # Where to run the jobs:
-job_compute_space: "${TMP}" # [FIX ME] replace "/path/to/temporary_compute_space" with yours
+#job_compute_space: "${TMP}" # [FIX ME] replace "/path/to/temporary_compute_space" with yours
+job_compute_space: "/cbica/comp_space/executive_function/xcp-d"
