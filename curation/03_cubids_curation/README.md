@@ -5,6 +5,8 @@ The Python scripts here are used to update, edit, or correct metadata in the Dat
 + Unordered scripts include: `config.yml` which is the custom configuration file we used for running `cubids group` and `cubids apply` commands; `cubids_apply.sh` that is an optional bash script used to submit `cubids apply` as a job since it takes a while to run; and `cubids_summary_counts.Rmd` that calculates the percentage of dominant and variant scans for each type of scan.
 + The `final_cubids_docs` folder contains the final versions of all the output documents from running CuBIDS; all versions can be found in the dataset on OpenNeuro.
 
+Note that in addition to running `16_add_IntendedFor_dwi_fmri.py`, one session (sub-19861/ses-1) was missing a PA fmap file, so we employed a different strategy to implement distortion correction. For this subject, the BOLD file acted as its own PA fmap. We did not use the IntendedFor field, but rather manually edited the B0FieldIdentifier and B0FieldSource in the appropriate fmap and BOLD JSON files to implement distortion correction using the AP fmap file and each BOLD file itself.
+
 Note about repeated runs in the dataset:
 + There are some scans with an extra run in the dataset, if it was re-done at the scanner. While T1 scans should have 1 run, T2 scans should have 1 run, DWI scans should have 1 run, fMRI rest scans should have 2 runs, fMRI n-back scans should have 1 run, fmaps should each have 1 run, and ASL/M0 scans should have 1 run each, there are instances where a session has an extra second and/or third run.
   + Based on notes taken at the scanner on the day of the scan, we manually deleted extraneous n-back runs in the case of a repeated n-back run.
