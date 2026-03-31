@@ -10,7 +10,7 @@ project_path = '/cbica/projects/executive_function/'
 # concatenating
 ################
 # path to unzipped xcpd data
-inpath_qc = project_path + 'EF_dataset/derivatives/xcpd_unzipped/xcpd_unzipped/xcpd/'
+inpath_qc = project_path + 'EF_dataset/derivatives/xcpd_unzipped/xcpd/'
 # outpath to save concatentaed qc data
 outpath = project_path + 'EF_dataset_figures/concatenated_data/'
 

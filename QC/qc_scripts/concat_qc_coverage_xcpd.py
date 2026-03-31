@@ -4,7 +4,7 @@ import numpy as np
 import os
 
 project_path = '/cbica/projects/executive_function/'
-inpath_qc = project_path + 'EF_dataset/derivatives/xcpd_unzipped/xcpd_unzipped/xcpd'
+inpath_qc = project_path + 'EF_dataset/derivatives/xcpd_unzipped/xcpd'
 outpath = project_path + 'EF_dataset_figures/concatenated_data/'
 
 fileNames_qc = sorted(glob.glob(os.path.join(
