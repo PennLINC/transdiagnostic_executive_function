@@ -16,7 +16,7 @@ library(dplyr)
 
 ```{r read in csv}
 # Read in necessary csv with fmri coverage info
-coverage_df <- read.csv('/Users/bsevchik/projects/EF_processing/concat_qc/concat_xcpd_qc_coverage_row_sums_pass_fail.csv')
+coverage_df <- read.csv('/Users/bsevchik/Documents/GitHub/transdiagnostic_executive_function/QC/qc_csvs/full_concatenated_csvs/concat_xcpd_qc_coverage_row_sums_pass_fail.csv')
 coverage_df
 ```
 
