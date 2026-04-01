@@ -7,7 +7,7 @@ import pandas as pd
 if __name__ == "__main__":
     # Load parcel dseg info
     dseg_file = (
-        "=/cbica/projects/executive_function/EF_dataset/derivatives/xcpd_unzipped/xcpd/atlases/atlas-4S1056Parcels/"
+        "/cbica/projects/executive_function/EF_dataset/derivatives/xcpd_unzipped/xcpd/atlases/atlas-4S1056Parcels/"
         "atlas-4S1056Parcels_dseg.tsv"
     )
     dseg_df = pd.read_table(dseg_file)
