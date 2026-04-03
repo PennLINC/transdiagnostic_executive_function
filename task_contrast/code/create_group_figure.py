@@ -41,8 +41,8 @@ for model_type in MODEL_TYPES:
         ) / model_type / contrast["contrast_dir"] / "group" / contrast["stat_file"]
 
         stat_img = load_img(group_zmap)
-
-        model_label = "RTDur" if "rtdur" in model_type else "noRTDur"
+   
+        model_label = "RTDur" if model_type == "nback-rtdur" else "noRTDur"
 
         plotting.plot_stat_map(
             stat_img,
