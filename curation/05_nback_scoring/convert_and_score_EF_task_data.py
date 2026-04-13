@@ -228,37 +228,44 @@ def compute_response_times(
     df: pd.DataFrame, template: List[Tuple[str, str]], label: str
 ) -> List[List[object]]:
     """
-    Reproduce the response time extraction logic from the notebook for a given
-    template (either 0BACK or 2BACK).
-    Returns rows: [label, index, expected, response]
+    Compute response times directly from the logfile:
+    RT = Response Time - Picture Time
+
+    Returns rows: [label, index, expected, response_time_ms]
     """
     rows: List[List[object]] = []
+
     for expected, index_str in template:
         if index_str is None:
             continue
+
         index_val = int(index_str)
-        a1 = df[df["Trial"] >= (index_val - 2)]
-        a2 = df[df["Trial"] <= index_val]
-        merged = pd.merge(a1, a2, how="inner")
-        aa = np.array(merged["TTime"].to_list())
 
-        if len(aa) > 6:
-            if aa[0] > 0:
-                response = aa[0] / 10
-            else:
-                # first non-zero among even indices
-                # enumerate(aa[::2]) returns (i, value) pairs
-                res = next((i for i, j in enumerate(aa[::2]) if j), None)
-                if res is None:
-                    response = None
-                else:
-                    ste = res - 1
-                    centr = 2 * res - 1
-                    response = aa[centr] / 10 + ste * 800
+        # The XML index appears to be 2 ahead of the logfile trial number
+        trial_num = index_val - 2
+
+        trial_df = df[df["Trial"] == trial_num]
+
+        picture_rows = trial_df[trial_df["EventType"] == "Picture"]
+        response_rows = trial_df[trial_df["EventType"] == "Response"]
+
+        if picture_rows.empty:
+            response_time_ms = None
         else:
-            response = None
+            picture_time = picture_rows.iloc[0]["Time"]
 
-        rows.append([label, index_val, expected, response])
+            if response_rows.empty:
+                response_time_ms = None
+            else:
+                response_time = response_rows.iloc[0]["Time"]
+                response_time_ms = response_time - picture_time
+
+                # Guard against impossible negative RTs
+                if pd.isna(response_time_ms) or response_time_ms < 0:
+                    response_time_ms = None
+
+        rows.append([label, index_val, expected, response_time_ms])
+
     return rows
 
 
@@ -285,9 +292,9 @@ def build_events_dataframe(allback: List[List[object]]) -> pd.DataFrame:
             scores.append("false_positive")
         elif "NR" in result and pd.isna(rt_sec):
             scores.append("true_negative")
-        elif "Match" in result and (not pd.isna(rt_sec) and rt_sec <= 2.4):
+        elif "Match" in result and (not pd.isna(rt_sec) and rt_sec <= 6.0): #seems like there were response times outside of 2.4 window from log files? Not sure what appropriate cut-off should be
             scores.append("true_positive")
-        elif "Match" in result and (pd.isna(rt_sec) or rt_sec > 2.4):
+        elif "Match" in result and (pd.isna(rt_sec) or rt_sec > 6.0):
             scores.append("false_negative")
         else:
             scores.append("unknown")
