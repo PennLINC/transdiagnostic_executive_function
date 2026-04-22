@@ -264,7 +264,7 @@ def build_events_dataframe(allback: List[List[object]]) -> pd.DataFrame:
     # - task trials keep original timing
     # - instruction rows are modeled as 12 consecutive 0.8 s units = 9.6 s
     df["onset"] = 0.8 * df["index"]
-    df["duration"] = np.where(df["task"] == "INSTRUCTION", 12 * 0.8, 3 * 0.8)
+    df["duration"] = np.where(df["task"] == "INSTRUCTION", 1 * 0.8, 3 * 0.8)
 
     df["onset"] = df["onset"].round(1)
     df["duration"] = df["duration"].round(1)
