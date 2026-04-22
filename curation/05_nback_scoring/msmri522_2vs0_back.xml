@@ -17,18 +17,18 @@
 	<bbl:stimuli magnitude="1" duration="3" logtype="INDEX" eventtype='Picture'>
 
 
-	<bbl:stim name="instr_0" code="pic1" index="31"   category="INSTRUCTION" expected="NR" classification="instruction"/>
-	<bbl:stim name="instr_0" code="pic1" index="32"   category="INSTRUCTION" expected="NR" classification="instruction"/>
-	<bbl:stim name="instr_0" code="pic1" index="33"   category="INSTRUCTION" expected="NR" classification="instruction"/>
-	<bbl:stim name="instr_0" code="pic1" index="34"   category="INSTRUCTION" expected="NR" classification="instruction"/>
-	<bbl:stim name="instr_0" code="pic1" index="35"   category="INSTRUCTION" expected="NR" classification="instruction"/>
-	<bbl:stim name="instr_0" code="pic1" index="36"   category="INSTRUCTION" expected="NR" classification="instruction"/>
-	<bbl:stim name="instr_0" code="pic1" index="37"   category="INSTRUCTION" expected="NR" classification="instruction"/>
-	<bbl:stim name="instr_0" code="pic1" index="38"   category="INSTRUCTION" expected="NR" classification="instruction"/>
-	<bbl:stim name="instr_0" code="pic1" index="39"   category="INSTRUCTION" expected="NR" classification="instruction"/>
-	<bbl:stim name="instr_0" code="pic1" index="40"   category="INSTRUCTION" expected="NR" classification="instruction"/>
-	<bbl:stim name="instr_0" code="pic1" index="41"   category="INSTRUCTION" expected="NR" classification="instruction"/>
-	<bbl:stim name="instr_0" code="pic1" index="42"   category="INSTRUCTION" expected="NR" classification="instruction"/>
+	<bbl:stim name="instr_0" code="solid" index="31"   category="INSTRUCTION" expected="NR" classification="instruction"/>
+	<bbl:stim name="instr_0" code="solid" index="32"   category="INSTRUCTION" expected="NR" classification="instruction"/>
+	<bbl:stim name="instr_0" code="solid" index="33"   category="INSTRUCTION" expected="NR" classification="instruction"/>
+	<bbl:stim name="instr_0" code="solid" index="34"   category="INSTRUCTION" expected="NR" classification="instruction"/>
+	<bbl:stim name="instr_0" code="solid" index="35"   category="INSTRUCTION" expected="NR" classification="instruction"/>
+	<bbl:stim name="instr_0" code="solid" index="36"   category="INSTRUCTION" expected="NR" classification="instruction"/>
+	<bbl:stim name="instr_0" code="solid" index="37"   category="INSTRUCTION" expected="NR" classification="instruction"/>
+	<bbl:stim name="instr_0" code="solid" index="38"   category="INSTRUCTION" expected="NR" classification="instruction"/>
+	<bbl:stim name="instr_0" code="solid" index="39"   category="INSTRUCTION" expected="NR" classification="instruction"/>
+	<bbl:stim name="instr_0" code="solid" index="40"   category="INSTRUCTION" expected="NR" classification="instruction"/>
+	<bbl:stim name="instr_0" code="solid" index="41"   category="INSTRUCTION" expected="NR" classification="instruction"/>
+	<bbl:stim name="instr_0" code="solid" index="42"   category="INSTRUCTION" expected="NR" classification="instruction"/>
 
 	<bbl:stim name="picJ" code="pic1" index="43"   category="0BACK" expected="NR" classification="foil"/>
 	<bbl:stim name="picM" code="pic1" index="46"   category="0BACK" expected="NR" classification="foil"/>
@@ -44,12 +44,25 @@
 	<bbl:stim name="picJ" code="pic1" index="76"   category="0BACK" expected="NR" classification="foil"/>
 	<bbl:stim name="picX" code="pic1" index="79"   category="0BACK" expected="Match" classification="target"/>
 	<bbl:stim name="picZ" code="pic1" index="82"   category="0BACK" expected="NR" classification="foil"/>
-	<bbl:stim name="picF" code="pic1" index="82"   category="0BACK" expected="NR" classification="foil"/>
+	<bbl:stim name="picF" code="pic1" index="85"   category="0BACK" expected="NR" classification="foil"/>
 	<bbl:stim name="picN" code="pic1" index="88"   category="0BACK" expected="NR" classification="foil"/>
 	<bbl:stim name="picW" code="pic1" index="91"   category="0BACK" expected="NR" classification="foil"/>
 	<bbl:stim name="picV" code="pic1" index="94"   category="0BACK" expected="NR" classification="foil"/>
 	<bbl:stim name="picX" code="pic1" index="97"   category="0BACK" expected="Match" classification="target"/>
 	<bbl:stim name="picV" code="pic1" index="100"   category="0BACK" expected="NR" classification="foil"/>
+
+	<bbl:stim name="instr_2" code="solid" index="103"   category="INSTRUCTION" expected="NR" classification="instruction"/>
+	<bbl:stim name="instr_2" code="solid" index="104"   category="INSTRUCTION" expected="NR" classification="instruction"/>
+	<bbl:stim name="instr_2" code="solid" index="105"   category="INSTRUCTION" expected="NR" classification="instruction"/>
+	<bbl:stim name="instr_2" code="solid" index="106"   category="INSTRUCTION" expected="NR" classification="instruction"/>
+	<bbl:stim name="instr_2" code="solid" index="107"   category="INSTRUCTION" expected="NR" classification="instruction"/>
+	<bbl:stim name="instr_2" code="solid" index="108"   category="INSTRUCTION" expected="NR" classification="instruction"/>
+	<bbl:stim name="instr_2" code="solid" index="109"   category="INSTRUCTION" expected="NR" classification="instruction"/>
+	<bbl:stim name="instr_2" code="solid" index="110"   category="INSTRUCTION" expected="NR" classification="instruction"/>
+	<bbl:stim name="instr_2" code="solid" index="111"   category="INSTRUCTION" expected="NR" classification="instruction"/>
+	<bbl:stim name="instr_2" code="solid" index="112"   category="INSTRUCTION" expected="NR" classification="instruction"/>
+	<bbl:stim name="instr_2" code="solid" index="113"   category="INSTRUCTION" expected="NR" classification="instruction"/>
+	<bbl:stim name="instr_2" code="solid" index="114"   category="INSTRUCTION" expected="NR" classification="instruction"/>
     
 	<bbl:stim name="picH" code="pic1" index="115"   category="2BACK" expected="NR" classification="foil"/>
 	<bbl:stim name="picW" code="pic1" index="118"   category="2BACK" expected="NR" classification="foil"/>
@@ -72,20 +85,18 @@
 	<bbl:stim name="picG" code="pic1" index="169"   category="2BACK" expected="NR" classification="foil"/>
 	<bbl:stim name="picZ" code="pic1" index="172"   category="2BACK" expected="Match" classification="target"/>
 
-
-
-	<bbl:stim name="instr_2" code="pic1" index="175"   category="INSTRUCTION" expected="NR" classification="instruction"/>
-	<bbl:stim name="instr_2" code="pic1" index="176"   category="INSTRUCTION" expected="NR" classification="instruction"/>
-	<bbl:stim name="instr_2" code="pic1" index="177"   category="INSTRUCTION" expected="NR" classification="instruction"/>
-	<bbl:stim name="instr_2" code="pic1" index="178"   category="INSTRUCTION" expected="NR" classification="instruction"/>
-	<bbl:stim name="instr_2" code="pic1" index="179"   category="INSTRUCTION" expected="NR" classification="instruction"/>
-	<bbl:stim name="instr_2" code="pic1" index="180"   category="INSTRUCTION" expected="NR" classification="instruction"/>
-	<bbl:stim name="instr_2" code="pic1" index="181"   category="INSTRUCTION" expected="NR" classification="instruction"/>
-	<bbl:stim name="instr_2" code="pic1" index="182"   category="INSTRUCTION" expected="NR" classification="instruction"/>
-	<bbl:stim name="instr_2" code="pic1" index="183"   category="INSTRUCTION" expected="NR" classification="instruction"/>
-	<bbl:stim name="instr_2" code="pic1" index="184"   category="INSTRUCTION" expected="NR" classification="instruction"/>
-	<bbl:stim name="instr_2" code="pic1" index="185"   category="INSTRUCTION" expected="NR" classification="instruction"/>
-	<bbl:stim name="instr_2" code="pic1" index="186"   category="INSTRUCTION" expected="NR" classification="instruction"/>
+	<bbl:stim name="instr_2" code="solid" index="175"   category="INSTRUCTION" expected="NR" classification="instruction"/>
+	<bbl:stim name="instr_2" code="solid" index="176"   category="INSTRUCTION" expected="NR" classification="instruction"/>
+	<bbl:stim name="instr_2" code="solid" index="177"   category="INSTRUCTION" expected="NR" classification="instruction"/>
+	<bbl:stim name="instr_2" code="solid" index="178"   category="INSTRUCTION" expected="NR" classification="instruction"/>
+	<bbl:stim name="instr_2" code="solid" index="179"   category="INSTRUCTION" expected="NR" classification="instruction"/>
+	<bbl:stim name="instr_2" code="solid" index="180"   category="INSTRUCTION" expected="NR" classification="instruction"/>
+	<bbl:stim name="instr_2" code="solid" index="181"   category="INSTRUCTION" expected="NR" classification="instruction"/>
+	<bbl:stim name="instr_2" code="solid" index="182"   category="INSTRUCTION" expected="NR" classification="instruction"/>
+	<bbl:stim name="instr_2" code="solid" index="183"   category="INSTRUCTION" expected="NR" classification="instruction"/>
+	<bbl:stim name="instr_2" code="solid" index="184"   category="INSTRUCTION" expected="NR" classification="instruction"/>
+	<bbl:stim name="instr_2" code="solid" index="185"   category="INSTRUCTION" expected="NR" classification="instruction"/>
+	<bbl:stim name="instr_2" code="solid" index="186"   category="INSTRUCTION" expected="NR" classification="instruction"/>
 
     <bbl:stim name="picM" code="pic1" index="187"   category="2BACK" expected="NR" classification="foil"/>
 	<bbl:stim name="picG" code="pic1" index="190"   category="2BACK" expected="NR" classification="foil"/>
@@ -108,19 +119,18 @@
 	<bbl:stim name="picR" code="pic1" index="241"   category="2BACK" expected="NR" classification="foil"/>
 	<bbl:stim name="picL" code="pic1" index="244"   category="2BACK" expected="Match" classification="target"/>
 
-
-	<bbl:stim name="instr_0" code="pic1" index="247"   category="INSTRUCTION" expected="NR" classification="instruction"/>
-	<bbl:stim name="instr_0" code="pic1" index="248"   category="INSTRUCTION" expected="NR" classification="instruction"/>
-	<bbl:stim name="instr_0" code="pic1" index="249"   category="INSTRUCTION" expected="NR" classification="instruction"/>
-	<bbl:stim name="instr_0" code="pic1" index="250"   category="INSTRUCTION" expected="NR" classification="instruction"/>
-	<bbl:stim name="instr_0" code="pic1" index="251"   category="INSTRUCTION" expected="NR" classification="instruction"/>
-	<bbl:stim name="instr_0" code="pic1" index="252"   category="INSTRUCTION" expected="NR" classification="instruction"/>
-	<bbl:stim name="instr_0" code="pic1" index="253"   category="INSTRUCTION" expected="NR" classification="instruction"/>
-	<bbl:stim name="instr_0" code="pic1" index="254"   category="INSTRUCTION" expected="NR" classification="instruction"/>
-	<bbl:stim name="instr_0" code="pic1" index="255"   category="INSTRUCTION" expected="NR" classification="instruction"/>
-	<bbl:stim name="instr_0" code="pic1" index="256"   category="INSTRUCTION" expected="NR" classification="instruction"/>
-	<bbl:stim name="instr_0" code="pic1" index="257"   category="INSTRUCTION" expected="NR" classification="instruction"/>
-	<bbl:stim name="instr_0" code="pic1" index="258"   category="INSTRUCTION" expected="NR" classification="instruction"/>
+	<bbl:stim name="instr_0" code="solid" index="247"   category="INSTRUCTION" expected="NR" classification="instruction"/>
+	<bbl:stim name="instr_0" code="solid" index="248"   category="INSTRUCTION" expected="NR" classification="instruction"/>
+	<bbl:stim name="instr_0" code="solid" index="249"   category="INSTRUCTION" expected="NR" classification="instruction"/>
+	<bbl:stim name="instr_0" code="solid" index="250"   category="INSTRUCTION" expected="NR" classification="instruction"/>
+	<bbl:stim name="instr_0" code="solid" index="251"   category="INSTRUCTION" expected="NR" classification="instruction"/>
+	<bbl:stim name="instr_0" code="solid" index="252"   category="INSTRUCTION" expected="NR" classification="instruction"/>
+	<bbl:stim name="instr_0" code="solid" index="253"   category="INSTRUCTION" expected="NR" classification="instruction"/>
+	<bbl:stim name="instr_0" code="solid" index="254"   category="INSTRUCTION" expected="NR" classification="instruction"/>
+	<bbl:stim name="instr_0" code="solid" index="255"   category="INSTRUCTION" expected="NR" classification="instruction"/>
+	<bbl:stim name="instr_0" code="solid" index="256"   category="INSTRUCTION" expected="NR" classification="instruction"/>
+	<bbl:stim name="instr_0" code="solid" index="257"   category="INSTRUCTION" expected="NR" classification="instruction"/>
+	<bbl:stim name="instr_0" code="solid" index="258"   category="INSTRUCTION" expected="NR" classification="instruction"/>
 
     <bbl:stim name="picN" code="pic1" index="259"   category="0BACK" expected="NR" classification="foil"/>
 	<bbl:stim name="picR" code="pic1" index="262"   category="0BACK" expected="NR" classification="foil"/>
@@ -143,19 +153,20 @@
 	<bbl:stim name="picX" code="pic1" index="313"   category="0BACK" expected="Match" classification="target"/>
 	<bbl:stim name="picS" code="pic1" index="316"   category="0BACK" expected="NR" classification="foil"/>
     
+	<!-- Cross-hairs at indices 319-348 -->
 
-	<bbl:stim name="instr_2" code="pic1" index="349"   category="INSTRUCTION" expected="NR" classification="instruction"/>
-	<bbl:stim name="instr_2" code="pic1" index="350"   category="INSTRUCTION" expected="NR" classification="instruction"/>
-	<bbl:stim name="instr_2" code="pic1" index="351"   category="INSTRUCTION" expected="NR" classification="instruction"/>
-	<bbl:stim name="instr_2" code="pic1" index="352"   category="INSTRUCTION" expected="NR" classification="instruction"/>
-	<bbl:stim name="instr_2" code="pic1" index="353"   category="INSTRUCTION" expected="NR" classification="instruction"/>
-	<bbl:stim name="instr_2" code="pic1" index="354"   category="INSTRUCTION" expected="NR" classification="instruction"/>
-	<bbl:stim name="instr_2" code="pic1" index="355"   category="INSTRUCTION" expected="NR" classification="instruction"/>
-	<bbl:stim name="instr_2" code="pic1" index="356"   category="INSTRUCTION" expected="NR" classification="instruction"/>
-	<bbl:stim name="instr_2" code="pic1" index="357"   category="INSTRUCTION" expected="NR" classification="instruction"/>
-	<bbl:stim name="instr_2" code="pic1" index="358"   category="INSTRUCTION" expected="NR" classification="instruction"/>
-	<bbl:stim name="instr_2" code="pic1" index="359"   category="INSTRUCTION" expected="NR" classification="instruction"/>
-	<bbl:stim name="instr_2" code="pic1" index="360"   category="INSTRUCTION" expected="NR" classification="instruction"/>
+	<bbl:stim name="instr_2" code="solid" index="349"   category="INSTRUCTION" expected="NR" classification="instruction"/>
+	<bbl:stim name="instr_2" code="solid" index="350"   category="INSTRUCTION" expected="NR" classification="instruction"/>
+	<bbl:stim name="instr_2" code="solid" index="351"   category="INSTRUCTION" expected="NR" classification="instruction"/>
+	<bbl:stim name="instr_2" code="solid" index="352"   category="INSTRUCTION" expected="NR" classification="instruction"/>
+	<bbl:stim name="instr_2" code="solid" index="353"   category="INSTRUCTION" expected="NR" classification="instruction"/>
+	<bbl:stim name="instr_2" code="solid" index="354"   category="INSTRUCTION" expected="NR" classification="instruction"/>
+	<bbl:stim name="instr_2" code="solid" index="355"   category="INSTRUCTION" expected="NR" classification="instruction"/>
+	<bbl:stim name="instr_2" code="solid" index="356"   category="INSTRUCTION" expected="NR" classification="instruction"/>
+	<bbl:stim name="instr_2" code="solid" index="357"   category="INSTRUCTION" expected="NR" classification="instruction"/>
+	<bbl:stim name="instr_2" code="solid" index="358"   category="INSTRUCTION" expected="NR" classification="instruction"/>
+	<bbl:stim name="instr_2" code="solid" index="359"   category="INSTRUCTION" expected="NR" classification="instruction"/>
+	<bbl:stim name="instr_2" code="solid" index="360"   category="INSTRUCTION" expected="NR" classification="instruction"/>
 
     <bbl:stim name="picJ" code="pic1" index="361"   category="2BACK" expected="NR" classification="foil"/>
 	<bbl:stim name="picF" code="pic1" index="364"   category="2BACK" expected="NR" classification="foil"/>
@@ -178,20 +189,18 @@
 	<bbl:stim name="picT" code="pic1" index="415"   category="2BACK" expected="NR" classification="foil"/>
 	<bbl:stim name="picB" code="pic1" index="418"   category="2BACK" expected="Match" classification="target"/>
 
-
-
-	<bbl:stim name="instr_0" code="pic1" index="421"   category="INSTRUCTION" expected="NR" classification="instruction"/>
-	<bbl:stim name="instr_0" code="pic1" index="422"   category="INSTRUCTION" expected="NR" classification="instruction"/>
-	<bbl:stim name="instr_0" code="pic1" index="423"   category="INSTRUCTION" expected="NR" classification="instruction"/>
-	<bbl:stim name="instr_0" code="pic1" index="424"   category="INSTRUCTION" expected="NR" classification="instruction"/>
-	<bbl:stim name="instr_0" code="pic1" index="425"   category="INSTRUCTION" expected="NR" classification="instruction"/>
-	<bbl:stim name="instr_0" code="pic1" index="426"   category="INSTRUCTION" expected="NR" classification="instruction"/>
-	<bbl:stim name="instr_0" code="pic1" index="427"   category="INSTRUCTION" expected="NR" classification="instruction"/>
-	<bbl:stim name="instr_0" code="pic1" index="428"   category="INSTRUCTION" expected="NR" classification="instruction"/>
-	<bbl:stim name="instr_0" code="pic1" index="429"   category="INSTRUCTION" expected="NR" classification="instruction"/>
-	<bbl:stim name="instr_0" code="pic1" index="430"   category="INSTRUCTION" expected="NR" classification="instruction"/>
-	<bbl:stim name="instr_0" code="pic1" index="431"   category="INSTRUCTION" expected="NR" classification="instruction"/>
-	<bbl:stim name="instr_0" code="pic1" index="432"   category="INSTRUCTION" expected="NR" classification="instruction"/>
+	<bbl:stim name="instr_0" code="solid" index="421"   category="INSTRUCTION" expected="NR" classification="instruction"/>
+	<bbl:stim name="instr_0" code="solid" index="422"   category="INSTRUCTION" expected="NR" classification="instruction"/>
+	<bbl:stim name="instr_0" code="solid" index="423"   category="INSTRUCTION" expected="NR" classification="instruction"/>
+	<bbl:stim name="instr_0" code="solid" index="424"   category="INSTRUCTION" expected="NR" classification="instruction"/>
+	<bbl:stim name="instr_0" code="solid" index="425"   category="INSTRUCTION" expected="NR" classification="instruction"/>
+	<bbl:stim name="instr_0" code="solid" index="426"   category="INSTRUCTION" expected="NR" classification="instruction"/>
+	<bbl:stim name="instr_0" code="solid" index="427"   category="INSTRUCTION" expected="NR" classification="instruction"/>
+	<bbl:stim name="instr_0" code="solid" index="428"   category="INSTRUCTION" expected="NR" classification="instruction"/>
+	<bbl:stim name="instr_0" code="solid" index="429"   category="INSTRUCTION" expected="NR" classification="instruction"/>
+	<bbl:stim name="instr_0" code="solid" index="430"   category="INSTRUCTION" expected="NR" classification="instruction"/>
+	<bbl:stim name="instr_0" code="solid" index="431"   category="INSTRUCTION" expected="NR" classification="instruction"/>
+	<bbl:stim name="instr_0" code="solid" index="432"   category="INSTRUCTION" expected="NR" classification="instruction"/>
 
     <bbl:stim name="picZ" code="pic1" index="433"   category="0BACK" expected="NR" classification="foil"/>
 	<bbl:stim name="picB" code="pic1" index="436"   category="0BACK" expected="NR" classification="foil"/>
@@ -216,6 +225,7 @@
 
 </bbl:stimuli>
 
+<!-- Cross-hairs at indices 493-522 -->
 
 <bbl:responses eventtype='Response'>
 			<bbl:response  answer="Match" name="Match" code="1"/>
