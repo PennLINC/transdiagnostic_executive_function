@@ -215,44 +215,43 @@ def read_log_as_dataframe(log_path: Path) -> pd.DataFrame:
     return df
 
 
+
 def compute_response_times(
     df: pd.DataFrame, template: List[Tuple[str, str]], label: str
 ) -> List[List[object]]:
     """
-    Reproduce the response time extraction logic from the notebook for a given
-    template.
-    Returns rows: [label, index, expected, response]
+    Extract response times for each XML template index by looking for an
+    explicit Response event within the same trial.
+
+    Assumes:
+    - df contains one row per log event
+    - Trial identifies the stimulus trial
+    - EventType == "Response" marks an actual button response
+    - TTime is in 0.1 ms units, so dividing by 10 gives milliseconds
+
+    Returns rows: [label, index, expected, response_ms]
+    where response_ms is None if no response was recorded.
     """
     rows: List[List[object]] = []
+
     for expected, index_str in template:
         if index_str is None:
             continue
+
         index_val = int(index_str)
+        trial_rows = df[df["Trial"] == index_val]
 
-        if label == "INSTRUCTION":
-            # Minimal fix: instruction periods are modeled, but no response timing
-            response = None
+        # Look specifically for response events in this trial
+        response_rows = trial_rows[trial_rows["EventType"] == "Response"]
+
+        if not response_rows.empty:
+            raw_ttime = pd.to_numeric(response_rows.iloc[0]["TTime"], errors="coerce")
+            response_ms = raw_ttime / 10.0 if pd.notna(raw_ttime) else None
         else:
-            a1 = df[df["Trial"] >= (index_val - 2)]
-            a2 = df[df["Trial"] <= index_val]
-            merged = pd.merge(a1, a2, how="inner")
-            aa = np.array(merged["TTime"].to_list())
+            response_ms = None
 
-            if len(aa) > 6:
-                if aa[0] > 0:
-                    response = aa[0] / 10
-                else:
-                    res = next((i for i, j in enumerate(aa[::2]) if j), None)
-                    if res is None:
-                        response = None
-                    else:
-                        ste = res - 1
-                        centr = 2 * res - 1
-                        response = aa[centr] / 10 + ste * 800
-            else:
-                response = None
+        rows.append([label, index_val, expected, response_ms])
 
-        rows.append([label, index_val, expected, response])
     return rows
 
 
