@@ -218,15 +218,17 @@ def compute_response_times(
     df: pd.DataFrame, template: List[Tuple[str, str]], label: str
 ) -> List[List[object]]:
     """
+    Extract response times for EF fractal n-back logs using the XML stimulus
+    index directly as the logfile Trial number.
 
-    For each template index:
-    - select rows where Trial == index
-    - order rows within the trial by Time so event order is stable
-    - take the second TTime entry (aa[1]) divided by 10 when the trial has
-      more than 2 rows
-    - otherwise use NaN so downstream scoring treats it as no response
+    Why this is the correct mapping for this task:
+    - the XML <stim ... index="..."> values match the logfile Trial values
+    - actual button presses appear as EventType == "Response"
+    - the response RT is stored in that row's TTime field
+    - TTime is in 0.1 ms units, so divide by 10 to get ms
 
-    Returns rows: [label, index, expected, response_ms]
+    Returns rows: [label, xml_index, expected, response_ms]
+    where response_ms is NaN if no response occurred for that trial.
     """
     rows: List[List[object]] = []
 
@@ -234,20 +236,24 @@ def compute_response_times(
         if index_str is None:
             continue
 
-        index_val = int(index_str)
+        xml_index = int(index_str)
 
-        a1 = df[df["Trial"] == index_val].copy()
-        if not a1.empty and "Time" in a1.columns:
-            a1 = a1.sort_values("Time", kind="stable")
+        trial_rows = df[df["Trial"] == xml_index].copy()
+        if trial_rows.empty:
+            rows.append([label, xml_index, expected, np.nan])
+            continue
 
-        aa = pd.to_numeric(a1["TTime"], errors="coerce").tolist()
+        trial_rows = trial_rows.sort_values("Time", kind="stable")
 
-        if len(aa) > 2 and pd.notna(aa[1]):
-            response_ms = float(aa[1]) / 10.0
+        response_rows = trial_rows[trial_rows["EventType"] == "Response"]
+
+        if not response_rows.empty:
+            raw_ttime = pd.to_numeric(response_rows.iloc[0]["TTime"], errors="coerce")
+            response_ms = float(raw_ttime) / 10.0 if pd.notna(raw_ttime) else np.nan
         else:
             response_ms = np.nan
 
-        rows.append([label, index_val, expected, response_ms])
+        rows.append([label, xml_index, expected, response_ms])
 
     return rows
 
