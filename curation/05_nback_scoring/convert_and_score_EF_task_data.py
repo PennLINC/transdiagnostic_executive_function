@@ -179,7 +179,6 @@ def read_log_as_dataframe(log_path: Path) -> pd.DataFrame:
         log_path,
         skiprows=3,
         sep="\t",
-        header=None,
         dtype=str,
         engine="python",
         encoding_errors="ignore",
@@ -199,7 +198,6 @@ def read_log_as_dataframe(log_path: Path) -> pd.DataFrame:
         "StimType",
         "PairIndex",
     ]
-    df = df[2:]
     numeric_cols = [
         "Trial",
         "Time",
@@ -220,17 +218,15 @@ def compute_response_times(
     df: pd.DataFrame, template: List[Tuple[str, str]], label: str
 ) -> List[List[object]]:
     """
-    Extract response times for each XML template index by looking for an
-    explicit Response event within the same trial.
 
-    Assumes:
-    - df contains one row per log event
-    - Trial identifies the stimulus trial
-    - EventType == "Response" marks an actual button response
-    - TTime is in 0.1 ms units, so dividing by 10 gives milliseconds
+    For each template index:
+    - select rows where Trial == index
+    - order rows within the trial by Time so event order is stable
+    - take the second TTime entry (aa[1]) divided by 10 when the trial has
+      more than 2 rows
+    - otherwise use NaN so downstream scoring treats it as no response
 
     Returns rows: [label, index, expected, response_ms]
-    where response_ms is None if no response was recorded.
     """
     rows: List[List[object]] = []
 
@@ -239,16 +235,17 @@ def compute_response_times(
             continue
 
         index_val = int(index_str)
-        trial_rows = df[df["Trial"] == index_val]
 
-        # Look specifically for response events in this trial
-        response_rows = trial_rows[trial_rows["EventType"] == "Response"]
+        a1 = df[df["Trial"] == index_val].copy()
+        if not a1.empty and "Time" in a1.columns:
+            a1 = a1.sort_values("Time", kind="stable")
 
-        if not response_rows.empty:
-            raw_ttime = pd.to_numeric(response_rows.iloc[0]["TTime"], errors="coerce")
-            response_ms = raw_ttime / 10.0 if pd.notna(raw_ttime) else None
+        aa = pd.to_numeric(a1["TTime"], errors="coerce").tolist()
+
+        if len(aa) > 2 and pd.notna(aa[1]):
+            response_ms = float(aa[1]) / 10.0
         else:
-            response_ms = None
+            response_ms = np.nan
 
         rows.append([label, index_val, expected, response_ms])
 
