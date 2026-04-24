@@ -54,7 +54,6 @@ if len(mask_candidates) == 0:
         "Falling back to Nilearn's automatic mask.\n"
     )
 else:
-    # XXX: One run per session, not subject, right?
     # Since only one run per subject, take the first match
     mask_img = str(mask_candidates[0])
     print(f"Using fMRIPrep brain mask for sub-{sub_id}:\n  {mask_img}\n")
@@ -66,7 +65,7 @@ else:
 MODEL_TYPES = ["rtdur", "nortdur"]
 for model_type in MODEL_TYPES:
     # Output directory for maps + reports
-    out_dir = Path(f"/cbica/projects/executive_function/code/task_contrast/final/results_troubleshoot2/first-level/nback-{model_type}")
+    out_dir = Path(f"/cbica/projects/executive_function/code/task_contrast/final/results_results_last_troubleshoot_1/first-level/nback-{model_type}")
     out_dir.mkdir(parents=True, exist_ok=True)
 
     (
@@ -84,13 +83,9 @@ for model_type in MODEL_TYPES:
         smoothing_fwhm=5.0,
         n_jobs=4,
         verbose=1,
-        signal_scaling=False,
-        # Use fMRIPrep's cosine regressors for drift (high_pass),
-        # so we turn OFF the GLM's own drift model.
         drift_model="cosine",
         high_pass=0.005,
-        # Confound strategy: motion + high_pass (cosines) + aCompCor (first 5)
-        confounds_strategy=("motion",),
+        confounds_strategy=("motion", "non_steady_state"),
         confounds_motion="basic",
         #confounds_compcor="anat_combined",
         #confounds_n_compcor=5,
@@ -115,6 +110,7 @@ for model_type in MODEL_TYPES:
                 {
                     "0BACK": "zero_back",
                     "2BACK": "two_back",
+                    "INSTRUCTION": "instruction",
                 }
             )
 
@@ -159,15 +155,18 @@ for model_type in MODEL_TYPES:
 
     save_glm_to_bids(
         model,
-        contrasts=["two_back - zero_back", "two_back", "zero_back"],
+        contrasts=["two_back - zero_back", "two_back", "zero_back", "instruction"],
         contrast_types={
             "two_back - zero_back": "t",
             "two_back": "t",
             "zero_back": "t",
+            "instruction": "t",
         },
         out_dir=out_dir,
+        height_control=None,
         threshold=norm.isf(0.001),
         cluster_threshold=10,
+        two_sided=True,
         bg_img=(
             "/cbica/projects/executive_function/templateflow/"
             "tpl-MNI152NLin6Asym/tpl-MNI152NLin6Asym_res-02_T1w.nii.gz"
