@@ -219,16 +219,14 @@ def compute_response_times(
 ) -> List[List[object]]:
     """
     Extract response times for EF fractal n-back logs using the XML stimulus
-    index directly as the logfile Trial number.
+    index as the start of a 3-trial window.
 
-    Why this is the correct mapping for this task:
-    - the XML <stim ... index="..."> values match the logfile Trial values
-    - actual button presses appear as EventType == "Response"
-    - the response RT is stored in that row's TTime field
-    - TTime is in 0.1 ms units, so divide by 10 to get ms
+    The XML specifies:
+      <bbl:stimuli duration="3" logtype="INDEX" eventtype="Picture">
+    and stimulus indices advance in steps of 3, so each XML stimulus is treated
+    as covering trials [index, index+1, index+2].
 
     Returns rows: [label, xml_index, expected, response_ms]
-    where response_ms is NaN if no response occurred for that trial.
     """
     rows: List[List[object]] = []
 
@@ -238,13 +236,12 @@ def compute_response_times(
 
         xml_index = int(index_str)
 
-        trial_rows = df[df["Trial"] == xml_index].copy()
+        trial_rows = df[df["Trial"].isin([xml_index, xml_index + 1, xml_index + 2])].copy()
         if trial_rows.empty:
             rows.append([label, xml_index, expected, np.nan])
             continue
 
-        trial_rows = trial_rows.sort_values("Time", kind="stable")
-
+        trial_rows = trial_rows.sort_values(["Trial", "Time"], kind="stable")
         response_rows = trial_rows[trial_rows["EventType"] == "Response"]
 
         if not response_rows.empty:
