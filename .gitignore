@@ -203,3 +203,5 @@ vignettes/*.pdf
 
 # R Environment Variables
 .Renviron
+
+testing/
