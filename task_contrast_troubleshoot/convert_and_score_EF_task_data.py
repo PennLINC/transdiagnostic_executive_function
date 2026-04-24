@@ -213,22 +213,23 @@ def read_log_as_dataframe(log_path: Path) -> pd.DataFrame:
     return df
 
 
-
 def compute_response_times(
     df: pd.DataFrame, template: List[Tuple[str, str]], label: str
 ) -> List[List[object]]:
     """
-    Extract response times for EF fractal n-back logs using the XML stimulus
-    index directly as the logfile Trial number.
+    For each XML stimulus index n, treat trials [n, n+1, n+2] as belonging
+    to the same scored event block:
 
-    Why this is the correct mapping for this task:
-    - the XML <stim ... index="..."> values match the logfile Trial values
-    - actual button presses appear as EventType == "Response"
-    - the response RT is stored in that row's TTime field
-    - TTime is in 0.1 ms units, so divide by 10 to get ms
+        n   = picture
+        n+1 = first crosshair
+        n+2 = second crosshair
+
+    If a response occurs:
+      - on n,   RT = TTime/10
+      - on n+1, RT = TTime/10 + 800
+      - on n+2, RT = TTime/10 + 1600
 
     Returns rows: [label, xml_index, expected, response_ms]
-    where response_ms is NaN if no response occurred for that trial.
     """
     rows: List[List[object]] = []
 
@@ -236,24 +237,37 @@ def compute_response_times(
         if index_str is None:
             continue
 
-        xml_index = int(index_str)
+        index_val = int(index_str)
 
-        trial_rows = df[df["Trial"] == xml_index].copy()
-        if trial_rows.empty:
-            rows.append([label, xml_index, expected, np.nan])
+        window_rows = df[df["Trial"].isin([index_val, index_val + 1, index_val + 2])].copy()
+        if window_rows.empty:
+            rows.append([label, index_val, expected, np.nan])
             continue
 
-        trial_rows = trial_rows.sort_values("Time", kind="stable")
+        window_rows = window_rows.sort_values(["Trial", "Time"], kind="stable")
+        response_rows = window_rows[window_rows["EventType"] == "Response"]
 
-        response_rows = trial_rows[trial_rows["EventType"] == "Response"]
-
-        if not response_rows.empty:
-            raw_ttime = pd.to_numeric(response_rows.iloc[0]["TTime"], errors="coerce")
-            response_ms = float(raw_ttime) / 10.0 if pd.notna(raw_ttime) else np.nan
-        else:
+        if response_rows.empty:
             response_ms = np.nan
+        else:
+            resp_row = response_rows.iloc[0]
+            resp_trial = int(resp_row["Trial"])
+            raw_ttime = pd.to_numeric(resp_row["TTime"], errors="coerce")
 
-        rows.append([label, xml_index, expected, response_ms])
+            if pd.isna(raw_ttime):
+                response_ms = np.nan
+            else:
+                trial_offset = resp_trial - index_val
+                if trial_offset == 0:
+                    response_ms = float(raw_ttime) / 10.0
+                elif trial_offset == 1:
+                    response_ms = float(raw_ttime) / 10.0 + 800.0
+                elif trial_offset == 2:
+                    response_ms = float(raw_ttime) / 10.0 + 1600.0
+                else:
+                    response_ms = np.nan
+
+        rows.append([label, index_val, expected, response_ms])
 
     return rows
 

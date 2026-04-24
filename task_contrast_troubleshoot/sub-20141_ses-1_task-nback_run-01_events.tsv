@@ -48,13 +48,13 @@ onset	duration	trial_type	results	response_time	score
 96.8	2.4	2BACK	NR	0.7321	false_positive
 99.2	2.4	2BACK	NR	n/a	true_negative
 101.6	2.4	2BACK	NR	n/a	true_negative
-104.0	2.4	2BACK	Match	n/a	false_negative
+104.0	2.4	2BACK	Match	0.8796	true_positive
 106.4	2.4	2BACK	NR	n/a	true_negative
 108.8	2.4	2BACK	NR	n/a	true_negative
 111.2	2.4	2BACK	NR	n/a	true_negative
 113.6	2.4	2BACK	Match	0.6561	true_positive
 116.0	2.4	2BACK	NR	n/a	true_negative
-118.4	2.4	2BACK	Match	n/a	false_negative
+118.4	2.4	2BACK	Match	0.9425	true_positive
 120.8	2.4	2BACK	NR	n/a	true_negative
 123.2	2.4	2BACK	NR	n/a	true_negative
 125.6	2.4	2BACK	Match	n/a	false_negative
@@ -82,7 +82,7 @@ onset	duration	trial_type	results	response_time	score
 159.2	2.4	2BACK	Match	n/a	false_negative
 161.6	2.4	2BACK	NR	n/a	true_negative
 164.0	2.4	2BACK	NR	n/a	true_negative
-166.4	2.4	2BACK	NR	n/a	true_negative
+166.4	2.4	2BACK	NR	0.8702000000000001	false_positive
 168.8	2.4	2BACK	NR	n/a	true_negative
 171.2	2.4	2BACK	NR	n/a	true_negative
 173.6	2.4	2BACK	Match	0.5836	true_positive
@@ -158,7 +158,7 @@ onset	duration	trial_type	results	response_time	score
 327.2	2.4	2BACK	NR	0.6013999999999999	false_positive
 329.6	2.4	2BACK	NR	n/a	true_negative
 332.0	2.4	2BACK	NR	n/a	true_negative
-334.4	2.4	2BACK	Match	n/a	false_negative
+334.4	2.4	2BACK	Match	1.3448	true_positive
 336.8	0.8	INSTRUCTION	NR	n/a	n/a
 337.6	0.8	INSTRUCTION	NR	n/a	n/a
 338.4	0.8	INSTRUCTION	NR	n/a	n/a
