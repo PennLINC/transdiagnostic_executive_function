@@ -204,4 +204,4 @@ vignettes/*.pdf
 # R Environment Variables
 .Renviron
 
-testing/
+task_contrast_troubleshoot/testing/
