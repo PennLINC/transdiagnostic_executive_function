@@ -65,7 +65,7 @@ else:
 MODEL_TYPES = ["rtdur", "nortdur"]
 for model_type in MODEL_TYPES:
     # Output directory for maps + reports
-    out_dir = Path(f"/cbica/projects/executive_function/code/task_contrast/final/results_results_last_troubleshoot_1/first-level/nback-{model_type}")
+    out_dir = Path(f"/cbica/projects/executive_function/code/task_contrast/final/results_last_troubleshoot_1/first-level/nback-{model_type}")
     out_dir.mkdir(parents=True, exist_ok=True)
 
     (
