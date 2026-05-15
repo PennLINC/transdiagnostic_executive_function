@@ -22,15 +22,6 @@ CLI inputs:
 - --output-dir: BIDS output root (defaults to <logs-dir>/bids_out)
 - --session-map: Path to session_map.tsv file
 - --dry-run: Print planned actions as JSON and make no file changes
-
-Note: This script assumes that the session_map.tsv file has been generated using the generate_session_map.py script.
-
-Example executed:
-python /cbica/projects/executive_function/code/curation/cubids_curation/convert_and_score_EF_task_data.py \
-  --xml /cbica/projects/executive_function/task_events_files/msmri522_2vs0_back.xml \
-  --logs-dir /cbica/projects/executive_function/task_events_files/flywheel/EFR01/SUBJECTS \
-  --output-dir /cbica/projects/executive_function/data/bids/EF_bids_data_DataLad \
-  --session-map /cbica/projects/executive_function/task_events_files/session_map.tsv
 """
 
 import argparse
@@ -143,10 +134,6 @@ def load_score_labels(xml_path: Path) -> List[ET.Element]:
     """
     Load the XML and return the list of stimulus/scoring elements used by the
     original notebook (root[5]).
-
-    We preserve the same indexing approach for compatibility. If the structure
-    doesn't match, we raise a clear error to help the user point to the correct
-    XML.
     """
     root = ET.parse(str(xml_path)).getroot()
     try:
@@ -165,19 +152,23 @@ def load_score_labels(xml_path: Path) -> List[ET.Element]:
 
 def split_templates_by_category(
     scorelabel: List[ET.Element],
-) -> Tuple[List[Tuple[str, str]], List[Tuple[str, str]]]:
+) -> Tuple[List[Tuple[str, str]], List[Tuple[str, str]], List[Tuple[str, str]]]:
     """
-    Returns (back0, back2) where each is a list of tuples (expected, index).
+    Returns (instruction, back0, back2) where each is a list of tuples
+    (expected, index).
     """
+    instruction: List[Tuple[str, str]] = []
     back0: List[Tuple[str, str]] = []
     back2: List[Tuple[str, str]] = []
     for elem in scorelabel:
         category = elem.get("category")
-        if category == "0BACK":
+        if category == "INSTRUCTION":
+            instruction.append((elem.get("expected"), elem.get("index")))
+        elif category == "0BACK":
             back0.append((elem.get("expected"), elem.get("index")))
         elif category == "2BACK":
             back2.append((elem.get("expected"), elem.get("index")))
-    return back0, back2
+    return instruction, back0, back2
 
 
 # ------------------------------ Data Processing ------------------------------
@@ -188,8 +179,7 @@ def read_log_as_dataframe(log_path: Path) -> pd.DataFrame:
         log_path,
         skiprows=3,
         sep="\t",
-        header=None,
-        dtype=str,  # read as strings first; we'll cast selectively
+        dtype=str,
         engine="python",
         encoding_errors="ignore",
     )
@@ -208,7 +198,6 @@ def read_log_as_dataframe(log_path: Path) -> pd.DataFrame:
         "StimType",
         "PairIndex",
     ]
-    df = df[2:]
     numeric_cols = [
         "Trial",
         "Time",
@@ -228,47 +217,74 @@ def compute_response_times(
     df: pd.DataFrame, template: List[Tuple[str, str]], label: str
 ) -> List[List[object]]:
     """
-    Reproduce the response time extraction logic from the notebook for a given
-    template (either 0BACK or 2BACK).
-    Returns rows: [label, index, expected, response]
+    For each XML stimulus index n, treat trials [n, n+1, n+2] as belonging
+    to the same scored event block:
+
+        n   = picture
+        n+1 = first crosshair
+        n+2 = second crosshair
+
+    If a response occurs:
+      - on n,   RT = TTime/10
+      - on n+1, RT = TTime/10 + 800
+      - on n+2, RT = TTime/10 + 1600
+
+    Returns rows: [label, xml_index, expected, response_ms]
     """
     rows: List[List[object]] = []
+
     for expected, index_str in template:
         if index_str is None:
             continue
+
         index_val = int(index_str)
-        a1 = df[df["Trial"] >= (index_val - 2)]
-        a2 = df[df["Trial"] <= index_val]
-        merged = pd.merge(a1, a2, how="inner")
-        aa = np.array(merged["TTime"].to_list())
 
-        if len(aa) > 6:
-            if aa[0] > 0:
-                response = aa[0] / 10
-            else:
-                # first non-zero among even indices
-                # enumerate(aa[::2]) returns (i, value) pairs
-                res = next((i for i, j in enumerate(aa[::2]) if j), None)
-                if res is None:
-                    response = None
-                else:
-                    ste = res - 1
-                    centr = 2 * res - 1
-                    response = aa[centr] / 10 + ste * 800
+        window_rows = df[df["Trial"].isin([index_val, index_val + 1, index_val + 2])].copy()
+        if window_rows.empty:
+            rows.append([label, index_val, expected, np.nan])
+            continue
+
+        window_rows = window_rows.sort_values(["Trial", "Time"], kind="stable")
+        response_rows = window_rows[window_rows["EventType"] == "Response"]
+
+        if response_rows.empty:
+            response_ms = np.nan
         else:
-            response = None
+            resp_row = response_rows.iloc[0]
+            resp_trial = int(resp_row["Trial"])
+            raw_ttime = pd.to_numeric(resp_row["TTime"], errors="coerce")
 
-        rows.append([label, index_val, expected, response])
+            if pd.isna(raw_ttime):
+                response_ms = np.nan
+            else:
+                trial_offset = resp_trial - index_val
+                if trial_offset == 0:
+                    response_ms = float(raw_ttime) / 10.0
+                elif trial_offset == 1:
+                    response_ms = float(raw_ttime) / 10.0 + 800.0
+                elif trial_offset == 2:
+                    response_ms = float(raw_ttime) / 10.0 + 1600.0
+                else:
+                    response_ms = np.nan
+
+        rows.append([label, index_val, expected, response_ms])
+
     return rows
 
 
 def build_events_dataframe(allback: List[List[object]]) -> pd.DataFrame:
     df = pd.DataFrame(allback, columns=["task", "index", "results", "response_time_ms"])
     df["index"] = df["index"].astype(int)
+
+    # Minimal fix:
+    # - task trials keep original timing
+    # - instruction rows are modeled as 12 consecutive 0.8 s units = 9.6 s
     df["onset"] = 0.8 * df["index"]
-    df["duration"] = 3 * 0.8
+    df["duration"] = np.where(df["task"] == "INSTRUCTION", 1 * 0.8, 3 * 0.8)
+
     df["onset"] = df["onset"].round(1)
     df["duration"] = df["duration"].round(1)
+
     df["response_time_ms"] = pd.to_numeric(df["response_time_ms"], errors="coerce")
     df["response_time"] = df["response_time_ms"] / 1000.0
     df = df.drop(columns=["index", "response_time_ms"]).rename(
@@ -278,10 +294,13 @@ def build_events_dataframe(allback: List[List[object]]) -> pd.DataFrame:
     # Scoring
     scores: List[str] = []
     for row in df.itertuples(index=False):
-        # row: trial_type, results, onset, duration, response_time
         result = row.results
         rt_sec = row.response_time
-        if "NR" in result and not pd.isna(rt_sec):
+        trial_type = row.trial_type
+
+        if trial_type == "INSTRUCTION":
+            scores.append("n/a")
+        elif "NR" in result and not pd.isna(rt_sec):
             scores.append("false_positive")
         elif "NR" in result and pd.isna(rt_sec):
             scores.append("true_negative")
@@ -297,23 +316,28 @@ def build_events_dataframe(allback: List[List[object]]) -> pd.DataFrame:
     first_cols = ["onset", "duration"]
     other_cols = [c for c in df.columns if c not in first_cols]
     df = df[first_cols + other_cols]
+
+    # Sort chronologically so file looks like actual task blocks
+    df = df.sort_values(["onset", "trial_type"]).reset_index(drop=True)
     return df
 
 
 def sidecar_json() -> Dict[str, object]:
     return {
         "trial_type": {
-            "Description": "Task condition for each trial",
+            "Description": "Task condition for each event",
             "Levels": {
+                "INSTRUCTION": "Instruction block shown before task blocks",
                 "0BACK": "0-back trial: respond to target picture",
                 "2BACK": "2-back trial: respond if picture matches the one shown two trials before",
             },
         },
         "results": {
-            "Description": "Expected outcome for each trial based on task rules",
+            "Description": "Expected outcome for each event based on task rules",
             "Levels": {
                 "NR": "No response expected",
                 "Match": "Response expected",
+                "n/a": "Not applicable for instruction events",
             },
         },
         "score": {
@@ -322,7 +346,8 @@ def sidecar_json() -> Dict[str, object]:
                 "false_positive": "No response expected, response detected",
                 "true_negative": "No response expected, no response detected",
                 "true_positive": "Response expected, response detected",
-                "false_negative": "Response expected, no response detected",
+                "false_negative": "Response expected, response not detected",
+                "n/a": "Not applicable for instruction events",
             },
         },
     }
@@ -406,7 +431,6 @@ def summarize_subject(bblid: str, df: pd.DataFrame) -> Dict[str, object]:
         }
     )
 
-    # Based on notebook constants: 0BACK has 15 targets and 45 foils, same for 2BACK
     summary.update(
         {
             "0_back_hit_rate": (back0tp / 15) if 15 else 0.0,
@@ -477,51 +501,40 @@ def update_sessions_tsv(
 ) -> None:
     """
     Write the per-session summary metrics into the subject's sessions.tsv.
-    - sessions.tsv path: <output_dir>/sub-<bblid>/sub-<bblid>_sessions.tsv
-    - Ensures a row for the given ses_label exists; adds missing columns.
     """
     subj_dir = output_dir / f"sub-{bblid}"
     subj_dir.mkdir(parents=True, exist_ok=True)
     sessions_path = subj_dir / f"sub-{bblid}_sessions.tsv"
 
-    # Load or initialize sessions dataframe
     if sessions_path.exists():
         df = pd.read_csv(sessions_path, sep="\t")
     else:
         df = pd.DataFrame({"session_id": [ses_label]})
 
-    # Ensure target session row exists
     if "session_id" not in df.columns:
         df.insert(0, "session_id", pd.Series(dtype=str))
     if not (df["session_id"] == ses_label).any():
-        # Append a new row with session_id set; keep other columns as NaN
         new_row = {
             col: (ses_label if col == "session_id" else pd.NA) for col in df.columns
         }
         df = pd.concat([df, pd.DataFrame([new_row])], ignore_index=True)
 
-    # Prepare metrics (exclude any id keys if present)
     metrics = {k: v for k, v in metrics.items() if k not in {"bblid", "subject"}}
 
-    # Add any missing columns
     for key in metrics.keys():
         if key not in df.columns:
             df[key] = pd.NA
 
-    # Update values for the session row
     row_idx = df.index[df["session_id"] == ses_label]
     for key, value in metrics.items():
         df.loc[row_idx, key] = value
 
-    # Keep 'session_id' and 'acq_time' as the first columns if present
     first_cols = [c for c in ["session_id", "acq_time"] if c in df.columns]
     other_cols = [c for c in df.columns if c not in first_cols]
     df = df[first_cols + other_cols]
 
-    # Write back (BIDS missing values as 'n/a')
     df.to_csv(sessions_path, sep="\t", index=False, na_rep="n/a")
 
-    # Create or update sessions.json sidecar with clear metric descriptions
     sessions_json = subj_dir / f"sub-{bblid}_sessions.json"
     if sessions_json.exists():
         try:
@@ -532,7 +545,6 @@ def update_sessions_tsv(
     else:
         sidecar = {}
 
-    # Ensure base fields
     sidecar.setdefault(
         "session_id",
         {
@@ -553,7 +565,6 @@ def update_sessions_tsv(
             "all_back": "0- and 2-back",
         }.get(prefix, prefix.replace("_", "-"))
 
-    # Add/refresh metric entries with descriptions and units
     for key in metrics.keys():
         desc: str
         units: str
@@ -619,21 +630,18 @@ def main() -> int:
 
     # Load XML scoring template
     scorelabel = load_score_labels(xml_path)
-    back0, back2 = split_templates_by_category(scorelabel)
+    instruction, back0, back2 = split_templates_by_category(scorelabel)
 
     logs_map = discover_logs_flywheel(logs_dir)
     if not logs_map:
         print(f"No .log files found under {logs_dir} with Flywheel pattern")
         return 1
 
-    # error if session map file does not exist
     if not args.session_map.exists():
         raise ValueError("Session map file does not exist")
 
-    # Build session mapping from provided TSV
-    ses_map: Dict[Tuple[str, str], str]
     df_map = pd.read_csv(args.session_map, sep="\t")
-    ses_map = {
+    ses_map: Dict[Tuple[str, str], str] = {
         (str(r.bblid), str(r.scanid)): str(r.session_id)
         for r in df_map.itertuples(index=False)
     }
@@ -643,7 +651,6 @@ def main() -> int:
         if not ses_label:
             continue
 
-        # Check BIDS func presence under output-dir and choose bold sidecar
         func_dir = output_dir / f"sub-{bblid}" / ses_label / "func"
         bold_sidecar = choose_highest_run_sidecar(func_dir)
         if bold_sidecar is None:
@@ -652,13 +659,13 @@ def main() -> int:
             )
             continue
 
-        # Choose a single log file for this session: prefer latest mtime
         log_path = max(log_list, key=lambda p: p.stat().st_mtime)
 
         try:
             bb = read_log_as_dataframe(log_path)
 
             allback: List[List[object]] = []
+            allback.extend(compute_response_times(bb, instruction, "INSTRUCTION"))
             allback.extend(compute_response_times(bb, back0, "0BACK"))
             allback.extend(compute_response_times(bb, back2, "2BACK"))
 
@@ -666,8 +673,10 @@ def main() -> int:
 
             tsv_path, json_path = events_paths_from_bold_sidecar(bold_sidecar)
 
-            # Per-session summary metrics
-            session_metrics = summarize_subject(bblid, events_df)
+            # Summary metrics should still be based only on task trials
+            session_metrics = summarize_subject(
+                bblid, events_df[events_df["trial_type"].isin(["0BACK", "2BACK"])]
+            )
 
             if args.dry_run:
                 report_item = {
@@ -691,8 +700,6 @@ def main() -> int:
         except Exception as exc:
             print(f"Error processing {log_path}: {exc}")
             continue
-
-    # No global summary CSV; metrics were written to sessions.tsv per subject or printed in dry-run
 
     return 0
 
