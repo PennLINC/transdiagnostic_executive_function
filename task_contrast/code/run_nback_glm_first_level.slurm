@@ -42,5 +42,5 @@ echo "SLURM_ARRAY_TASK_ID: $SLURM_ARRAY_TASK_ID"
 # RUN FIRST-LEVEL SCRIPT
 # --------------------------
 
-python /cbica/projects/executive_function/code/task_contrast/final/code/run_nback_glm_single_subject_final_3.py $SUB_ID
+python /cbica/projects/executive_function/code/task_contrast/final/code/run_nback_glm_single_subject.py $SUB_ID
 

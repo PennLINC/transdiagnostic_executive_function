@@ -9,4 +9,4 @@
 eval "$(micromamba shell hook --shell bash)"
 micromamba activate nilearn_glm
 
-python /cbica/projects/executive_function/code/task_contrast/final/code/run_nback_second_level_final_3.py
+python /cbica/projects/executive_function/code/task_contrast/final/code/run_nback_second_level.py
