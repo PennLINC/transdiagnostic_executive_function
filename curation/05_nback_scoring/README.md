@@ -25,7 +25,7 @@ python code/curation/cubids_curation/check_log_missingness.py \
 ## convert_and_score_EF_task_data.py
 
 This script converts the EF fractal n-back logs to BIDS-compliant events and updates the sessions.tsv file with summary scores and performance metrics.
-It takes as input the xml file that contains the scoring template for the task and the flywheel logs directory, along with the session_map.tsv file output by `generate_session_map.py`.
+It takes as input the xml file that contains the scoring template for the task (`msmri522_2vs0_back.xml`) and the flywheel logs directory, along with the session_map.tsv file output by `generate_session_map.py`.
 This script was converted from a legacy coversion and scoring script: `convert_and_score_EF_task_data.ipynb`.
 
 
