@@ -26,7 +26,7 @@ from nilearn import plotting
 # ============================================================
 maps = {
     "EF": Path(
-        "/cbica/projects/executive_function/code/task_contrast/final/results/"
+        "/cbica/projects/executive_function/code/task_contrast/final/results_final_3/"
         "second-level/nback-rtdur/group-twoBackMinusZeroBack/group/"
         "contrast-twobackminuszeroback_stat-z_statmap.nii.gz"
     ),
