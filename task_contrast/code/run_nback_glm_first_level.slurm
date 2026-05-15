@@ -1,8 +1,8 @@
 #!/bin/bash
-#SBATCH --job-name=nback_firstlevel
-#SBATCH --output=nback_%A_%a.out
-#SBATCH --error=nback_%A_%a.err
-#SBATCH --array=0-109          # 110 subjects
+#SBATCH --job-name=nback_final_3
+#SBATCH --output=nback_final__3%A_%a.out
+#SBATCH --error=nback_final__3%A_%a.err
+#SBATCH --array=0-109         #110 subjects
 #SBATCH --time=03:00:00
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=32G
@@ -19,6 +19,7 @@ micromamba activate nilearn_glm
 # SUBJECT LIST (NO COMMAS)
 # --------------------------
 
+#subject list includes all subjects that have nback data and passed QC
 SUBJECT_LIST=(
   19861 20139 20141 20149 20188 20214 20238 20252 20253 20258 20259
   20302 20303 20305 20328 20336 20347 20350 20352 20399 20402 20403
@@ -41,5 +42,5 @@ echo "SLURM_ARRAY_TASK_ID: $SLURM_ARRAY_TASK_ID"
 # RUN FIRST-LEVEL SCRIPT
 # --------------------------
 
-python /cbica/projects/executive_function/code/task_contrast/final/code/run_nback_glm_single_subject.py $SUB_ID
+python /cbica/projects/executive_function/code/task_contrast/final/code/run_nback_glm_single_subject_final_3.py $SUB_ID
 

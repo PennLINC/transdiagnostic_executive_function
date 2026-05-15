@@ -5,12 +5,14 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+#import templateflow.api as tflow
 from nilearn.glm.second_level import SecondLevelModel
 from nilearn.image import load_img
 from nilearn.interfaces.bids import save_glm_to_bids
+from scipy.stats import norm
 
 
-CONTRAST_LABELS = ["twoBack", "zeroBack", "twoBackMinusZeroBack"]
+CONTRAST_LABELS = ["twoBack", "zeroBack", "twoBackMinusZeroBack", "instruction"]
 MODEL_TYPES = ["rtdur", "nortdur"]
 group_mask_img = load_img(
     "/cbica/projects/executive_function/.cache/templateflow/"
@@ -22,14 +24,14 @@ bg_img = load_img(
 )
 
 for model_type in MODEL_TYPES:
-    firstlevel_dir = Path(f"/cbica/projects/executive_function/code/task_contrast/final/results/first-level/nback-{model_type}")
+    firstlevel_dir = Path(f"/cbica/projects/executive_function/code/task_contrast/final/results_final_3/first-level/nback-{model_type}")
     for contrast_label in CONTRAST_LABELS:
         print("\n====================================================")
         print(f"Running group model for contrast: {contrast_label}")
         print("====================================================\n")
 
         group_out_dir = Path(
-            f"/cbica/projects/executive_function/code/task_contrast/final/results/second-level/nback-{model_type}/group-{contrast_label}"
+            f"/cbica/projects/executive_function/code/task_contrast/final/results_final_3/second-level/nback-{model_type}/group-{contrast_label}"
         )
         group_out_dir.mkdir(exist_ok=True, parents=True)
 
@@ -93,11 +95,12 @@ for model_type in MODEL_TYPES:
             model=model,
             contrasts=contrasts,
             out_dir=group_out_dir,
-            threshold=0.001,          # <-- p-value threshold
-            height_control="fpr",     # <-- interpret threshold as p
+            threshold=norm.isf(0.001),          
+            height_control=None,     
             cluster_threshold=10,
             bg_img=bg_img,
             two_sided=True,
         )
 
         print(f"\nSaved second-level outputs to:\n  {group_out_dir}\n")
+
