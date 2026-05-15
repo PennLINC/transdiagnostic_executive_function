@@ -1,6 +1,6 @@
 ######Create statistical null
 from neuromaps import datasets, images, nulls, resampling, transforms
-EF = "/cbica/projects/executive_function/code/task_contrast/final/results/second-level/nback-rtdur/group-twoBackMinusZeroBack/group/contrast-twobackminuszeroback_stat-z_statmap.nii.gz"
+EF = "/cbica/projects/executive_function/code/task_contrast/final/results_final_3/second-level/nback-rtdur/group-twoBackMinusZeroBack/group/contrast-twobackminuszeroback_stat-z_statmap.nii.gz"
 PNC = "/cbica/projects/executive_function/code/task_contrast/final/task_contrast_PNC/group_zmap_MNI.nii.gz"
 EF, PNC = resampling.resample_images(src=EF,trg=PNC, resampling = 'transform_to_alt', alt_spec=('fsLR','32k'), src_space='MNI152', trg_space='MNI152')
 
@@ -60,11 +60,11 @@ plt.xlabel("EF")
 plt.ylabel("PNC")
 plt.tight_layout()
 
-out_dir = "/cbica/projects/executive_function/code/task_contrast/final/compare_EF_PNC"
+out_dir = "/cbica/projects/executive_function/code/task_contrast/final/compare_EF_PNC/final"
 os.makedirs(out_dir, exist_ok=True)
 
 plt.savefig(
-    os.path.join(out_dir, "scatterplot.pdf"),
+    os.path.join(out_dir, "EF_PNC_scatterplot.pdf"),
     bbox_inches="tight",
     transparent=True,
 )
