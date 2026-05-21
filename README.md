@@ -4,6 +4,8 @@ Reproducibility details found here: https://pennlinc.github.io/transdiagnostic_e
 
 Penn LEAD is a longitudinal dataset consisting of clinical, cognitive, and multimodal neuroimaging data from 132 adolescents, designed to investigate **transdiagnostic executive function**.
 
+The data descriptor paper corresponding with this repository can be found on bioRxiv: [Link](https://doi.org/10.1101/2025.11.10.687633)
+
 The data corresponding with this repository can be found on OpenNeuro:
 + [Raw data](https://openneuro.org/datasets/ds007116)
 + [sMRIPrep derivatives](https://openneuro.org/datasets/ds007089)
