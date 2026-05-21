@@ -8,6 +8,7 @@ In the `/code` folder:
 + Run `create_group_figure.py` to create pdf forms of the second-level unthresholded results that can be used as input into Adobe Illustrator for the final figures.
 + Run `create_group_thresholded_figure.py` to create pdf forms of the second-level thresholded results that can be used as input into Adobe Illustrator for the final figures.
 + Run `create_parcellated_figures.py` to create maps (and results from PNC dataset) projected to fsLR surface and parcellated with the Schaefer 400 atlas.
++ `create_TR_table.py` computes the number of TRs occupied by each modeled condition and by implicit baseline, with results here: `nback_condition_tr_counts.tsv`.
 
   
 In the `/QC` folder:
