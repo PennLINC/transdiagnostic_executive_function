@@ -13,7 +13,7 @@ In the `/code` folder:
 In the `/QC` folder:
 + `summarize_nback_logs.py` prints sessions that were excluded from the a specified job ID from running `run_nback_glm_first_level.slurm`. Sessions were not included after running the script if they were missing an events.tsv or the response_time was n/a for every single trial in that session.
 + `summarize_nback_performance.py` uses the events.tsv files with behavioral results and produces `nback_block_performance_summary.tsv`, which summarizes behavioral performance in each 0back and 2back block for each session.
-+ `plot_timeseries.py` compares expected task timing regressors against ROI BOLD timeseries.
++ `plot_timeseries.py` compares expected task timing regressors against ROI BOLD timeseries. (Examples here: `plotted_timeseries_examples`)
 
 
 The `/results` folder contains the pdf forms of second-level results that can be used as input into Illustrator for the final figures.
