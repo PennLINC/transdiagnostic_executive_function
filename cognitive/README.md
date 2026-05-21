@@ -1,5 +1,5 @@
 The script used to organize/clean cognitive data from the Penn Computerized Neurobehavioral Test Battery (CNB) is not available on GitHub to prevent sharing protected health information.
-+ `CNB_transformation_script_EF.Rmd` is used to convert the column names from their original format to a format consistent with the National Institute of Mental Health Data Archive (NDA).
++ `CNB_transformation_script_EF.Rmd` is used to convert the column names from their original format to a format consistent with the National Institute of Mental Health Data Archive (NDA) and produce separate tsv files for each cognitive task.
 + The following subjects/sessions are missing CNB data for which we have a corresponding scan:
   + sub-21161, ses-1
   + sub-22510, ses-2
