@@ -19,7 +19,7 @@ forms of psychopathology, including attention deficit hyperactivity disorder (AD
 spectrum (PS).
 There are relatively few open data resources specifically tailored to evaluate the development of EF across
 clinical diagnoses. Here, we introduce a new data resource that combines longitudinal multi-modal
-imaging data (sMRI, dMRI, fMRI, ASL, & QSM) with rich clinical and cognitive phenotyping data.
+imaging data (sMRI, dMRI, resting-state and task fMRI, & ASL) with rich clinical and cognitive phenotyping data.
 
 ### Project Lead
 
@@ -31,8 +31,7 @@ Theodore D. Satterthwaite
 
 ### Collaborators
 
-Brooke L. Sevchik, Golia Shafiei, Kristin Murtha, Juliette B.H. Brook, Lia Brodrick, Kahini Mehta, Sage Rush,
-Matt Cieslak, Steven L. Meisler, Taylor Salo, S. Parker Singleton, Tien T. Tong, Mrugank Salunke, Dani S. Bassett, Monica E. Calkins, Mark A. Elliott, Raquel E. Gur, Ruben C. Gur, Tyler M. Moore, Kosha Ruparel, Russell T. Shinohara, M. Dylan Tisdall, Daniel H. Wolf, David R. Roalf, Theodore D. Satterthwaite
+Brooke L. Sevchik, Golia Shafiei, Kristin Murtha, Sophia Linguiti, Lia Brodrick, Juliette B.H. Brook, Matt Cieslak, Elizabeth Flook, Kahini Mehta, Steven L. Meisler, Kosha Ruparel, Sage Rush, Taylor Salo, S. Parker Singleton, Tien T. Tong, Mrugank Salunke, Dani S. Bassett, Monica E. Calkins, Mark A. Elliott, Raquel E. Gur, Ruben C. Gur, Tyler M. Moore, J. Cobb Scott, Russell T. Shinohara, M. Dylan Tisdall, Daniel H. Wolf, David R. Roalf, Theodore D. Satterthwaite
 
 ### Project Start Date
 
@@ -40,7 +39,7 @@ September 2024
 
 ### Current Project Status
 
-In preparation
+Under review
 
 ### Github repo
 
@@ -56,7 +55,7 @@ In preparation
 
 ### Conference presentations
 
-- Poster to be presented at Flux Congress, September 2025
+- Flux Congress, September 2025
 
 ### Code documentation
 
@@ -94,6 +93,26 @@ Clinical and Demographic Data:
 3. Clean and organize demographic data into usable format. Consult with other members of team to correct any mistakes in original demographic data. Visualize demographic info with bar plots and histograms.
    + `/demographics/demographics_org.Rmd` organizes, summarizes, and plots demographics data, as well as corrects any mistakes in original demographic data. The resulting plots are stored in `/demographics/demographic_figures`
 
+Cognitive Data:
+1. Organize and clean data from CNB. Consult with members of team to resolve any errors or weird formatting. Report missingness.
+2. Use `cognitive/CNB_transformation_script_EF.Rmd` to create a format that is consistent with the National Institute of Mental Health Data Archive and produce separate tsv files for each cognitive task. These resulting files with their corresponding JSON files can be found in the `phenotype` folder [here](https://openneuro.org/datasets/ds007116).
 
+Self-Report Data:
+1. Clean and organize self-report data. Separate self-report csv into separate tsv files for each scale. Consult with original sources and other members of team to learn scoring strategy for each scale.
+2. Score each script.
+   + `self-report` contains all the R Markdown scripts used to score each scale. The resulting tsv files with their corresponding JSON files can be found in the `phenotype` folder [here](https://openneuro.org/datasets/ds007116).
 
+Task Contrast:
+1. Create events.tsv files and corresponding JSON files for each subject/session that did the nback task using log files from Flywheel.
+   + Details about this process and scripts can be found in `curation/05_nback_scoring'.
+2. Run first and second-level GLMs in Nilearn.
+   + Get list of subjects that had nback data and passed QC to use in first-level scripts using `task_contrast/get_nback_subjects.Rmd`
+   + Scripts found in `task_contrast/code`.
+   + Scripts used to run QC checks found in `task_contrast/QC`
+4. Create group figures from second-level results.
+   + Scripts found in `task_contrast/code`.
+   + Output figures found in `task_contrast/results`
+5. Compare 2back>0back results in this dataset with 2back>0back results from the Philadelphia Neurodevelopmental Cohort.
+   + Script found in `task_contrast/compare_EF_PNC`
+   + Scatterplot of comparison found in `task_contrast/results/EF_PNC_scatterplot.pdf`
 
