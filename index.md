@@ -10,7 +10,8 @@ nav_order: 3
 
 ### Project Title
 
-Transdiagnostic Executive Function: An Open, Fully Processed, Longitudinal Data Resource
+Transdiagnostic Executive Function
+A longitudinal data resource to study brain development and transdiagnostic variation in executive function
 
 ### Brief Project Description
 Executive function (EF) is a crucial aspect of human development.
