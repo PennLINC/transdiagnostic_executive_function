@@ -32,7 +32,7 @@ task_label = "nback"
 space_label = "MNI152NLin6Asym"
 
 # Optional: restrict to one subject, e.g. "20238"
-subject_filter = 20238  # or None
+subject_filter = None  # or None
 
 output_tsv = Path(
     "/cbica/projects/executive_function/code/task_contrast/final/nback_condition_tr_counts.tsv"
