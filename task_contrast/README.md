@@ -1,5 +1,7 @@
 The environment used for these scripts is the `nilearn_glm` environment, for which the python requirements can be found in `/python_requirements/nilearn_glm_requirements`
 
+`get_nback_subjects.Rmd` produces the list of subjects that should be initially included in the first-level analysis scripts (i.e., subjects with nback data and that passed our QC).
+
 In the `/code` folder:
 + Call `run_nback_glm_single_subject.py` with `run_nback_glm_first_level.slurm` to run the first-level glm analysis.
 + Call `run_nback_second_level.py` with `run_nback_glm_second_level.slurm` to run the second-level glm analysis (unthresholded group maps).
