@@ -4,7 +4,8 @@ author: "Brooke Sevchik"
 date: "2025-11-19"
 output: html_document
 ---
-Basically, we just want to include subjects with nback data in array.
+Basically, we just want to include subjects with nback data that passed QC in array.
+Subject-level exclusions:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -16,8 +17,7 @@ library(dplyr)
 library(readr)
 ```
 
-
-```{r filter}
+```{r filter subject}
 fmri_data<- read.csv("/Users/bsevchik/Documents/GitHub/transdiagnostic_executive_function/QC/qc_csvs/final_QC_csvs/EF_desc-fMRI_qc.csv")
 
 fmri_data_nback <- fmri_data %>%
@@ -30,5 +30,30 @@ print(unique(fmri_data_nback$participant_id))
 ```
 
 
+Session-level exclusions:
 
+```{r filter session}
+#Main task
+fmri_data<- read.csv("/Users/bsevchik/Documents/GitHub/transdiagnostic_executive_function/QC/qc_csvs/final_QC_csvs/EF_desc-fMRI_qc.csv")
+fmri_data_no_rest<- fmri_data %>%
+  filter(task == 'nback')
 
+fmri_data_nback <- fmri_data_no_rest %>%
+  filter(qc_determination == 'pass')
+
+fmri_data_nback
+n_distinct(fmri_data_nback$participant_id)
+
+#Which sessions were excluded at this stage?
+excluded_from_fmri_data_nback <- fmri_data_no_rest %>%
+  anti_join(
+    fmri_data_nback %>%
+      distinct(participant_id, session_id),
+    by = c("participant_id", "session_id")
+  ) %>%
+  arrange(participant_id, session_id)
+
+excluded_from_fmri_data_nback
+
+```
+Exclude these sessions in first-level GLM script
