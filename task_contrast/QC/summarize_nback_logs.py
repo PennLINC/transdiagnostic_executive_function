@@ -2,12 +2,13 @@
 
 from pathlib import Path
 
-job_id = "15289941"
+job_id = "15478578"
 logs = sorted(Path(".").glob(f"nback_*{job_id}*.out"))
 
 missing_events = []
 excluded_subjects = []
 all_na_response = []
+qc_excluded_sessions = []
 
 for log in logs:
     lines = log.read_text(errors="replace").splitlines()
@@ -28,6 +29,9 @@ for log in logs:
         elif stripped.startswith("Sessions with missing events.tsv"):
             section = "missing"
             continue
+        elif stripped.startswith("Sessions excluded based on task_contrast_exclusions.csv"):
+            section = "qc_excluded"
+            continue
         elif stripped.startswith("Entirely excluded subject"):
             section = "excluded"
             continue
@@ -45,6 +49,9 @@ for log in logs:
 
         elif section == "missing" and stripped.startswith("sub-"):
             missing_events.append((log.name, stripped))
+
+        elif section == "qc_excluded" and stripped.startswith("sub-"):
+            qc_excluded_sessions.append((log.name, stripped))
 
         elif section == "excluded" and stripped.startswith("sub-"):
             excluded_subjects.append((log.name, stripped))
@@ -70,6 +77,15 @@ else:
     print("None")
 
 print("\n===================================")
+print("Sessions that did not pass QC")
+print("===================================")
+if qc_excluded_sessions:
+    for log, item in qc_excluded_sessions:
+        print(f"{log}: {item}")
+else:
+    print("None")
+
+print("\n===================================")
 print("Entirely excluded subjects")
 print("===================================")
 if excluded_subjects:
@@ -77,5 +93,3 @@ if excluded_subjects:
         print(f"{log}: {item}")
 else:
     print("None")
-    
-    
