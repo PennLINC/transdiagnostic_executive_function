@@ -54,6 +54,7 @@ excluded_from_fmri_data_nback <- fmri_data_no_rest %>%
   arrange(participant_id, session_id)
 
 excluded_from_fmri_data_nback
+write.csv(excluded_from_fmri_data_nback, "/Users/bsevchik/Documents/GitHub/transdiagnostic_executive_function/task_contrast/task_contrast_exclusions.csv", row.names = FALSE)
 
 ```
 Exclude these sessions in first-level GLM script

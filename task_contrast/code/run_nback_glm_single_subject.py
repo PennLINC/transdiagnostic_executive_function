@@ -28,6 +28,23 @@ derivatives_folder = (
 )
 deriv_root = Path(derivatives_folder)
 
+exclusions_file = Path(
+    "/cbica/projects/executive_function/code/task_contrast/final/"
+    "task_contrast_exclusions.csv"
+)
+
+exclusions = pd.read_csv(exclusions_file, dtype=str)
+exclusions["participant_id"] = (
+    exclusions["participant_id"].str.replace("^sub-", "", regex=True)
+)
+exclusions["session_id"] = (
+    exclusions["session_id"].str.replace("^ses-", "", regex=True)
+)
+
+csv_excluded_sessions = set(
+    zip(exclusions["participant_id"], exclusions["session_id"])
+)
+
 task_label = "nback"
 space_label = "MNI152NLin6Asym"
 
@@ -50,12 +67,17 @@ bold_files = sorted(deriv_root.glob(bold_pattern))
 usable_sessions = set()
 missing_events_sessions = []
 all_na_response_sessions = []
+csv_excluded_sessions_this_sub = []
 
 for bold_file in bold_files:
     fname = bold_file.name
     ses = get_entity(fname, "ses")
     run = get_entity(fname, "run")
     acq = get_entity(fname, "acq")
+
+    if (sub_id, ses) in csv_excluded_sessions:
+        csv_excluded_sessions_this_sub.append(f"sub-{sub_id}_ses-{ses}")
+        continue
 
     events_pattern = (
         f"sub-{sub_id}/ses-{ses}/func/"
@@ -94,6 +116,13 @@ else:
 print("\nSessions with missing events.tsv:")
 if missing_events_sessions:
     for x in missing_events_sessions:
+        print(f"  {x}")
+else:
+    print("  None")
+
+print("\nSessions excluded based on task_contrast_exclusions.csv:")
+if csv_excluded_sessions_this_sub:
+    for x in sorted(set(csv_excluded_sessions_this_sub)):
         print(f"  {x}")
 else:
     print("  None")
@@ -144,7 +173,7 @@ MODEL_TYPES = ["rtdur", "nortdur"]
 for model_type in MODEL_TYPES:
     out_dir = Path(
         f"/cbica/projects/executive_function/code/task_contrast/final/"
-        f"results_final_3/first-level/nback-{model_type}"
+        f"results_final_3_edited/first-level/nback-{model_type}"
     )
     out_dir.mkdir(parents=True, exist_ok=True)
 
@@ -199,7 +228,7 @@ for model_type in MODEL_TYPES:
     for events in events_list:
         events = events.copy()
 
-        # ---- MINIMAL FIX: drop INSTRUCTION trials ----
+        # ---- drop INSTRUCTION trials ----
         events = events.loc[events["trial_type"] != "INSTRUCTION"].copy()
 
         if "trial_type" in events.columns:
