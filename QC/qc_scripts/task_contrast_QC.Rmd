@@ -1,0 +1,92 @@
+---
+title: "EF_task-contrast_QC"
+author: "Brooke Sevchik"
+date: "2026-05-26"
+output: html_document
+---
+
+Basically, we just want to include subjects with nback data that passed QC in array.
+Subject-level exclusions:
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r load packages, include=FALSE}
+library(tidyverse)
+library(dplyr)
+library(readr)
+```
+
+Create binary QC doc:
+
+```{r QC doc creation}
+#filter for just nback task from fmri QC
+fmri_data<- read.csv("/Users/bsevchik/Documents/GitHub/transdiagnostic_executive_function/QC/qc_csvs/final_QC_csvs/EF_desc-fMRI_qc.csv")
+task_QC_data <- fmri_data %>%
+  filter(task == 'nback')
+
+#get rid of old column names from fMRI doc
+task_QC_data <- subset(task_QC_data, select = -c(median_FD, low_coverage_sum, qc_determination))
+task_QC_data
+
+#list failed QC reasons & subjects/sessions (based on output of summarize_nback_logs.py after running first-level GLM)
+missing_events_failures <- tibble(
+  participant_id = c("20336", "20352", "20691", "20860", "21553", "21713", "20258", "22617"),
+  session_id     = c("1", "2", "2", "1", "1", "1", "1", "2")
+)
+
+response_time_failures <- tibble(
+  participant_id = c("20149", "20842", "20214", "21112", "21161", "22045"),
+  session_id     = c("1", "1", "2", "2", "3", "1")
+)
+
+fmri_qc_failures <- tibble(
+  participant_id = c("22653", "20691", "20916", "20923", "20953", "21112", "21154", "21493"),
+  session_id     = c("1", "1", "1", "1", "2", "1", "2", "1")
+)
+
+#pass/fail based on columns for specific QC reasons
+task_QC_data <- task_QC_data %>%
+  mutate(
+    missing_events_tsv = if_else(
+      paste(participant_id, session_id) %in%
+        paste(missing_events_failures$participant_id, missing_events_failures$session_id),
+      "fail",
+      "pass"
+    ),
+    response_time_all_na = if_else(
+      paste(participant_id, session_id) %in%
+        paste(response_time_failures$participant_id, response_time_failures$session_id),
+      "fail",
+      "pass"
+    ),
+    failed_fmri_QC = if_else(
+      paste(participant_id, session_id) %in%
+        paste(fmri_qc_failures$participant_id, fmri_qc_failures$session_id),
+      "fail",
+      "pass"
+    ),
+    
+    #final QC determination: if any of the specific column reasons fail, qc_determination fails
+     qc_determination = if_else(
+      missing_events_tsv == "fail" |
+        response_time_all_na == "fail" |
+        failed_fmri_QC == "fail",
+      "fail",
+      "pass"
+     )
+  )
+
+#save to GitHub
+write.csv(task_QC_data, "/Users/bsevchik/Documents/GitHub/transdiagnostic_executive_function/QC/qc_csvs/final_QC_csvs/EF_desc-taskcontrast_qc.csv", row.names = FALSE)
+
+```
+
+
+
+
+
+
+
+
