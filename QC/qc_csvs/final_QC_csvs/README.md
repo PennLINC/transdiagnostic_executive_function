@@ -2,3 +2,4 @@
 + `EF_desc-asl_qc.csv` and `EF_desc-asl_qc.json` correspond to recommendations for ASL QC.
 + `EF_desc-diffusion_qc.csv` and `EF_desc-diffusion_qc.json` correspond to recommendations for DWI QC.
 + `EF_desc-fMRI_qc.csv` and `EF_desc-fMRI_qc.json` correspond to recommendations for fMRI QC.
++ `EF_desc-taskcontrast_qc.csv` and `EF_desc-taskcontrast_qc.json` correspond to the sessions that were not included in first and second-level GLMs for task contrast, and the reasons for exclusion.
