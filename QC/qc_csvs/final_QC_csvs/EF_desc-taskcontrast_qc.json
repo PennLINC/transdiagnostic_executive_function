@@ -1,0 +1,61 @@
+{
+    "participant_id": {
+        "LongName": "Participant identifier",
+        "Description": "The participant identifier indicates the participant that was scanned."
+    },
+    "session_id": {
+        "LongName": "Session identifier",
+        "Description": "The session identifier indicates the longitudinal session at which the participant was scanned.",
+        "Levels": {
+            "ses-1": "The first neuroimaging session; all participants went through at least one neuroimaging session",
+            "ses-2": "The second neuroimaging session (not all participants have a second session)",
+            "ses-3": "The third neuroimaging session (not all participants have a third session)"
+        }
+    },
+    "task": {
+        "LongName": "Task",
+        "Description": "Type of scan",
+        "Levels": {
+            "nback": "n-back task scan"
+        }
+    },
+    "run": {
+        "LongName": "Run",
+        "Description": "Run number; note that resting state scans were meant to have 2 runs, and nback scans were meant to have 1 run, but there are cases of an unexpected third run for resting-state scans if the MRI tech decided to re-do a run.",
+        "Levels": {
+            "01": "first run"
+        }
+    },
+    "missing_events_tsv": {
+        "LongName": "List of scans missing events.tsv file",
+        "Description": "Sessions without an events.tsv file were excluded from task contrast GLMs.",
+        "Levels": {
+            "pass": "Scan is included in task fMRI GLMs",
+            "fail": "Scan is excluded from task fMRI GLMs"
+        }
+    },
+    "response_time_all_na": {
+        "LongName": "List of scans where response_time was n/a for every trial",
+        "Description": "Sessions where response_time was n/a for every trial were excluded from task contrast GLMs. This indicates that the subject was not paying attention at all or fell asleep in the scanner.",
+        "Levels": {
+            "pass": "Scan is included in task fMRI GLMs",
+            "fail": "Scan is excluded from task fMRI GLMs"
+        }
+    },
+    "failed_fmri_QC": {
+        "LongName": "List of scans that failed fMRI QC for every trial",
+        "Description": "Sessions that failed fMRI QC earlier were excluded from task contrast GLMs.",
+        "Levels": {
+            "pass": "Scan is included in task fMRI GLMs",
+            "fail": "Scan is excluded from task fMRI GLMs"
+        }
+    },
+    "qc_determination": {
+        "LongName": "QC Determination",
+        "Description": "The final determination of whether r not a scan was excluded from task contrast GLMs.",
+        "Levels": {
+            "Fail": "The scan is excluded. A scan fails if missing_events_tsv, response_time_all_na, or failed_fmri_QC fails.",
+            "Pass": "The scan is included."
+        }
+    }
+}
