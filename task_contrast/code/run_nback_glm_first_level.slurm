@@ -1,7 +1,7 @@
 #!/bin/bash
-#SBATCH --job-name=nback_final_3_edited
-#SBATCH --output=nback_final__3_edited%A_%a.out
-#SBATCH --error=nback_final__3_edited%A_%a.err
+#SBATCH --job-name=nback
+#SBATCH --output=nback%A_%a.out
+#SBATCH --error=nback%A_%a.err
 #SBATCH --array=0-109         #110 subjects
 #SBATCH --time=03:00:00
 #SBATCH --cpus-per-task=4
@@ -42,5 +42,5 @@ echo "SLURM_ARRAY_TASK_ID: $SLURM_ARRAY_TASK_ID"
 # RUN FIRST-LEVEL SCRIPT
 # --------------------------
 
-python /cbica/projects/executive_function/code/task_contrast/final/code/run_nback_glm_single_subject_final_3_edited.py $SUB_ID
+python /cbica/projects/executive_function/code/task_contrast/final/code/run_nback_glm_single_subject.py $SUB_ID
 
