@@ -18,11 +18,32 @@ library(dplyr)
 library(readr)
 ```
 
+```{r filter subject}
+fmri_data<- read.csv("/Users/bsevchik/Documents/GitHub/transdiagnostic_executive_function/QC/qc_csvs/final_QC_csvs/EF_desc-fMRI_qc.csv")
+
+fmri_data_nback <- fmri_data %>%
+  filter(task == 'nback' & qc_determination == 'pass')
+
+fmri_data_nback
+
+subject_list <- unique(fmri_data_nback$participant_id)
+
+print(subject_list)
+
+```
+
+
 Create binary QC doc:
+
+```{r filter out subjects not included in GLM array}
+fmri_data<- read.csv("/Users/bsevchik/Documents/GitHub/transdiagnostic_executive_function/QC/qc_csvs/final_QC_csvs/EF_desc-fMRI_qc.csv")
+fmri_data <- fmri_data %>%
+  filter(participant_id %in% subject_list)
+```
+
 
 ```{r QC doc creation}
 #filter for just nback task from fmri QC
-fmri_data<- read.csv("/Users/bsevchik/Documents/GitHub/transdiagnostic_executive_function/QC/qc_csvs/final_QC_csvs/EF_desc-fMRI_qc.csv")
 task_QC_data <- fmri_data %>%
   filter(task == 'nback')
 
@@ -83,8 +104,17 @@ write.csv(task_QC_data, "/Users/bsevchik/Documents/GitHub/transdiagnostic_execut
 
 ```
 
+Check how many participants in task GLMs
+```{r check how many participants included in GLM}
+pass_counts <- task_QC_data %>%
+  dplyr::filter(qc_determination == "pass") %>%
+  dplyr::summarise(
+    n_pass_sessions = dplyr::n(),
+    n_pass_participants = dplyr::n_distinct(participant_id)
+  )
 
-
+print(pass_counts)
+```
 
 
 
