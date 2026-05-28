@@ -1,0 +1,220 @@
+---
+title: "get_nback_sessions_included"
+author: "Brooke Sevchik"
+date: "2026-05-21"
+output: html_document
+---
+
+---
+title: "subjects_task_contrast"
+author: "Brooke Sevchik"
+date: "2025-11-19"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r load packages, include=FALSE}
+library(tidyverse)
+library(dplyr)
+library(readr)
+library(stringr)
+```
+
+Get list of sessions included in first-level analysis. (has nback data and passed QC)
+```{r filter 1}
+#Main task
+fmri_data<- read.csv("/Users/bsevchik/Documents/GitHub/transdiagnostic_executive_function/QC/qc_csvs/final_QC_csvs/EF_desc-fMRI_qc.csv")
+fmri_data_no_rest<- fmri_data %>%
+  filter(task == 'nback')
+
+fmri_data_nback <- fmri_data_no_rest %>%
+  filter(qc_determination == 'pass')
+
+fmri_data_nback
+n_distinct(fmri_data_nback$participant_id)
+
+#Which sessions were excluded at this stage?
+excluded_from_fmri_data_nback <- fmri_data_no_rest %>%
+  anti_join(
+    fmri_data_nback %>%
+      distinct(participant_id, session_id),
+    by = c("participant_id", "session_id")
+  ) %>%
+  arrange(participant_id, session_id)
+
+excluded_from_fmri_data_nback
+
+```
+Determine how many were affected by error: identify participants who have at least one nback session that passed QC and one that failed. Then retyrn the failed sessions for those participants, since these are the sessions that could have accidentally been included when I passed only subject IDs to the first-level script.
+
+```{r check size of error}
+mixed_qc_participants <- fmri_data_no_rest %>%
+  group_by(participant_id) %>%
+  summarise(
+    n_sessions = n_distinct(session_id),
+    n_pass = n_distinct(session_id[qc_determination == "pass"]),
+    n_fail = n_distinct(session_id[qc_determination != "pass"]),
+    .groups = "drop"
+  ) %>%
+  filter(n_pass > 0, n_fail > 0)
+mixed_qc_participants
+
+potentially_included_but_should_not <- fmri_data_no_rest %>%
+  semi_join(mixed_qc_participants, by = "participant_id") %>%
+  filter(qc_determination != "pass") %>%
+  arrange(participant_id, session_id)
+
+potentially_included_but_should_not
+
+```
+
+
+Filter that list to exclude subjects that didn't pass first-level analysis (all response_times were n/a in events.tsv file, or no events.tsv file)
+
+```{r filter 2}
+fmri_data_nback_filtered <- fmri_data_nback %>%
+  filter(
+    !(
+      (participant_id == 20336 & session_id == 1) |
+      (participant_id == 20352 & session_id == 2) |
+      (participant_id == 20691 & session_id == 2) |
+      (participant_id == 20860 & session_id == 1) |
+      (participant_id == 21553 & session_id == 1) |
+      (participant_id == 21713 & session_id == 1) |
+      (participant_id == 20258 & session_id == 1) |
+      (participant_id == 22617 & session_id == 2) |
+      (participant_id == 20149 & session_id == 1) |
+      (participant_id == 20842 & session_id == 1) |
+      (participant_id == 20214 & session_id == 2) |
+      (participant_id == 21112 & session_id == 2) |
+      (participant_id == 21161 & session_id == 3) |
+      (participant_id == 22045 & session_id == 1)
+    )
+  )
+fmri_data_nback_filtered
+n_distinct(fmri_data_nback_filtered$participant_id)
+
+
+#Which sessions were excluded at this stage?
+excluded_from_fmri_data_nback_filtered <- fmri_data_nback %>%
+  anti_join(
+    fmri_data_nback_filtered %>%
+      distinct(participant_id, session_id),
+    by = c("participant_id", "session_id")
+  ) %>%
+  arrange(participant_id, session_id)
+
+excluded_from_fmri_data_nback_filtered
+```
+
+Check which were the participant ids that were filtered out in second step above.
+```{r check discrepancies}
+ids_original <- fmri_data_nback %>%
+  distinct(participant_id) %>%
+  arrange(participant_id)
+
+ids_filtered <- fmri_data_nback_filtered %>%
+  distinct(participant_id) %>%
+  arrange(participant_id)
+
+anti_join(ids_original, ids_filtered, by = "participant_id")
+
+```
+
+Load in EF_age_info.csv, filter that csv to exclude the session IDs not in fmri_data_nback_filtered
+
+```{r filter age info}
+#load in age info
+EF_age_info <- read_csv("/Users/bsevchik/projects/EF_code/EF_self_report/EF_age_info.csv")
+EF_age_info
+
+#filter
+EF_age_info_filtered <- EF_age_info %>%
+  semi_join(
+    fmri_data_nback_filtered %>%
+      distinct(participant_id, session_id),
+    by = c("participant_id", "session_id")
+  )
+EF_age_info_filtered
+
+#check how many rows filtered
+nrow(EF_age_info)
+nrow(fmri_data_nback_filtered)
+nrow(EF_age_info_filtered)
+```
+
+#BELOW:
+for now just running as if we want data on the 105 participants, but can edit later to do on the 107 participants depending on which route we go
+
+Within-subject average from EF_age_info_filtered --> EF_age_info_filtered_avg (one row per subject)
+```{r within-subject average}
+EF_age_info_subject_avg <- EF_age_info_filtered %>%
+  group_by(participant_id) %>%
+  summarise(
+    age_avg = mean(age, na.rm = TRUE),
+    .groups = "drop"
+  )
+EF_age_info_subject_avg
+```
+
+
+Between-subject mean age, min, and max from EF_age_info_filtered_avg
+```{r between-subject average}
+EF_age_info_subject_avg %>%
+  summarise(
+    mean_age = mean(age_avg, na.rm = TRUE),
+    min_age = min(age_avg, na.rm = TRUE),
+    max_age = max(age_avg, na.rm = TRUE)
+  )
+```
+
+
+From one row per subject EF_age_info_filtered_avg, calculate proportion of male subjects
+Load in demographics info, then filter.
+
+```{r filter demographic info}
+#load in demographic info
+EF_demographic_info <- read_tsv("/Users/bsevchik/Documents/GitHub/transdiagnostic_executive_function/demographics/participants.tsv")
+EF_demographic_info
+
+EF_demographic_info <- EF_demographic_info %>%
+  mutate(
+    participant_id = str_remove(participant_id, "sub-"),
+    participant_id = as.integer(participant_id)
+  )
+EF_demographic_info
+
+#filter
+EF_demographic_info_filtered <- EF_demographic_info %>%
+  semi_join(
+    fmri_data_nback_filtered %>%
+      distinct(participant_id),
+    by = c("participant_id")
+  )
+EF_demographic_info_filtered
+
+#check how many rows filtered
+nrow(EF_demographic_info_filtered) #should be 105
+```
+
+Calculate proportion of males.
+
+```{r male proportion}
+EF_demographic_info_filtered %>%
+  summarise(
+    n_total = n(),
+    n_male = sum(sex == "M", na.rm = TRUE),
+    prop_male = mean(sex == "M", na.rm = TRUE)
+  )
+```
+
+#WAIT UNTIL DONE W FIXES!
+
+Calculate number of rejected subjects: number of rejected from no nback data/did not pass QC, and then number of rejected from no events.tsv or response_time is all n/a
+```{r calculate rejected subjects}
+
+```
+
