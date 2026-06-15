@@ -117,7 +117,6 @@ EF_demographic_info_filtered %>%
   )
 ```
 
-#WAIT UNTIL DONE W FIXES!
 
 Calculate number of rejected subjects: number of rejected from no nback data/did not pass QC, and then number of rejected from no events.tsv or response_time is all n/a
 ```{r calculate rejected subjects}
