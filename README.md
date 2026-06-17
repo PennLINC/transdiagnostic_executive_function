@@ -26,3 +26,4 @@ The data corresponding with this repository can be found on OpenNeuro:
 + The `analysis` folder contains scripts needed to unzip and plot data from processed outputs for visualization. The `neuroimaging_figures` folder contains the PNG and PDF images that resulted from running these scripts.
 + The `task_contrast` folder contains all scripts and outputs from running task contrast analyses using Nilearn.
 + The `python_requirements` folder contains text files containing details about the environments used to run scripts.
++ The `cubic_org` folder contains a README for internal documentation about project organization on the cubic cluster.
