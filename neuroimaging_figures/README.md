@@ -3,3 +3,5 @@
 + `fmriprep_figures` contains the correlation matrices that were then formatted in Adobe Illustrator and used for figure 6 in the manuscript.
 + `reconstructed_tracts` contains the individual white matter tract figures for DWI data that were then formatted in Adobe Illustrator and used for figure 8 in the manuscript.
 + `surface_plots` contains the plotted atlases that were then formatted in Adobe Illustrator and used for figure 5 in the manuscript. It also contains the ALFF and ReHo plots that were then formatted in Adobe Illustrator and used for figure 6 in the manuscript.
++ `illustrator_files` contains the Adobe Illustrator files that were used to take the figures generated from code from the folders above and format into a final, manuscript-ready version of the figures. We did not upload the illustrator file for figure 8, as it is too large.
++ `final_png` contains the final png exports from Adobe Illustrator that were uploaded to the manuscript.
