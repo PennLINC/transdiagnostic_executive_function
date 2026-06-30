@@ -90,6 +90,7 @@
     |- mamba/                             # Environment setup files
     |- matlab/                            # MATLAB setup files
     |- miniforge3/                        # Miniforge installation/environment files
+    |- not_github_or_local/               # Files stored here & not published to github or local for privacy reasons
     |- python_requirements/               # Python requirements files for different environments
 
     |- software/                          # Downloaded software needed for the project
