@@ -20,7 +20,7 @@ library(webshot)
 
 ```{r load in csvs}
 # Load in final clinical diagnosis df (cleaned up from clinical_data_cleaning.Rmd script)
-clinical_diagnosis_df <- read.csv('/Users/bsevchik/projects/EF_clinical/final_clinical_CNB/clinical/UPDATED_clinical_scanned_clean.csv') # local path
+clinical_diagnosis_df <- read.csv('/Users/bsevchik/Documents/research_projects/EF_revisions/UPDATED_clinical_scanned_clean.csv') # local path
 
 ```
 
@@ -99,7 +99,65 @@ summary_df <- summary_df %>%
 print(summary_df)
 #write.csv(summary_df, file = #"/Users/bsevchik/projects/EF_clinical/final_clinical_CNB/clinical/diagnoses_wideform.csv", row.names = FALSE) # local path
 
+
+
 ```
+```{r summarize diagnoses as percent}
+
+# Calculate dx_ percentages within each study group
+# Denominator = total number of participants in that study group
+
+summarize_dx_percent <- function(df, group_name) {
+  # Ensure dx_ columns are numeric
+  dx_data <- df %>%
+    select(all_of(dx_cols)) %>%
+    mutate(across(everything(), ~ as.numeric(as.character(.))))
+  
+  # Sum diagnoses across columns
+  dx_sums <- colSums(dx_data, na.rm = TRUE)
+  
+  # Convert counts to percent of total participants in that group
+  dx_percents <- round(100 * dx_sums / nrow(df), 1)
+  
+  # Return as a row in a data frame
+  data.frame(study_group = group_name, t(dx_percents), check.names = FALSE)
+}
+
+# Apply the function to each study group
+ADHD_percent_summary <- summarize_dx_percent(ADHD_df, "ADHD")
+TDNC_percent_summary <- summarize_dx_percent(TDNC_df, "TD/NC")
+PROCHR_percent_summary <- summarize_dx_percent(PROCHR_df, "PRO/CHR")
+
+# Combine into one summary data frame
+summary_percent_df <- bind_rows(
+  ADHD_percent_summary,
+  TDNC_percent_summary,
+  PROCHR_percent_summary
+)
+
+# Exclude remitted ones from summary_percent_df
+summary_percent_df <- summary_percent_df %>%
+  select(
+    -dx_prodromal_remit,
+    -dx_psychosis_remit,
+    -dx_scz_remit,
+    -dx_moodnos_remit,
+    -dx_mdd_remit,
+    -dx_bp_remit,
+    -dx_adhd_remit,
+    -dx_ptsd_remit,
+    -dx_other_remit
+  )
+
+# View or export the result
+print(summary_percent_df)
+
+```
+
+```
+
+
+
 ```{r distribution}
 # Convert wide to long format
 summary_long <- summary_df %>%
