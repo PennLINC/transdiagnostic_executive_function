@@ -40,7 +40,10 @@ September 2024
 
 ### Current Project Status
 
-Under review
+Completed (July 2026)
+
+### Corresponding Publication
+<https://doi.org/10.1038/s41597-026-08095-1>
 
 ### Github repo
 
